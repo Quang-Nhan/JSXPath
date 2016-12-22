@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Parser/JSXPathParser.js - JSXPath - xpath query language for JSON documents</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="JSXPath - xpath query language for JSON documents" width="117" height="52">JSXPath - xpath query language for JSON documents</h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 1.2.9</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/JSXAxisTokens.html">JSXAxisTokens</a></li>
+                                <li><a href="../classes/JSXOperatorTokens.html">JSXOperatorTokens</a></li>
+                                <li><a href="../classes/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../classes/JSXPathFunctions.html">JSXPathFunctions</a></li>
+                                <li><a href="../classes/JSXProcessor.html">JSXProcessor</a></li>
+                                <li><a href="../classes/JSXReplacer.html">JSXReplacer</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../modules/Parser.html">Parser</a></li>
+                                <li><a href="../modules/Processor.html">Processor</a></li>
+                                <li><a href="../modules/Tokens.html">Tokens</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: Parser/JSXPathParser.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+var JSXParseTokens = require(&quot;../Tokens/JSXParseTokens&quot;);
+var JSXOperatorTokens = require(&quot;../Tokens/JSXOperatorTokens&quot;);
+var JSXReplacer = require(&quot;./JSXReplacer&quot;);
+var JSXDebugConfig = require(&quot;../JSXDebugConfig&quot;);
+var JSXError = require(&quot;../Utils/JSXError&quot;);
+var JSXUtils = require(&quot;../Utils/JSXUtils&quot;);
+
+class JSXPathParser {
+	constructor() {
+		this.DEBUG = JSXDebugConfig.debugOn;
+		this.ParseTokens = new JSXParseTokens();
+		this.Utils = new JSXUtils();
+		this.OperatorTokens = new JSXOperatorTokens();
+		this.Error = new JSXError();
+		this.Replacer = null;
+	}
+
+	parse(psPath, poVariables, poJSONKeys) {
+		this.Error.test(&quot;DefinedAndValidType&quot;, {name: &quot;psPath&quot;, data: psPath, type: typeof psPath, expectedType: &quot;string&quot;, at: &quot;JSXPathParser:parse&quot;})
+		if (!psPath)
+			throw new Error(&quot;Path expression has not being defined.&quot;);
+		if (&quot;string&quot; !== typeof psPath)
+			throw new Error(&quot;Path expression is not of type &#x27;string&#x27;.&quot;);
+		this.Replacer = new JSXReplacer(poVariables, poJSONKeys);
+
+		let sPath = this._normalise(psPath).trim();
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), &quot;JSXPathParser:parse:sPath&quot;, sPath);
+
+		let aParsed = this._transform(sPath);
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), &quot;JSXPathParser:parse:aParsed&quot;, aParsed);
+
+		let aFinalParsed =  this._postParsedProcessing(aParsed); //used to group comma separate expressions
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), &quot;JSXPathParser:parse:aFinalParsed&quot;, aFinalParsed);
+		return aFinalParsed;
+	}
+
+	_normalise(psPath) {
+		let sNormalised = this.Replacer.replace(psPath, &quot;preAutoParenthesis&quot;); //this._replace(psPath);
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), &quot;JSXPathParser:_normalised:replace1&quot;, sNormalised);
+
+		sNormalised = this._autoParenthesis(sNormalised);
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), &quot;JSXPathParser:_normalised:sAutoParenthesized&quot;, sNormalised);
+		
+		sNormalised = this.Replacer.replace(sNormalised, &quot;postAutoParenthesis&quot;);
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), &quot;JSXPathParser:_normalised:replace2&quot;, sNormalised);
+
+		return this._camelCase(sNormalised);
+	}
+
+	/**
+	 * Converts function name and axes name containing dashes to Camel Case if any;
+	 * @param  {string} psInput path expression
+	 * @return {string}         camelcased function name and axes path expressions
+	 */
+	_camelCase(psInput) {
+		let aMinusSplits = psInput.split(/\-(?=[\w|\-]*[\(|\:{2}])/);
+		let sCamelCase = aMinusSplits[0];
+		for (let i = 1; i &lt; aMinusSplits.length; ++i) {
+			//grab the first character and replace with the capitalVersion
+			let sUpper = aMinusSplits[i][0].toUpperCase();
+			let sReplaced = sUpper + aMinusSplits[i].substring(1, aMinusSplits[i].length)
+			sCamelCase += sReplaced;
+		}
+		return sCamelCase;
+	}
+
+	_autoParenthesis(psInput) {
+		var sAutoParen = psInput;
+		const PRECEDENCE = [
+			{ level: 1, regex: /[\~|\÷|\%]/g  }
+			, { level: 2, regex: /(\+|\¬(?!\d+))/g }
+			, { level: 3, regex: /[\&lt;|\&gt;|\≤|\≥]/g } 
+			, { level: 4, regex: /[\=|\≠]/g }
+			, { level: 5, regex: /[\&amp;|\Ø]/g }
+		]
+		var oUpdated = {};
+
+		for (let i = 0; i &lt; PRECEDENCE.length; ++i) {
+			let match;
+			let aMatches = [];
+			while(match = PRECEDENCE[i].regex.exec(sAutoParen)) {
+				aMatches.push(match.index);
+			}
+			for (let j = 0; j &lt; aMatches.length; ++j) {
+				if (this._requireAutoParen(sAutoParen, aMatches[j])) {
+					oUpdated = this._autoParenAt(sAutoParen, aMatches[j]);
+					sAutoParen = oUpdated.autoParen;
+					//update remaining matched positions to reflect the changes to paren string.
+					for (let k = j+1; k &lt; aMatches.length; ++k) {
+						if (oUpdated.left === -1) {
+							break;
+						} else if (oUpdated.left &lt;= aMatches[k] &amp;&amp; aMatches[k] &lt;= oUpdated.right) {
+							aMatches[k]++;
+						} else {
+							aMatches[k] += 2;
+						}
+					}
+				}
+			}
+		}
+
+		return sAutoParen;
+	}
+
+	_requireAutoParen(psInput, pnIndex) {
+		let leftSub, rightSub;
+		let leftSpaceIndex = this.Utils.lastIndexOfString(psInput, [&quot; &quot;], pnIndex - 1);
+		let rightSpaceIndex = this.Utils.nextIndexOfString(psInput, [&quot; &quot;], pnIndex + 2);
+
+		leftSpaceIndex = leftSpaceIndex === -1 ? 0 : leftSpaceIndex;
+		leftSub = psInput.substring(leftSpaceIndex, pnIndex);
+		rightSpaceIndex = rightSpaceIndex === -1 ? psInput.length : rightSpaceIndex;
+		rightSub = psInput.substring(pnIndex, rightSpaceIndex);
+
+		return !(leftSub.indexOf(&quot;(&quot;) &gt; -1 &amp;&amp; rightSub.indexOf(&quot;)&quot;) &gt; -1);
+	}
+
+	_autoParenAt(psInput, pnIndex) {
+		let sAutoParened = psInput;
+		let nLeftScope = this._findInsertPosition(&quot;left&quot;, sAutoParened, pnIndex);
+		let nRightScope = this._findInsertPosition(&quot;right&quot;, sAutoParened, pnIndex);
+
+		nLeftScope = nLeftScope === 0 ? 0 : nLeftScope + 1;
+		sAutoParened = (sAutoParened.substring(0, nLeftScope) + &quot;(&quot; +  sAutoParened.substring(nLeftScope, nRightScope) + &quot;)&quot; + sAutoParened.substring(nRightScope, sAutoParened.length)).trim();
+		
+		return {
+			autoParen: sAutoParened,
+			left: nLeftScope,
+			right: nRightScope
+		}		
+	}
+
+	_findInsertPosition(psDirection, psInput, pnIndex) {
+		let oCounts = {
+			parenCount: 0,
+			brackCount: 0,
+			run: {
+				&quot;]&quot;: (self) =&gt; --self.brackCount,
+				&quot;)&quot;: (self) =&gt; --self.parenCount,
+				&quot;[&quot;: (self) =&gt; ++self.brackCount,
+				&quot;(&quot;: (self) =&gt; ++self.parenCount
+			}
+		}
+
+		return (psDirection === &quot;left&quot;) ? 
+		this._handleLeftHandScope(psInput, pnIndex, oCounts) : 
+		this._handleRightHandScope(psInput, pnIndex, oCounts);
+	}
+
+	_handleLeftHandScope(psInput, pnIndex, poCounts) {
+		let nInsertsAt = -1;
+		let nPointer = pnIndex;
+
+		for (let i = pnIndex; i &gt;= 0; --i) {
+			if ((psInput[i] === &quot;(&quot; &amp;&amp; poCounts.parenCount === 0) ||
+				(psInput[i] === &quot;[&quot; &amp;&amp; poCounts.brackCount === 0) || 
+				(psInput[i] === &quot; &quot; &amp;&amp; i &lt; pnIndex - 1 &amp;&amp; poCounts.brackCount === 0 &amp;&amp; poCounts.parenCount === 0)) {
+				
+				nPointer = i;
+				nInsertsAt = nPointer;
+				break;
+			} else if (poCounts.run[psInput[i]]) {
+				nPointer =  i;
+				poCounts.run[psInput[i]](poCounts);
+				if (poCounts.parenCount === poCounts.brackCount &amp;&amp; poCounts.parenCount === 0) {
+					let sSub, nSubParen, nSubBrack;
+					let nSpace = this.Utils.lastIndexOfString(psInput, [&quot; &quot;], nPointer);
+					
+					nSpace = nSpace === -1 ? 0 : nSpace;
+					sSub = psInput.substring(nSpace, nPointer);
+					nSubParen = sSub.lastIndexOf(&quot;(&quot;);
+					nSubBrack = sSub.lastIndexOf(&quot;[&quot;);
+					
+					if (nSubParen === -1 &amp;&amp; nSubBrack === -1) {
+						nPointer = nSpace;
+					} else if (nSubParen &gt;= nSubBrack) {
+						nPointer = nSpace + nSubParen;
+					} else {
+						nPointer = nSpace + nSubBrack;
+					} 
+					nInsertsAt = nPointer;
+					break;
+				}
+			}
+		}
+
+		if (nPointer === pnIndex) {
+			nInsertsAt = this.Utils.lastIndexOfString(psInput, [&quot; &quot;], nPointer-1);
+			return nInsertsAt === -1 ? 0 : nInsertsAt;
+		}
+
+		return nInsertsAt;
+	}
+
+	_handleRightHandScope(psInput, pnIndex, poCounts) {
+		let nInsertsAt = -1;
+		let nPointer = pnIndex;
+
+		for (let i = pnIndex; i &lt; psInput.length; ++i) {
+			if ((psInput[i] === &quot;)&quot; &amp;&amp; poCounts.parenCount === 0) || 
+				(psInput[i] === &quot;]&quot; &amp;&amp; poCounts.brackCount === 0) ||
+				(psInput[i] === &quot; &quot; &amp;&amp; i &gt; pnIndex + 1 &amp;&amp; poCounts.brackCount === 0 &amp;&amp; poCounts.parenCount === 0)) {
+				
+				nPointer = i;
+				nInsertsAt = nPointer;
+				break;
+			} else if (poCounts.run[psInput[i]]) {
+				nPointer =  i;
+				poCounts.run[psInput[i]](poCounts);
+				if (poCounts.parenCount === poCounts.brackCount &amp;&amp; poCounts.parenCount === 0) {
+					let sSub, nSubParen, nSubBrack;
+					let nSpace = this.Utils.nextIndexOfString(psInput, [&quot; &quot;], nPointer);
+					sSub = psInput.substring(nPointer, nSpace);
+					nSubParen = sSub.indexOf(&quot;)&quot;);
+					nSubBrack = sSub.indexOf(&quot;]&quot;);
+
+					if (nSpace === -1) {
+					} else if (nSubParen === nSubBrack &amp;&amp; nSubParen === -1) {
+						nPointer = nSpace;
+					} else if (nSubParen &lt;= nSubBrack) {
+						nPointer += ++nSubParen;
+					} else {
+						nPointer += ++nSubBrack;
+					}
+					nInsertsAt = nPointer;
+					break;
+				}
+			}
+		}
+
+		if (nPointer === pnIndex) {
+			nInsertsAt = this.Utils.nextIndexOfString(psInput, [&quot; &quot;], nPointer+2);
+			return nInsertsAt === -1 ? psInput.length : nInsertsAt;
+		}
+
+		return nInsertsAt;
+	}
+
+
+	_transform(psPath) {
+		let aParsed = [];
+		let prevIndex = null;
+		for (let i = 0; i &lt; psPath.length; ++i) {
+			if (this.ParseTokens.tokens.hasOwnProperty(psPath[i])) {
+				aParsed = this.ParseTokens.tokens[psPath[i]].apply(this, [aParsed, psPath, i, prevIndex]);
+				prevIndex = i;
+			} else if (i === psPath.length - 1) {
+				aParsed = this.ParseTokens.splitToken(aParsed, psPath, i, prevIndex);
+			}
+		}
+		return aParsed;
+	}
+
+	_postParsedProcessing(paParse) {
+		let nBeg = null;
+		let aRange = [];
+		let self = this;
+
+		for (let i = 0; i &lt; paParse.length; ++i) {
+			let e = paParse[i];
+			if (Array.isArray(e)) {
+				paParse[i] = self._postParsedProcessing(e);
+			} else if (&quot;,&quot; === e) {
+				if (nBeg === null)
+					nBeg = i-1;
+				if ( (i+2) &gt; paParse.length - 1 || Object.keys(this.OperatorTokens.tokens).concat([&quot;,&quot;]).indexOf(paParse[i+2]) === -1 ) {
+					aRange.push({ b: nBeg, e: i+1 });
+					nBeg = null;
+				}
+			}
+		}
+
+		//if an argument consists of operator, group it into an array.
+		//eg [a, &#x27;,&#x27;, b, +, c, &#x27;,&#x27;, d ] =&gt; [&#x27;,&#x27;, a, [b, +, c], d]
+		while (aRange.length &gt; 0) {
+			let range = aRange.pop();
+			let aSplice = paParse.splice(range.b, range.e - range.b+1);
+			let aArgs = [&quot;,&quot;];
+			let group = [];
+			let bNewArg = true;
+			while (aSplice.length &gt; 0) {
+				let e = aSplice.shift();
+				if (&quot;,&quot; === e) {
+					bNewArg = true; 
+				} else {
+					if (bNewArg) {
+						aArgs.push(e); 	
+					} else {
+						let lastArg = aArgs[aArgs.length-1];
+						if (Array.isArray(lastArg)) {
+							lastArg.push(e);
+						} else {
+							aArgs[aArgs.length-1] = [lastArg, e];
+						}
+					}
+					bNewArg = false;
+				}
+			}
+			paParse.splice(range.b, 0 , aArgs);
+		}
+
+		return paParse;
+	}
+}
+
+module.exports = JSXPathParser;
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

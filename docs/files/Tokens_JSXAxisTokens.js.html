@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tokens/JSXAxisTokens.js - JSXPath - xpath query language for JSON documents</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="JSXPath - xpath query language for JSON documents" width="117" height="52">JSXPath - xpath query language for JSON documents</h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 1.2.9</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/JSXAxisTokens.html">JSXAxisTokens</a></li>
+                                <li><a href="../classes/JSXOperatorTokens.html">JSXOperatorTokens</a></li>
+                                <li><a href="../classes/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../classes/JSXPathFunctions.html">JSXPathFunctions</a></li>
+                                <li><a href="../classes/JSXProcessor.html">JSXProcessor</a></li>
+                                <li><a href="../classes/JSXReplacer.html">JSXReplacer</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../modules/Parser.html">Parser</a></li>
+                                <li><a href="../modules/Processor.html">Processor</a></li>
+                                <li><a href="../modules/Tokens.html">Tokens</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: Tokens/JSXAxisTokens.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+var JSXDebugConfig = require(&quot;../JSXDebugConfig&quot;);
+
+/**
+ * JSXPath 
+ *=======
+ * - [Home](../README.html)
+ * - Axis
+ * - [Functions](FUNCTIONS.html)
+ * - [Node Selection](NODESELECTION.html)
+ * - [Operators](OPERATORS.html)
+ *
+ * # Axis
+ * #### [*](#) , [..](#) , [siblings](#) , [descendant](#) , [descendant-or-self](#) , [ancestor](#) , [ancestor-or-self](#) , [//](#) , [self](#) , [parent](#)
+ * Axis expressions are used to navigate around the node tree to retrieve a node set relative to the current node
+ *
+ * @module Tokens
+ * @class JSXAxisTokens
+ * @constructor
+ */
+class JSXAxisTokens {
+	constructor() {
+		this.DEBUG = JSXDebugConfig.debugOn;
+		this.SHOWCONTEXTTOKENS = JSXDebugConfig.showContextTokens;
+		this.tokens = {
+			/**
+			 * ## *
+			 * retrieve the children of the current node
+			 *
+			 * &#x60;&#x60;&#x60;js
+			 * let path = &#x27;&#x27;;
+			 * let result = jsxpath.process(path);
+			 * ----------
+			 * // result =&gt; 
+			 * &#x60;&#x60;&#x60;
+			 * 
+			 * @method *
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			&quot;*&quot;: (poRef, psNode) =&gt; {
+				let result = {};
+				let oChildren = {};
+				let asChildren = poRef[&quot;.&quot;].children;
+				let sParent = poRef[&quot;.&quot;].name;
+				if (0 &lt; asChildren.length) {
+					for (let i = asChildren.length-1; i &gt;= 0; --i) {
+						let c = asChildren[i];
+						let oChild = poRef[c];
+						if (Array.isArray(oChild)) {
+							let thisChildren = [];
+							for (let j = oChild.length-1; j &gt;= 0; --j) {
+								if (sParent === oChild[j].parent) {
+									thisChildren.push(oChild[j]);
+								}
+							}
+							oChildren[c] = thisChildren;
+						} else {
+							oChildren[c] = oChild;
+						}
+					}
+				}
+
+				if (!psNode) {
+					result = oChildren;
+				} else if (oChildren[psNode]) {
+					result = oChildren[psNode];
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:*&quot;, result);
+				return result;
+			  }
+			/**
+			 * ## ..
+			 * retrieves the parent node
+			 * 
+			 * alias: [parent](#)
+			 *
+			 * &#x60;&#x60;&#x60;js
+			 * let path = &#x27;&#x27;;
+			 * let result = jsxpath.process(path);
+			 * ----------
+			 * // result =&gt; 
+			 * &#x60;&#x60;&#x60;
+			 * 
+			 * @function parent
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;..&quot;: (poRef, psNode) =&gt; {
+				let result = {};
+				let parent = {};
+				if (poRef[&quot;.&quot;] === poRef[&quot;@&quot;]) {
+					return parent;
+				}
+				let oCurrent = poRef[poRef[&quot;.&quot;].parent] || [];
+				let sChildName = poRef[&quot;.&quot;].name;
+
+				if (Array.isArray(oCurrent)) {
+					for (let i = 0; i &lt; oCurrent.length; ++i) {
+						if (oCurrent[i].children.indexOf(sChildName) &gt; -1) {
+							oCurrent = oCurrent[i];
+							break;
+						}
+					}
+				} 
+				parent[oCurrent.name] = oCurrent;
+
+				if (psNode &amp;&amp; psNode===oCurrent.name || psNode === &quot;*&quot; || !psNode) {
+					result = parent;
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:..&quot;, result);
+				return result;
+			  }
+			/**
+			* ## siblings
+			 * retrieve all siblings of the current node
+			 * 
+			 * &#x60;&#x60;&#x60;js
+			 * let path = &#x27;&#x27;;
+			 * let result = jsxpath.process(path);
+			 * ----------
+			 * // result =&gt; 
+			 * &#x60;&#x60;&#x60;
+			 * 
+			 * @function siblings
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;siblings&quot;: (poRef, psNode, pfExplode) =&gt; {
+				let result = {};
+				let siblings = {};
+				let self = this;
+				if (poRef[&quot;.&quot;] === poRef[&quot;@&quot;]) {
+					result = siblings;
+				} else {
+					let oCurrent = poRef[poRef[&quot;.&quot;].parent] || [];
+					let sChildName = poRef[&quot;.&quot;].name;
+					let values = [];
+					let nodes = [];
+
+					if (Array.isArray(oCurrent)) {
+						for (let i = 0; i &lt; oCurrent.length; ++i) {
+							if (oCurrent[i].children.indexOf(sChildName) &gt; -1) {
+								oCurrent = oCurrent[i];
+								break;
+							}
+						}
+					}
+					oCurrent.children.forEach((c) =&gt; {
+						if (c !== sChildName) {
+							let p = oCurrent.name;
+							let oNode = poRef[c];
+							if (Array.isArray(oNode)){
+								for (let i = 0; i &lt; oNode.length; ++i) {
+									if (oNode[i].parent = p) {
+										oNode = oNode[i];
+										break;
+									}
+								}
+							}
+							siblings[c] = oNode;
+						}
+					});
+
+					if (!psNode || psNode === &quot;*&quot;) {
+						result = siblings;
+					} else if (siblings[psNode]) {
+						result = siblings[psNode];
+					} 
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:siblings&quot;, result);
+				return result;
+			  }
+			/**
+			 * ## descendant
+			 * retrieves all descendants of current node excluding self
+			 * 
+			 * &#x60;&#x60;&#x60;js
+			 * let path = &#x27;&#x27;;
+			 * let result = jsxpath.process(path);
+			 * ----------
+			 * // result =&gt; 
+			 * &#x60;&#x60;&#x60;
+			 * 
+			 * @function descendant
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;descendant&quot;: (poRef, psNode, pfExplode) =&gt; {
+				let result = {};
+				let oCurrent = poRef[&quot;.&quot;];
+				let descendant = {};
+				if (null !== oCurrent &amp;&amp; &quot;object&quot; === typeof oCurrent.value) {
+					descendant = pfExplode.apply(this, [oCurrent.value]);
+				}
+				if (!psNode || psNode === &quot;*&quot;) {
+					result = descendant; 
+				} else if (descendant[psNode]) {
+					result = descendant[psNode];
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:descendant&quot;, result);
+				return result;
+			  }
+			/**
+			 * ## descendant-or-self
+			 * retrieves all descendants of current node including self
+			 * 
+			 * alias: [//](#)
+			 * 
+			 * &#x60;&#x60;&#x60;js
+			 * let path = &#x27;&#x27;;
+			 * let result = jsxpath.process(path);
+			 * ----------
+			 * // result =&gt; 
+			 * &#x60;&#x60;&#x60;
+			 * 
+			 * @function descendantOrSelf
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;descendantOrSelf&quot;: (poRef, psNode, pfExplode) =&gt; {
+				var result = {};
+				let oCurrent = poRef[&quot;.&quot;];
+				let dos = {};
+				if (null !== oCurrent &amp;&amp; &quot;object&quot; === typeof oCurrent.value)
+					dos = pfExplode(oCurrent.value);
+				dos[oCurrent.name] = oCurrent;
+				// if (psNode &amp;&amp; dos[psNode]) {
+				// 	result = dos[psNode];
+				// }
+
+				if (!psNode || psNode === &#x27;*&#x27;) {
+					result = dos;
+				} else if (dos[psNode]) {
+					result = dos[psNode];
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:descendantOrSelf&quot;, result);
+				return result;
+			  }
+			/**
+			  * ## ancestor
+			 * retrieves all ancestors of current node excluding self
+			 * 
+			 * @function ancestor
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;ancestor&quot;: (poRef, psNode) =&gt; {
+				let result = {};
+				let current = poRef[&quot;.&quot;];
+				let child = null;
+				let parent = null;
+				let ancestors = {};
+
+				do {
+					child = current.name;
+					parent = current.parent;
+
+					if (parent !== null) {
+						current = poRef[parent];
+
+						if (Array.isArray(current)) {
+							for (let i = 0; i &lt; current.length; ++i) {
+								if (current[i].children.indexOf(child) &gt; -1) {
+									current = current[i];
+									break;
+								}
+							} 
+						} 
+						ancestors[current.name] = current;
+					}
+				} while(null !== parent);
+
+				if (!psNode) {
+					result = ancestors;
+				} else if (ancestors[psNode]) {
+					result = ancestors[psNode];
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:ancestor&quot;, result);
+				return result;
+			  }
+			/**
+			 * ## ancestor-or-self
+			 * retrieves the ancestors of current node including self
+			 * 
+			 * @function ancestorOrSelf
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;ancestorOrSelf&quot;: (poRef, psNode) =&gt; {
+				let result = {};
+				let current = poRef[&quot;.&quot;];
+				let child = null;
+				let parent = null;
+				let ancestors = {}
+
+				ancestors[current.name] = current;
+
+				do {
+					child = current.name;
+					parent = current.parent;
+
+					if (parent !== null) {
+						current = poRef[parent];
+
+						if (Array.isArray(current)) {
+							for (let i = 0; i &lt; current.length; ++i) {
+								if (current[i].children.indexOf(child) &gt; -1) {
+									current = current[i];
+									break;
+								}
+							} 
+						} 
+						ancestors[current.name] = current;
+					}
+				} while(null !== parent);
+				
+				if (!psNode || psNode === &quot;*&quot;) {
+					result = ancestors;
+				} else  if (ancestors[psNode]) {
+					result = ancestors[psNode];
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:ancestorOrSelf&quot;, result);
+				return result;
+			  }
+			/**
+			 * ## //
+			 * retrieves the parent node
+			 * alias: [descendant-or-self](#)
+			 * 
+			 * @function //
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;//&quot;: (poRef, psNode, pfExplode) =&gt; {
+				this.tokens[&quot;descendant&quot;](poRef, psNode, pfExplode);
+			  }
+			/**
+			 * ## self
+			 * current node
+			 * alias: [descendant-or-self](#)
+			 * 
+			 * @function self
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;self&quot;: (poRef, psNode) =&gt; {
+				let current = poRef[&quot;.&quot;];
+				let result = {};
+
+				if (!psNode) {
+					result = current;
+				} else {
+					result = this.tokens[&quot;*&quot;](poRef, psNode);
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:self&quot;, result);
+				return result;
+			  }
+			/**
+			 * ## parent
+			 * retrieves the parent node
+			 * alias: [..](#)
+			 * 
+			 * @function parent
+			 * @param  {object} poRef - the exploded input json
+			 * @param  {string} [psNode] - the name of the node
+			 * @return {object} Key Value object
+			 */
+			, &quot;parent&quot;: (poRef, psNode) =&gt; {
+				return this.tokens[&quot;..&quot;](poRef, psNode);
+			  }
+			, &quot;preceding&quot;: (poRef, psNode) =&gt; {
+				//TODO
+				//get the chidlren from parent, sorts in alphabetical order
+				//compose a set nodes before self.
+				
+			  }
+			, &quot;precedingSiblings&quot;: (poRef, psNode) =&gt; {
+				//TODO
+			}
+			, &quot;following&quot;: (poRef, psNode) =&gt; {
+				//TODO
+			  }
+			, &quot;followingSiblings&quot;: (poRef, psNode) =&gt; {
+				//TODO
+				//get the chidlren from parent, sorts in alphabetical order
+				//compose a set nodes after self.
+
+			  }
+			, &quot;position&quot;: (poRef, nPos) =&gt; {
+				//if array returns the index of the object
+				//otherwise returns the index according the the sorted children list
+				let current = poRef[&quot;.&quot;];
+				let result = {};
+				if (nPos &lt; 1)
+					return console.log(&quot;position index:&quot;, nPos, &quot; cannot be less than 1.&quot;);
+				if (current &amp;&amp; current.value &amp;&amp; Array.isArray(current.value)) {
+					if (nPos &gt; current.value.length)
+						return console.log(&quot;position index:&quot;, nPos, &quot; is greater than &quot;, current.value.length);
+					return current.value[nPos-1];
+				}
+				// istanbul ignore next
+				this._outputDebug(&quot;JSXAxisTokens:position&quot;, result);
+			  }
+		};
+	}
+
+	tokens() {
+		return this.tokens;
+	}
+
+	_outputDebug(where) {
+		// istanbul ignore next
+		if (this.DEBUG &amp;&amp; this.SHOWCONTEXTTOKENS) console.log(new Date(), where, JSON.stringify(result));
+	}
+}
+
+module.exports = JSXAxisTokens;
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

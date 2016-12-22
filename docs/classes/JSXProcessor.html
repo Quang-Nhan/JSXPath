@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSXProcessor - JSXPath - xpath query language for JSON documents</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="JSXPath - xpath query language for JSON documents" width="117" height="52">JSXPath - xpath query language for JSON documents</h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 1.2.9</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/JSXAxisTokens.html">JSXAxisTokens</a></li>
+                                <li><a href="../classes/JSXOperatorTokens.html">JSXOperatorTokens</a></li>
+                                <li><a href="../classes/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../classes/JSXPathFunctions.html">JSXPathFunctions</a></li>
+                                <li><a href="../classes/JSXProcessor.html">JSXProcessor</a></li>
+                                <li><a href="../classes/JSXReplacer.html">JSXReplacer</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../modules/Parser.html">Parser</a></li>
+                                <li><a href="../modules/Processor.html">Processor</a></li>
+                                <li><a href="../modules/Tokens.html">Tokens</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>JSXProcessor Class</h1>
+<div class="box meta">
+
+
+        <div class="foundat">
+            Defined in: <a href="../files/Processor_JSXProcessor.js.html#l13"><code>Processor&#x2F;JSXProcessor.js:13</code></a>
+        </div>
+
+            Module: <a href="../modules/Processor.html">Processor</a>
+
+</div>
+
+
+<div class="box intro">
+    
+</div>
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+<div id="method_JSXProcessor" class="method item">
+    <h3 class="name"><code>JSXProcessor</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>poCustomFunctions</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l13"><code>Processor&#x2F;JSXProcessor.js:13</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">poCustomFunctions</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Object containing custom funnctions</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+    </div>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                            <li class="index-item method private">
+                                <a href="#method__processArrayElement">_processArrayElement</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__processCurrentNode">_processCurrentNode</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__processPath">_processPath</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__test">_test</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__type">_type</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_process">process</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+
+        </div>
+
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+<div id="method__processArrayElement" class="method item private">
+    <h3 class="name"><code>_processArrayElement</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>prev</code>
+                </li>
+                <li class="arg">
+                        <code>current</code>
+                </li>
+                <li class="arg">
+                        <code>next</code>
+                </li>
+                <li class="arg">
+                        <code>exploded</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l221"><code>Processor&#x2F;JSXProcessor.js:221</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Process the current element</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">prev</code>
+                        <span class="type">Any</span>
+
+
+                    <div class="param-description">
+                        <p>The previous parsed element</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">current</code>
+                        <span class="type">Any</span>
+
+
+                    <div class="param-description">
+                        <p>The current element</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">next</code>
+                        <span class="type">Any</span>
+
+
+                    <div class="param-description">
+                        <p>The next element to be parsed</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">exploded</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The flattened/exploded json</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The parsed result of the current element.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__processCurrentNode" class="method item private">
+    <h3 class="name"><code>_processCurrentNode</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>pasNodes</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l130"><code>Processor&#x2F;JSXProcessor.js:130</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns the current node after parsing the list of keys that denotes the document path</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">pasNodes</code>
+                        <span class="type">Array<String></span>
+
+
+                    <div class="param-description">
+                        <p>A list of node string denoting the document path</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The current node</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__processPath" class="method item private">
+    <h3 class="name"><code>_processPath</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>paPath</code>
+                </li>
+                <li class="arg">
+                        <code>exploded</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l82"><code>Processor&#x2F;JSXProcessor.js:82</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">paPath</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>Array construct of the path</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">exploded</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Flattened/exploded form of the initial json</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any</span>:
+                    <p>Processed result</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__test" class="method item private">
+    <h3 class="name"><code>_test</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>paPath</code>
+                </li>
+                <li class="arg">
+                        <code>exploded</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l170"><code>Processor&#x2F;JSXProcessor.js:170</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Function to parse a predicates.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">paPath</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>Array construct of the path</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">exploded</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Flattened/exploded form of the initial json</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any</span>:
+                    <p>Processed result</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__type" class="method item private">
+    <h3 class="name"><code>_type</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>pPath</code>
+                </li>
+                <li class="arg">
+                        <code>poRef</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l182"><code>Processor&#x2F;JSXProcessor.js:182</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Function to determine what type of element is in the parsed array.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">pPath</code>
+                        <span class="type">String | Array</span>
+
+
+                    <div class="param-description">
+                        <p>The element of the path array construct.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">poRef</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The exploded json.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>The JSXPath enum type</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_process" class="method item">
+    <h3 class="name"><code>process</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>psPath</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[poJSON]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[poVariables]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Processor_JSXProcessor.js.html#l47"><code>Processor&#x2F;JSXProcessor.js:47</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Main function to process</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">psPath</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The path expression.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[poJSON]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                        <p>The input json object to be traversed against.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[poVariables]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                        <p>An object containing user defined variables.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any</span>:
+                    <p>processed result.</p>
+
+            </div>
+        </div>
+
+
+</div>
+            </div>
+
+
+
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

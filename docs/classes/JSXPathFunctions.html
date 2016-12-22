@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSXPathFunctions - JSXPath - xpath query language for JSON documents</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="JSXPath - xpath query language for JSON documents" width="117" height="52">JSXPath - xpath query language for JSON documents</h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 1.2.9</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/JSXAxisTokens.html">JSXAxisTokens</a></li>
+                                <li><a href="../classes/JSXOperatorTokens.html">JSXOperatorTokens</a></li>
+                                <li><a href="../classes/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../classes/JSXPathFunctions.html">JSXPathFunctions</a></li>
+                                <li><a href="../classes/JSXProcessor.html">JSXProcessor</a></li>
+                                <li><a href="../classes/JSXReplacer.html">JSXReplacer</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/JSXPath.html">JSXPath</a></li>
+                                <li><a href="../modules/Parser.html">Parser</a></li>
+                                <li><a href="../modules/Processor.html">Processor</a></li>
+                                <li><a href="../modules/Tokens.html">Tokens</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>JSXPathFunctions Class</h1>
+<div class="box meta">
+
+
+        <div class="foundat">
+            Defined in: <a href="../files/Tokens_JSXPathFunctions.js.html#l5"><code>Tokens&#x2F;JSXPathFunctions.js:5</code></a>
+        </div>
+
+            Module: <a href="../modules/Tokens.html">Tokens</a>
+
+</div>
+
+
+<div class="box intro">
+    <h1>JSXPath</h1>
+<ul>
+<li><a href="../README.html">Home</a></li>
+<li><a href="AXIS.html">Axis</a></li>
+<li>Functions</li>
+<li><a href="NODESELECTION.html">Node Selection</a></li>
+<li><a href="OPERATORS.html">Operators</a></li>
+</ul>
+<h1>Functions</h1>
+<p><a href="">node</a> ,
+<a href="">nodeValue</a> ,
+<a href="">text</a></p>
+<p>Function expression are used to refine queries or add programming capabilities. JSXPath allows user to add their own custom functions (see TODO)</p>
+<p>The following function examples will use the JSXPath constructor below as the initial setup.</p>
+<h5>constructor</h5>
+<pre class="code prettyprint"><code class="language-js">var js = {
+    int: {
+        a: 1,
+        b: 2
+    },
+    dec: {
+        a: 1.5,
+        b: 1.4
+    }
+    str: {
+        st1: &quot;abc&quot;,
+        st2: &quot;DE&quot;,
+        st3: &quot;efg&quot;,
+        tok: &quot;q,u,a,n,g&quot;,
+        num: &quot;-10&quot;
+    }
+}
+var jsxpath = new JSXPath(js);
+</code></pre>
+
+</div>
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+<div id="method_JSXPathFunctions" class="method item">
+    <h3 class="name"><code>JSXPathFunctions</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l5"><code>Tokens&#x2F;JSXPathFunctions.js:5</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+
+
+
+</div>
+    </div>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                            <li class="index-item method">
+                                <a href="#method_boolean">boolean</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_ceiling">ceiling</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_concat">concat</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_contains">contains</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_count">count</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_floor">floor</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_localName">localName</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_matches">matches</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_name">name</a>
+
+                            </li>
+                            <li class="index-item method deprecated">
+                                <a href="#method_node">node</a>
+
+                                    <span class="flag deprecated">deprecated</span>
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_nodeValue">nodeValue</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_not">not</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_number">number</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_replace">replace</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_round">round</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_string">string</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_stringLength">stringLength</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_substring">substring</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_substringAfter">substringAfter</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_substringBefore">substringBefore</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_sum">sum</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_text">text</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tokenize">tokenize</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_translate">translate</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+
+        </div>
+
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+<div id="method_boolean" class="method item">
+    <h3 class="name"><code>boolean</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l658"><code>Tokens&#x2F;JSXPathFunctions.js:658</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>boolean //TODO code and jasmine</h2>
+<p>Converts the value of a node or primitive value to a boolean. If no argument is given, the value of the current node is converted to a boolean.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'boolean(/notExists)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; false
+</code></pre>
+<pre class="code prettyprint"><code class="language-js">let path = 'boolean(';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type">Array</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_ceiling" class="method item">
+    <h3 class="name"><code>ceiling</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l452"><code>Tokens&#x2F;JSXPathFunctions.js:452</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>ceiling</h2>
+<p>Ceiling a decimal number to it's smallest integer greater than or equal to a given number.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'ceiling(/dec/a)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 2
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one arguments: [0] source number</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>the ceiling integer value</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_concat" class="method item">
+    <h3 class="name"><code>concat</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l162"><code>Tokens&#x2F;JSXPathFunctions.js:162</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>concat</h2>
+<p>combines a set of strings and return the resulting string.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'concat(/str/st1, /str/st2, /str/st3, &quot; ZYW&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; &quot;abcDEfgh ZYW&quot;
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array<String></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the combined string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_contains" class="method item">
+    <h3 class="name"><code>contains</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l132"><code>Tokens&#x2F;JSXPathFunctions.js:132</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>contains</h2>
+<p>validates that the source string contains the search string</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'contains(/str/st2, &quot;E&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; true
+</code></pre>
+<pre class="code prettyprint"><code class="language-js">let path = 'contains(/str/st2, &quot;e&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; false
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array<String></span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>two arguments: [0] source string, [1] search string</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+                    <p>true of the source string contains the search string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_count" class="method item">
+    <h3 class="name"><code>count</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l474"><code>Tokens&#x2F;JSXPathFunctions.js:474</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>count</h2>
+<p>Returns the number of nodes in a node set.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = '';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one arguments: [0] source number</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>the number of nodes</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_floor" class="method item">
+    <h3 class="name"><code>floor</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l430"><code>Tokens&#x2F;JSXPathFunctions.js:430</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>floor</h2>
+<p>Floor a decimal number to it's largest integer less than or equal to a given number.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'floor(/dec/b)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 1
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one arguments: [0] source number</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>the floored integer value</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_localName" class="method item">
+    <h3 class="name"><code>localName</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l570"><code>Tokens&#x2F;JSXPathFunctions.js:570</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>local-name //TODO: jasmine</h2>
+<p>Returns the current node name.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = '/int/*[local-name() = &quot;a&quot;]';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 1
+</code></pre>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the current node name.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_matches" class="method item">
+    <h3 class="name"><code>matches</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l325"><code>Tokens&#x2F;JSXPathFunctions.js:325</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>matches</h2>
+<p>returns true if the source string matches a string/regex pattern.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'matches(/str/st2, &quot;^D&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; true
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>two arguments: [0] source string, [1] pattern string/regex</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+                    <p>a list of matched substring</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_name" class="method item">
+    <h3 class="name"><code>name</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l537"><code>Tokens&#x2F;JSXPathFunctions.js:537</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>name</h2>
+<p>the name of the node or the name of the current node if no argument is passed.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = '';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one arguments: [0] source number</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the name of the node</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_node" class="method item deprecated">
+    <h3 class="name"><code>node</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+        <span class="flag deprecated">deprecated</span>
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l55"><code>Tokens&#x2F;JSXPathFunctions.js:55</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>node //TODO: jasmine</h2>
+<p>retrieve the current node object containing the following properties { name, value, parent, children }</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = '/int/*[node() = ';
+let result = jsxpath.process(path);
+==========
+// result =&gt; { name: &quot;a&quot;, value: 1, parent: &quot;int&quot;, children: [] }
+</code></pre>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>current node object</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_nodeValue" class="method item">
+    <h3 class="name"><code>nodeValue</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any | Array<any></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l74"><code>Tokens&#x2F;JSXPathFunctions.js:74</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>nodeValue //TODO: jasmine</h2>
+<p>retrieves the value/s of nodes. If no nodes are passed in, then the current node value is returned</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = '/int/*[nodeValue() = 1]';
+let result = jsxpath.process(path);
+==========
+// result =&gt; [1]
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type">Array</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any | Array<any></span>:
+                    <p>the value of the current node or an array of node values</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_not" class="method item">
+    <h3 class="name"><code>not</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l702"><code>Tokens&#x2F;JSXPathFunctions.js:702</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>not</h2>
+<p>Negates the boolean value.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'not(/a = /b)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; true
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one arguments: [0] node set or boolean value</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_number" class="method item">
+    <h3 class="name"><code>number</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l598"><code>Tokens&#x2F;JSXPathFunctions.js:598</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>number //TODO: jasmine</h2>
+<p>Converts the value of a node or primitive value to a number. If no arguments is given, the value of the current node is converted to a number if valid.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'number(/str/num)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; -10
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type">Array</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_replace" class="method item">
+    <h3 class="name"><code>replace</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l350"><code>Tokens&#x2F;JSXPathFunctions.js:350</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>replace</h2>
+<p>Replaces substring matching a string/pattern with the replacement string and returns the result.</p>
+<pre class="code prettyprint"><code class="language-js">let path = 'replace(/str/st3, &quot;[\w]g&quot;, &quot;F&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; &quot;eF&quot;
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>three arguments: [0] source string, [1] pattern string/regex, [2] replacement string</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the transformed string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_round" class="method item">
+    <h3 class="name"><code>round</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l401"><code>Tokens&#x2F;JSXPathFunctions.js:401</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>round</h2>
+<p>Round a decimal number to it's nearest integer. If the decimal is greater than or equal to x.5, it will round up otherwise round down</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'round(/dec/a)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 2
+</code></pre>
+<pre class="code prettyprint"><code class="language-js">let path = 'round(/dec/b)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 1
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one arguments: [0] source number</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>the rounded integer value</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_string" class="method item">
+    <h3 class="name"><code>string</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l626"><code>Tokens&#x2F;JSXPathFunctions.js:626</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>string</h2>
+<p>Converts the value of a node or primitive value to a string. If no argument is given, the value of the current node is converted to a string.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'string(/int/b)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; &quot;2&quot;
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type">Array</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_stringLength" class="method item">
+    <h3 class="name"><code>stringLength</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l304"><code>Tokens&#x2F;JSXPathFunctions.js:304</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>string-length</h2>
+<p>returns the length of a given string.</p>
+<pre class="code prettyprint"><code class="language-js">let path = 'string-length(/str/st2)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 2
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>one argument: [0] source string</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>the length of the string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_substring" class="method item">
+    <h3 class="name"><code>substring</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l187"><code>Tokens&#x2F;JSXPathFunctions.js:187</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>substring</h2>
+<p>returns the substring of the source string given the starting index and optional substring length.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'substring(/str/st1, 1)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; bc
+</code></pre>
+<pre class="code prettyprint"><code class="language-js">let path = 'substring(/str/st1, 1, 1)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; b
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>two or three arguments: [0] source string, [1] start index number, [2] substring length number (optional)</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the combined string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_substringAfter" class="method item">
+    <h3 class="name"><code>substringAfter</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l246"><code>Tokens&#x2F;JSXPathFunctions.js:246</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>substring-after</h2>
+<p>returns the substring-after of the source string after the end of the search string.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'substring-after(/str/st3, &quot;f&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; &quot;g&quot;
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>two arguments: [0] source string, [1] search string</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the substring after the end of the search string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_substringBefore" class="method item">
+    <h3 class="name"><code>substringBefore</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l222"><code>Tokens&#x2F;JSXPathFunctions.js:222</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>substring-before</h2>
+<p>returns the substring-before of the source string before the start of the search string.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'substring-before(/str/st3, &quot;f&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; &quot;e&quot;
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>two arguments: [0] source string, [1] search string</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the substring before the start of the search string</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_sum" class="method item">
+    <h3 class="name"><code>sum</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Number</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l493"><code>Tokens&#x2F;JSXPathFunctions.js:493</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>sum //TODO: jasmine</h2>
+<p>Returns the sum of numbers and/or nodes that contains number value.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'sum(/int/a, /int/b)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 3
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type">Array<Number | Object></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Number</span>:
+                    <p>the summation result</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_text" class="method item">
+    <h3 class="name"><code>text</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any | Array<any></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l105"><code>Tokens&#x2F;JSXPathFunctions.js:105</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>text //TODO:jasmine</h2>
+<p>retrieves the string formatted of nodes value/s. If no nodes are passed in, then the current node value text is returned</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = '';
+let result = jsxpath.process(path);
+==========
+// result =&gt; 
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type">Array</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any | Array<any></span>:
+                    <p>the value of the current node or an array of node values</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_tokenize" class="method item">
+    <h3 class="name"><code>tokenize</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Array<String></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l373"><code>Tokens&#x2F;JSXPathFunctions.js:373</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>tokenize</h2>
+<p>Splits the string based on the token pattern specified</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'tokenize(/str/tok, &quot;,&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; [&quot;q&quot;, &quot;u&quot;, &quot;a&quot;, &quot;n&quot;, &quot;g&quot;]
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>two arguments: [0] source string, [1] pattern string/regex</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Array<String></span>:
+                    <p>a list of splitted strings</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_translate" class="method item">
+    <h3 class="name"><code>translate</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/Tokens_JSXPathFunctions.js.html#l270"><code>Tokens&#x2F;JSXPathFunctions.js:270</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <h2>translate //TODO: jasmine</h2>
+<p>returned the tranformed string given a 'from' list of characters to the 'to' list of characters.</p>
+<p><a href="#constructor">constructor</a></p>
+<pre class="code prettyprint"><code class="language-js">let path = 'translate(&quot;abDE EDfg&quot;, &quot;DE&quot;, &quot;de&quot;)';
+let result = jsxpath.process(path);
+==========
+// result =&gt; &quot;abde edfg&quot;
+</code></pre>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>three arguments: [0] source string, [1] from string of characters, [2] to string of characters</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>the translated string</p>
+
+            </div>
+        </div>
+
+
+</div>
+            </div>
+
+
+
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

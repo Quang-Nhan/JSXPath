@@ -1,0 +1,33 @@
+{
+  "name": "jsxpath",
+  "version": "1.0.0-alpha.1",
+  "description": "An Adaptation of XPath notation to query a JSON document.",
+  "main": "src/JSXPath.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "keywords": [
+    "[\"jsxpath\"",
+    "\"JSXPath\"",
+    "\"json\"",
+    "\"xpath\"",
+    "\"js\"",
+    "\"query",
+    "language\"]"
+  ],
+  "author": "Quang Nhan <qn.codyn@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-exec": "^1.0.1",
+    "grunt-jasmine-node-coverage": "^1.1.1"
+  },
+  "homepage": "https://github.com/Quang-Nhan/JSXPath",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quang-Nhan/JSXPath"
+  },
+  "dependencies": {
+    "lodash": "^4.17.2"
+  }
+}

@@ -1,0 +1,2026 @@
+{
+    "project": {
+        "name": "JSXPath - xpath query language for JSON documents",
+        "description": "The Foo API: a library for doing X, Y, and Z",
+        "version": "1.2.9",
+        "url": "http://example.com/"
+    },
+    "files": {
+        "Exploder/JSXPloder.js": {
+            "name": "Exploder/JSXPloder.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "Parser/JSXPathParser.js": {
+            "name": "Parser/JSXPathParser.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "Parser/JSXReplacer.js": {
+            "name": "Parser/JSXReplacer.js",
+            "modules": {
+                "Parser": 1
+            },
+            "classes": {
+                "JSXReplacer": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "Processor/JSXProcessor.js": {
+            "name": "Processor/JSXProcessor.js",
+            "modules": {
+                "Processor": 1
+            },
+            "classes": {
+                "JSXProcessor": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "Tokens/JSXAxisTokens.js": {
+            "name": "Tokens/JSXAxisTokens.js",
+            "modules": {
+                "Tokens": 1
+            },
+            "classes": {
+                "JSXAxisTokens": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "Tokens/JSXOperatorTokens.js": {
+            "name": "Tokens/JSXOperatorTokens.js",
+            "modules": {},
+            "classes": {
+                "JSXOperatorTokens": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "Tokens/JSXPathFunctions.js": {
+            "name": "Tokens/JSXPathFunctions.js",
+            "modules": {},
+            "classes": {
+                "JSXPathFunctions": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "Utils/JSXError.js": {
+            "name": "Utils/JSXError.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "Utils/JSXUtils.js": {
+            "name": "Utils/JSXUtils.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "Utils/JSXValidator.js": {
+            "name": "Utils/JSXValidator.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "JSXPath.js": {
+            "name": "JSXPath.js",
+            "modules": {
+                "JSXPath": 1
+            },
+            "classes": {
+                "JSXPath": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "Parser": {
+            "name": "Parser",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "JSXReplacer": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "Parser/JSXReplacer.js",
+            "line": 10
+        },
+        "Processor": {
+            "name": "Processor",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "JSXProcessor": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "Processor/JSXProcessor.js",
+            "line": 13
+        },
+        "Tokens": {
+            "name": "Tokens",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "JSXAxisTokens": 1,
+                "JSXOperatorTokens": 1,
+                "JSXPathFunctions": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 5,
+            "description": "JSXPath \n=======\n- [Home](../README.html)\n- Axis\n- [Functions](FUNCTIONS.html)\n- [Node Selection](NODESELECTION.html)\n- [Operators](OPERATORS.html)\n\n# Axis\n#### [*](#) , [..](#) , [siblings](#) , [descendant](#) , [descendant-or-self](#) , [ancestor](#) , [ancestor-or-self](#) , [//](#) , [self](#) , [parent](#)\nAxis expressions are used to navigate around the node tree to retrieve a node set relative to the current node",
+            "is_constructor": 1
+        },
+        "JSXPath": {
+            "name": "JSXPath",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "JSXPath": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "JSXPath.js",
+            "line": 4,
+            "description": "JSXPath\n=======\nJSXPath is an adaptation of XPath, a querying language for XML documents, to query JSON document.\nIf you are already familiar with the construct of [XPath], using this should be a simple.\n### TODO list\n[ ] Date Time functions\n[ ] Incorporate Date Time durations into existing operators: -, +, =, != , >, >=, <, <=\n\n## Contents\n- Home\n\t- [Why JSXPath?](#why-jsx-path)\n\t- [Installation](#installation)\n\t- [Differences & Limitations](#differences-amp-limitations)\n\t- [Features](#features)\n\t\t- [Predicate Expressions](#predicate-expressions)\n\t\t- [Variables](#variables)\n\t\t- [Custom Functions](#custom-functions)\n\t\t- [Object Comparison](#object-comparison)\n- [Axis](md/AXIS.html)\n- [Functions](md/FUNCTIONS.html)\n- [Node Selection](md/NODESELECTION.html)\n- [Operators](md/OPERATORS.html)\n\n## Why JSXPath?\nIF you only require a simple retrieval of a value in an object without the need of interrigating it, eg with the json = { a: 1, b: 2}, to get the value of a, then `json.a` is enough. But if you require a more complex conditioning, sure you can write your own functions to handle it, or why not let JSXPath do that?\n\nExample return the value of json.c if the sum of values json.a and json.b is equal to 3;\n```js\nlet js = {a:1, b:2, c: \"pass\"}\n//without JSXPath\nfunction sum(pa, pb) {\nif (!isNumber(pa) || isNumber(pb)) {\n\tthrow new Error(\"an argument is not a number\");\n}\n\treturn pa + pb;\n}\n\nfunction isNumber(num) {\n\treturn !isNaN(num) && isFinite(num);\n}\n\nlet result = sum(js.a, js.b) === 3 ? js.c : null;\n----------\n// result => 'pass'\n\n// with JSXPath\nlet JSXPath = require(\"JSXPath\");\nlet jsxpath = new JSXPath(json);\n\nlet path = '/c[sum(/a, /b) = 3]';\nlet result = jsxpath.process(path);\n----------\n// result => 'pass';\n```\n\n## Installation\n\n## Differences & Limitations\nThere are some notable differences and limiations between xml and json that the query langauge do not support.\n- The '@' symbol is not used in JSXPath expression since JSON only consists of key value pair. '@' in XML denotes an attribute.\n- The axis 'preceding', 'preceding-sibling', 'following', and 'following-sibling' is currently not supported. JSON is a hash map, the keys are not always returned in a particular order. (although future implentations may involve sorting the the node set and returns the relevant siblings and nodes based on this order). \n- The operator token keywords are reserved. This means that the keys in the json cannot contain the following symbols (|,/,+, -, %, *, =, >, <) and spaces (future implemenation may cater for this using quotes to denote a key)\n\n## Features\n\n#### Node Selections, Operators, and Axes\nJSXPath supports most of the expressions found in xpath.\n\n| Node Selection | Operators | Axes \t\t\t\t|\n| -------------- | --------  | ----------------- |\n| key  \t\t\t| &#124; (todo)| self \t\t|\n| . \t \t\t \t| + \t\t| ancestor \t\t\t|\n| .. \t \t\t| - \t\t| ancestor-or-self\t|\n| / \t\t \t \t| * \t\t| child\t\t\t\t|\n| // \t\t\t| div \t\t| descendant \t\t|\n| *\t\t\t\t| = \t\t| descendant-or-self|\n| \t\t\t\t| != \t\t| parent\t\t\t|\n| \t\t\t\t| < \t\t|\t\t\t\t\t|\n| \t\t\t\t| <= \t\t|\t\t\t\t\t|\n| \t\t\t\t| > \t\t|\t\t\t\t\t|\n| \t\t\t\t| >= \t\t|\t\t\t\t\t|\n| \t\t\t\t| or \t\t|\t\t\t\t\t|\n| \t\t\t\t| and \t\t|\t\t\t\t\t|\n| \t\t\t\t| mod \t\t|\t\t\t\t\t|\n\n#### Predicate Expressions\nPredicate expressions are used to filter out node sets based on conditions within '[' ']'.\n```js\nlet JSXPath = require(\"JSXPath\");\n\nlet js = {\n\ttic: 1,\n\ttac: 10,\n\ttoe: 100,\n\tfoo: {\n\t\ttic: 2,\n\t\ttac: 20,\n\t\ttoe: 200\n\t}\n};\nlet path = '/toe[/tic = 1 and /tac > 9]';\n\nlet jsxpath = new JSXPath(js);\nlet result = jsxpath.process(path);\n----------\n// result => 100\n\nlet path = '//tac[.>1]'\nlet result = jsxpath.process(path)\n----------\n// result => [10, 20];\n\nlet path = '/toe[/tac = 3]'\nlet result = jsxpath.process(path);\n----------\n// result => [];\n```\n+ If the predicate expression resolved to be true, and the result is a single value, then that is returned.\n+ If the predicate expression resolved to be true, and the result contains multiple values, then the returned value will be an array of values.\n+ If the predicate expression resolved to false, then the returned result will be an empty array.\n\n#### Variables\nJSXPath supports variables denoted by the '$' sign.\nThe process function accepts a varible object as a second argument.\n```js\nlet JSXPath = require(\"JSXPath\");\n\nlet js = { a: 18 };\nlet path = '/a + $v1 - $v2';\nlet vars = { $v1: 19, $v2: 20 };\n\nlet jsxpath = new JSXPath(js);\nlet result = jsxpath.process(path, vars);\n----------\n// result => 17\n```\n#### Custom Functions\nAlong with predefined JSXPath functions, JSXPath can also support custom functions.\nThe new JSXPath constructor accepts a custom function object as a second argument.\n\n`note` the custom function will overwrite the predefined functions if they both share the same function name.\n```js\nlet JSXPath = require(\"JSXPath\");\nlet customFunctions = {\n    max: (args, validator) => {\n\t\tlet max = validator.validateNumber(args[0], \"max()\", true);\n\t\tfor (let i = 1; i < args.length; i++) {\n\t\t\tlet n = validator.validateNumber(args[i], \"max()\", true);\n\t\t\tif (n > max) {\n\t\t\t  max = n;\n\t\t\t}\n\t\t}\n\t\treturn max;\n    }\n};\nlet js = {\n\ta: 1,\n\tb: 2,\n\tc: 3\n};\n\nlet jsxpath = new JSXPath(js, customFunctions);\nlet path = 'max(/a, /b, /c)';\nlet result = jsxpath.process(path);\n----------\n// result => 3\n```\n*__Note:__ the arguments passed in the function can be a number of values:*\n- a primitive data type (number, string, boolean, undefined, null) value,\n- a node object in the form of {parent:.., name:..., children:[...], value:...},\n- an array or a node that has a value of an array of values. TODO: relook at above and this current point.\n\nJSXPath provides a number of handy validate helper that can check if an argument is a certain dataType. If it is a valid type then it will return the value otherwise returns null. This can be accessed via the second argument in the custom function.\n\n- `validateString( val, caller, throwError )`\n\t- returns the value string if valid otherwise returns null or throw an error if throwError is set to true\n- `validateNumber( val, caller, throwError )`\n\t- returns the number value if valid otherwise returns null or throw an error if throwError is set to true\n- `validateNode( val, caller, throwError )`\n\t- returns the node object if valid otherwise returns null or throw an error if throwError is set to true\n- `validateBoolean( val, caller, throwError )`\n\t- returns the boolean value if valid otherwise returns null or throw an error if throwError is set to true\n- `validateObject( val, caller, throwError )`\n\t- returns the object value if valid otherwise returns null or throw an error if throwError is set to true\n- `isArray( val, caller, throwError )`\n\t- returns the array value if valid otherwise returns null or throw an error if throwError is set to true\n\nThe `val` argument can either be a primitive, array or a node object value. If it's a node object, it will look for and check against val.value in order to determine if it is a valid data type.\n\n#### Object Comparison\nJSXPath has the ability to compare pure JSON objects in the path expression.\n```js\nlet JSXPath = require(\"JSXPath\");\nlet js = {\n\ta: 1,\n\tb: {c: 2}\n};\nlet jsxpath = new JSXPath(js);\nlet path = '/b = {\"c\": 2}';\nlet result = jsxpath.process(path);\n----------\n// result => true\n```\n//or by using varibles to store the object;\n\n```js\nlet vars = { $c: {c:2} };\nlet path = '/b = $c';\nlet result = jsxpath.process(path, vars);\n----------\n// result => true\n```\n*__Note:__  The json expression must be a valid json format. Only equal (=) and not equal (!=) can be used for object comparison."
+        }
+    },
+    "classes": {
+        "JSXReplacer": {
+            "name": "JSXReplacer",
+            "shortname": "JSXReplacer",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Parser",
+            "namespace": "",
+            "file": "Parser/JSXReplacer.js",
+            "line": 10,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "poVariables",
+                    "description": "An object containing the defined variables.",
+                    "type": "Object"
+                },
+                {
+                    "name": "poJSONKeys",
+                    "description": "The list of keys from the input json.",
+                    "type": "Object"
+                }
+            ]
+        },
+        "JSXProcessor": {
+            "name": "JSXProcessor",
+            "shortname": "JSXProcessor",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Processor",
+            "namespace": "",
+            "file": "Processor/JSXProcessor.js",
+            "line": 13,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "poCustomFunctions",
+                    "description": "Object containing custom funnctions",
+                    "type": "Object"
+                }
+            ]
+        },
+        "JSXAxisTokens": {
+            "name": "JSXAxisTokens",
+            "shortname": "JSXAxisTokens",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Tokens",
+            "namespace": "",
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 3,
+            "description": "JSXPath \n=======\n- [Home](../README.html)\n- Axis\n- [Functions](FUNCTIONS.html)\n- [Node Selection](NODESELECTION.html)\n- [Operators](OPERATORS.html)\n\n# Axis\n#### [*](#) , [..](#) , [siblings](#) , [descendant](#) , [descendant-or-self](#) , [ancestor](#) , [ancestor-or-self](#) , [//](#) , [self](#) , [parent](#)\nAxis expressions are used to navigate around the node tree to retrieve a node set relative to the current node"
+        },
+        "JSXOperatorTokens": {
+            "name": "JSXOperatorTokens",
+            "shortname": "JSXOperatorTokens",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Tokens",
+            "namespace": "",
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 4,
+            "description": "JSXPath\n=======\n- [Home](../README.html)\n- [Axis](AXIS.html)\n- [Functions](FUNCTIONS.html)\n- [Node Selection](NODESELECTION.html)\n- Operators\n\n# Operators \n##### [+](#+) , [-](#-2) , [*](#-3) , [div](#div) , [mod](#mod) , [=](#-4) , [!=](#-5) , [>](#gt) , [<](#lt) , [>=](#gt-2) , [<=](#lt-2) , [and](#and) , [or](#or) , [|](#-6)\nOperators are symbols used to perform operation/tests on its left and right values.\n\nThe following operator examples will use the JSXPath constructor below as the initial setup.\n```js\nvar JSXPath = require(\"JSXPath\");\nvar js = {\n\ta: 1,\n\tb: 2,\n\tc: [3, 4]\n};\nvar jsxpath = new JSXPath(js); \n```"
+        },
+        "JSXPathFunctions": {
+            "name": "JSXPathFunctions",
+            "shortname": "JSXPathFunctions",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Tokens",
+            "namespace": "",
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 5,
+            "description": "JSXPath \n=======\n- [Home](../README.html)\n- [Axis](AXIS.html)\n- Functions\n- [Node Selection](NODESELECTION.html)\n- [Operators](OPERATORS.html)\n\n# Functions\n[node]() , \n[nodeValue]() , \n[text]()\n\n\nFunction expression are used to refine queries or add programming capabilities. JSXPath allows user to add their own custom functions (see TODO)\n\nThe following function examples will use the JSXPath constructor below as the initial setup.\n##### constructor\n```js\nvar js = {\n\tint: {\n\t\ta: 1,\n\t\tb: 2\n\t},\n\tdec: {\n\t\ta: 1.5,\n\t\tb: 1.4\n\t}\n\tstr: {\n\t\tst1: \"abc\",\n\t\tst2: \"DE\",\n\t\tst3: \"efg\",\n\t\ttok: \"q,u,a,n,g\",\n\t\tnum: \"-10\"\n\t}\n}\nvar jsxpath = new JSXPath(js);\n```",
+            "is_constructor": 1
+        },
+        "JSXPath": {
+            "name": "JSXPath",
+            "shortname": "JSXPath",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "JSXPath",
+            "namespace": "",
+            "file": "JSXPath.js",
+            "line": 4,
+            "description": "JSXPath\n=======\nJSXPath is an adaptation of XPath, a querying language for XML documents, to query JSON document.\nIf you are already familiar with the construct of [XPath], using this should be a simple.\n### TODO list\n[ ] Date Time functions\n[ ] Incorporate Date Time durations into existing operators: -, +, =, != , >, >=, <, <=\n\n## Contents\n- Home\n\t- [Why JSXPath?](#why-jsx-path)\n\t- [Installation](#installation)\n\t- [Differences & Limitations](#differences-amp-limitations)\n\t- [Features](#features)\n\t\t- [Predicate Expressions](#predicate-expressions)\n\t\t- [Variables](#variables)\n\t\t- [Custom Functions](#custom-functions)\n\t\t- [Object Comparison](#object-comparison)\n- [Axis](md/AXIS.html)\n- [Functions](md/FUNCTIONS.html)\n- [Node Selection](md/NODESELECTION.html)\n- [Operators](md/OPERATORS.html)\n\n## Why JSXPath?\nIF you only require a simple retrieval of a value in an object without the need of interrigating it, eg with the json = { a: 1, b: 2}, to get the value of a, then `json.a` is enough. But if you require a more complex conditioning, sure you can write your own functions to handle it, or why not let JSXPath do that?\n\nExample return the value of json.c if the sum of values json.a and json.b is equal to 3;\n```js\nlet js = {a:1, b:2, c: \"pass\"}\n//without JSXPath\nfunction sum(pa, pb) {\nif (!isNumber(pa) || isNumber(pb)) {\n\tthrow new Error(\"an argument is not a number\");\n}\n\treturn pa + pb;\n}\n\nfunction isNumber(num) {\n\treturn !isNaN(num) && isFinite(num);\n}\n\nlet result = sum(js.a, js.b) === 3 ? js.c : null;\n----------\n// result => 'pass'\n\n// with JSXPath\nlet JSXPath = require(\"JSXPath\");\nlet jsxpath = new JSXPath(json);\n\nlet path = '/c[sum(/a, /b) = 3]';\nlet result = jsxpath.process(path);\n----------\n// result => 'pass';\n```\n\n## Installation\n\n## Differences & Limitations\nThere are some notable differences and limiations between xml and json that the query langauge do not support.\n- The '@' symbol is not used in JSXPath expression since JSON only consists of key value pair. '@' in XML denotes an attribute.\n- The axis 'preceding', 'preceding-sibling', 'following', and 'following-sibling' is currently not supported. JSON is a hash map, the keys are not always returned in a particular order. (although future implentations may involve sorting the the node set and returns the relevant siblings and nodes based on this order). \n- The operator token keywords are reserved. This means that the keys in the json cannot contain the following symbols (|,/,+, -, %, *, =, >, <) and spaces (future implemenation may cater for this using quotes to denote a key)\n\n## Features\n\n#### Node Selections, Operators, and Axes\nJSXPath supports most of the expressions found in xpath.\n\n| Node Selection | Operators | Axes \t\t\t\t|\n| -------------- | --------  | ----------------- |\n| key  \t\t\t| &#124; (todo)| self \t\t|\n| . \t \t\t \t| + \t\t| ancestor \t\t\t|\n| .. \t \t\t| - \t\t| ancestor-or-self\t|\n| / \t\t \t \t| * \t\t| child\t\t\t\t|\n| // \t\t\t| div \t\t| descendant \t\t|\n| *\t\t\t\t| = \t\t| descendant-or-self|\n| \t\t\t\t| != \t\t| parent\t\t\t|\n| \t\t\t\t| < \t\t|\t\t\t\t\t|\n| \t\t\t\t| <= \t\t|\t\t\t\t\t|\n| \t\t\t\t| > \t\t|\t\t\t\t\t|\n| \t\t\t\t| >= \t\t|\t\t\t\t\t|\n| \t\t\t\t| or \t\t|\t\t\t\t\t|\n| \t\t\t\t| and \t\t|\t\t\t\t\t|\n| \t\t\t\t| mod \t\t|\t\t\t\t\t|\n\n#### Predicate Expressions\nPredicate expressions are used to filter out node sets based on conditions within '[' ']'.\n```js\nlet JSXPath = require(\"JSXPath\");\n\nlet js = {\n\ttic: 1,\n\ttac: 10,\n\ttoe: 100,\n\tfoo: {\n\t\ttic: 2,\n\t\ttac: 20,\n\t\ttoe: 200\n\t}\n};\nlet path = '/toe[/tic = 1 and /tac > 9]';\n\nlet jsxpath = new JSXPath(js);\nlet result = jsxpath.process(path);\n----------\n// result => 100\n\nlet path = '//tac[.>1]'\nlet result = jsxpath.process(path)\n----------\n// result => [10, 20];\n\nlet path = '/toe[/tac = 3]'\nlet result = jsxpath.process(path);\n----------\n// result => [];\n```\n+ If the predicate expression resolved to be true, and the result is a single value, then that is returned.\n+ If the predicate expression resolved to be true, and the result contains multiple values, then the returned value will be an array of values.\n+ If the predicate expression resolved to false, then the returned result will be an empty array.\n\n#### Variables\nJSXPath supports variables denoted by the '$' sign.\nThe process function accepts a varible object as a second argument.\n```js\nlet JSXPath = require(\"JSXPath\");\n\nlet js = { a: 18 };\nlet path = '/a + $v1 - $v2';\nlet vars = { $v1: 19, $v2: 20 };\n\nlet jsxpath = new JSXPath(js);\nlet result = jsxpath.process(path, vars);\n----------\n// result => 17\n```\n#### Custom Functions\nAlong with predefined JSXPath functions, JSXPath can also support custom functions.\nThe new JSXPath constructor accepts a custom function object as a second argument.\n\n`note` the custom function will overwrite the predefined functions if they both share the same function name.\n```js\nlet JSXPath = require(\"JSXPath\");\nlet customFunctions = {\n    max: (args, validator) => {\n\t\tlet max = validator.validateNumber(args[0], \"max()\", true);\n\t\tfor (let i = 1; i < args.length; i++) {\n\t\t\tlet n = validator.validateNumber(args[i], \"max()\", true);\n\t\t\tif (n > max) {\n\t\t\t  max = n;\n\t\t\t}\n\t\t}\n\t\treturn max;\n    }\n};\nlet js = {\n\ta: 1,\n\tb: 2,\n\tc: 3\n};\n\nlet jsxpath = new JSXPath(js, customFunctions);\nlet path = 'max(/a, /b, /c)';\nlet result = jsxpath.process(path);\n----------\n// result => 3\n```\n*__Note:__ the arguments passed in the function can be a number of values:*\n- a primitive data type (number, string, boolean, undefined, null) value,\n- a node object in the form of {parent:.., name:..., children:[...], value:...},\n- an array or a node that has a value of an array of values. TODO: relook at above and this current point.\n\nJSXPath provides a number of handy validate helper that can check if an argument is a certain dataType. If it is a valid type then it will return the value otherwise returns null. This can be accessed via the second argument in the custom function.\n\n- `validateString( val, caller, throwError )`\n\t- returns the value string if valid otherwise returns null or throw an error if throwError is set to true\n- `validateNumber( val, caller, throwError )`\n\t- returns the number value if valid otherwise returns null or throw an error if throwError is set to true\n- `validateNode( val, caller, throwError )`\n\t- returns the node object if valid otherwise returns null or throw an error if throwError is set to true\n- `validateBoolean( val, caller, throwError )`\n\t- returns the boolean value if valid otherwise returns null or throw an error if throwError is set to true\n- `validateObject( val, caller, throwError )`\n\t- returns the object value if valid otherwise returns null or throw an error if throwError is set to true\n- `isArray( val, caller, throwError )`\n\t- returns the array value if valid otherwise returns null or throw an error if throwError is set to true\n\nThe `val` argument can either be a primitive, array or a node object value. If it's a node object, it will look for and check against val.value in order to determine if it is a valid data type.\n\n#### Object Comparison\nJSXPath has the ability to compare pure JSON objects in the path expression.\n```js\nlet JSXPath = require(\"JSXPath\");\nlet js = {\n\ta: 1,\n\tb: {c: 2}\n};\nlet jsxpath = new JSXPath(js);\nlet path = '/b = {\"c\": 2}';\nlet result = jsxpath.process(path);\n----------\n// result => true\n```\n//or by using varibles to store the object;\n\n```js\nlet vars = { $c: {c:2} };\nlet path = '/b = $c';\nlet result = jsxpath.process(path, vars);\n----------\n// result => true\n```\n*__Note:__  The json expression must be a valid json format. Only equal (=) and not equal (!=) can be used for object comparison."
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "Exploder/JSXPloder.js",
+            "line": 87,
+            "description": "explode the input json",
+            "params": [
+                {
+                    "name": "poInput",
+                    "description": "the input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "internal] [description",
+                    "description": "",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "Object"
+            },
+            "class": "JSXReplacer"
+        },
+        {
+            "file": "Parser/JSXPathParser.js",
+            "line": 56,
+            "description": "Converts function name and axes name containing dashes to Camel Case if any;",
+            "params": [
+                {
+                    "name": "psInput",
+                    "description": "path expression",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "camelcased function name and axes path expressions",
+                "type": "String"
+            },
+            "class": "JSXReplacer"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 48,
+            "itemtype": "method",
+            "name": "replace",
+            "description": "Performs a series of predefined string replacement of the path expression.",
+            "params": [
+                {
+                    "name": "psPath",
+                    "description": "The path expression.",
+                    "type": "String"
+                },
+                {
+                    "name": "psWhen",
+                    "description": "one of \"preAutoParenthesis|postAutoParenthesis\".",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Transformed psPath.",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 68,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_op1",
+            "description": "Replace function for \">=|<=|>|<|\\||*|=|!=|+|\"",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 89,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_op2",
+            "description": "Replace function for \"and|or|div|mod\" operators.",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 105,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_objectKey",
+            "description": "Replace function for node name expressions in quotes",
+            "params": [
+                {
+                    "name": "poVariables",
+                    "description": "An object containing the defined variables.",
+                    "type": "Object"
+                },
+                {
+                    "name": "poKeys",
+                    "description": "The list of keys from the input json.",
+                    "type": "Object"
+                },
+                {
+                    "name": "Utils",
+                    "description": "Utility function",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 148,
+            "privat": "",
+            "itemtype": "method",
+            "name": "_root",
+            "description": "Replace function for root expression.",
+            "params": [
+                {
+                    "name": "m",
+                    "description": "match",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String]"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 159,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_axis",
+            "description": "Replace function for axis expressions",
+            "params": [
+                {
+                    "name": "poVariables",
+                    "description": "An object containing the defined variables.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 202,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_position",
+            "description": "Replace function for position expression",
+            "params": [
+                {
+                    "name": "Utils",
+                    "description": "Utility function",
+                    "type": "Function"
+                },
+                {
+                    "name": "operatorTokensKeys",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 222,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_descendant",
+            "description": "Replace function for \"//\".",
+            "params": [
+                {
+                    "name": "m1",
+                    "description": "Matches.",
+                    "type": "String"
+                },
+                {
+                    "name": "m2",
+                    "description": "Match.",
+                    "type": "String"
+                },
+                {
+                    "name": "i",
+                    "description": "Index.",
+                    "type": "Number"
+                },
+                {
+                    "name": "o",
+                    "description": "Original string.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 241,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_object",
+            "description": "Replace function for pure object or array expression.",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "One of \"{|[\"",
+                    "type": "String"
+                },
+                {
+                    "name": "variables",
+                    "description": "An object containing the defined variables.",
+                    "type": "Object"
+                },
+                {
+                    "name": "operatorTokenKeys",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Parser/JSXReplacer.js",
+            "line": 265,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_extractor",
+            "description": "Used by _object function",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "One of \"{|[\"",
+                    "type": "String"
+                },
+                {
+                    "name": "variables",
+                    "description": "An object containing the defined variables.",
+                    "type": "Object"
+                },
+                {
+                    "name": "operatorTokensKeys",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXReplacer",
+            "module": "Parser"
+        },
+        {
+            "file": "Processor/JSXProcessor.js",
+            "line": 47,
+            "itemtype": "method",
+            "name": "process",
+            "description": "Main function to process",
+            "params": [
+                {
+                    "name": "psPath",
+                    "description": "The path expression.",
+                    "type": "String"
+                },
+                {
+                    "name": "poJSON",
+                    "description": "The input json object to be traversed against.",
+                    "type": "Object",
+                    "optional": true
+                },
+                {
+                    "name": "poVariables",
+                    "description": "An object containing user defined variables.",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "processed result.",
+                "type": "Any"
+            },
+            "class": "JSXProcessor",
+            "module": "Processor"
+        },
+        {
+            "file": "Processor/JSXProcessor.js",
+            "line": 82,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_processPath",
+            "params": [
+                {
+                    "name": "paPath",
+                    "description": "Array construct of the path",
+                    "type": "Array"
+                },
+                {
+                    "name": "exploded",
+                    "description": "Flattened/exploded form of the initial json",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Processed result",
+                "type": "Any"
+            },
+            "class": "JSXProcessor",
+            "module": "Processor"
+        },
+        {
+            "file": "Processor/JSXProcessor.js",
+            "line": 130,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_processCurrentNode",
+            "description": "Returns the current node after parsing the list of keys that denotes the document path",
+            "params": [
+                {
+                    "name": "pasNodes",
+                    "description": "A list of node string denoting the document path",
+                    "type": "Array<String>"
+                }
+            ],
+            "return": {
+                "description": "The current node",
+                "type": "Object"
+            },
+            "class": "JSXProcessor",
+            "module": "Processor"
+        },
+        {
+            "file": "Processor/JSXProcessor.js",
+            "line": 170,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_test",
+            "description": "Function to parse a predicates.",
+            "params": [
+                {
+                    "name": "paPath",
+                    "description": "Array construct of the path",
+                    "type": "Array"
+                },
+                {
+                    "name": "exploded",
+                    "description": "Flattened/exploded form of the initial json",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Processed result",
+                "type": "Any"
+            },
+            "class": "JSXProcessor",
+            "module": "Processor"
+        },
+        {
+            "file": "Processor/JSXProcessor.js",
+            "line": 182,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_type",
+            "description": "Function to determine what type of element is in the parsed array.",
+            "params": [
+                {
+                    "name": "pPath",
+                    "description": "The element of the path array construct.",
+                    "type": "String|Array"
+                },
+                {
+                    "name": "poRef",
+                    "description": "The exploded json.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The JSXPath enum type",
+                "type": "String"
+            },
+            "class": "JSXProcessor",
+            "module": "Processor"
+        },
+        {
+            "file": "Processor/JSXProcessor.js",
+            "line": 221,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_processArrayElement",
+            "description": "Process the current element",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "The previous parsed element",
+                    "type": "Any"
+                },
+                {
+                    "name": "current",
+                    "description": "The current element",
+                    "type": "Any"
+                },
+                {
+                    "name": "next",
+                    "description": "The next element to be parsed",
+                    "type": "Any"
+                },
+                {
+                    "name": "exploded",
+                    "description": "The flattened/exploded json",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The parsed result of the current element.",
+                "type": "Object"
+            },
+            "class": "JSXProcessor",
+            "module": "Processor"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 25,
+            "description": "## *\nretrieve the children of the current node\n\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n----------\n// result => \n```",
+            "itemtype": "method",
+            "name": "*",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 73,
+            "description": "## ..\nretrieves the parent node\n\nalias: [parent](#)\n\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n----------\n// result => \n```",
+            "itemtype": "method",
+            "name": "parent",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 117,
+            "description": "## siblings\nretrieve all siblings of the current node\n\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n----------\n// result => \n```",
+            "itemtype": "method",
+            "name": "siblings",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 179,
+            "description": "## descendant\nretrieves all descendants of current node excluding self\n\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n----------\n// result => \n```",
+            "itemtype": "method",
+            "name": "descendant",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 211,
+            "description": "## descendant-or-self\nretrieves all descendants of current node including self\n\nalias: [//](#)\n\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n----------\n// result => \n```",
+            "itemtype": "method",
+            "name": "descendantOrSelf",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 249,
+            "description": "## ancestor\nretrieves all ancestors of current node excluding self",
+            "itemtype": "method",
+            "name": "ancestor",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 293,
+            "description": "## ancestor-or-self\nretrieves the ancestors of current node including self",
+            "itemtype": "method",
+            "name": "ancestorOrSelf",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 339,
+            "description": "## //\nretrieves the parent node\nalias: [descendant-or-self](#)",
+            "itemtype": "method",
+            "name": "//",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 352,
+            "description": "## self\ncurrent node\nalias: [descendant-or-self](#)",
+            "itemtype": "method",
+            "name": "self",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXAxisTokens.js",
+            "line": 375,
+            "description": "## parent\nretrieves the parent node\nalias: [..](#)",
+            "itemtype": "method",
+            "name": "parent",
+            "params": [
+                {
+                    "name": "poRef",
+                    "description": "- the exploded input json",
+                    "type": "Object"
+                },
+                {
+                    "name": "psNode",
+                    "description": "- the name of the node",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Key Value object",
+                "type": "Object"
+            },
+            "class": "JSXAxisTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 33,
+            "itemtype": "method",
+            "name": "constructor - Creates operator tokens",
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 41,
+            "description": "## ++\nsummation\n\n```js\nlet path = '9 + /a';\nlet result = jsxpath.process(path);\n----------\n// result => 10\n```",
+            "itemtype": "method",
+            "name": "+",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 76,
+            "description": "## -\nsubtraction\n\n```js\nlet path = '/a - /b';\nlet result = jsxpath.process(path);\n----------\n// result => -1\n```",
+            "itemtype": "method",
+            "name": "¬",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 104,
+            "description": "## *\nmultiply\n\n```js\nlet path = '/c[2] * /b';\nlet result = jsxpath.process(path);\n---------\n// result => 8\n```",
+            "itemtype": "method",
+            "name": "~",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 131,
+            "description": "## div\ndivision\n\n```js\nlet path = '20 div /b';\nlet result = jsxpth.process(path);\n---------\n// result => 10\n```",
+            "itemtype": "method",
+            "name": "÷",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 158,
+            "description": "## mod\nmodulus\n\n```js\nlet path = '1 mod /b';\nlet result = jsxpth.process(path);\n---------\n// result => 1\n```",
+            "itemtype": "method",
+            "name": "%",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 185,
+            "description": "## =\nequality\n\n```js\nlet path = '/a = /b';\nlet result = jsxpath.process(path);\n----------\n// result => false\n```",
+            "itemtype": "method",
+            "name": "=",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 237,
+            "description": "## !=\nnot equal\n\n```js\nlet path = '/a != /b'\nlet result = jsxpath.process(path);\n----------\n// result => true\n```",
+            "itemtype": "method",
+            "name": "≠",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 284,
+            "description": "## >\ngreater than\n\n```js\nlet path = '/a > 1';\nlet result = jaxpath.process(path);\n----------\n// result => false\n```",
+            "itemtype": "method",
+            "name": ">",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 330,
+            "description": "## <\nless than\n\n```js\nlet path = '/a < 1';\nlet result = jsxpath.process(path);\n----------\n// result => false\n```",
+            "itemtype": "method",
+            "name": "<",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 376,
+            "description": "## >=\ngreater than or equal to\n\n```js\nlet path = '/a >= 1';\nlet result = jsxpath.process(path);\n----------\n// result => true\n```",
+            "itemtype": "method",
+            "name": "≥",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 422,
+            "description": "## <=\nless than or equal to\n\n```js\nlet path = '/a <= 1';\nlet result = jsxpath.process(path)\n----------\n// result => true\n```",
+            "itemtype": "method",
+            "name": "≤",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 469,
+            "description": "## and\nlogical and\n\n```js\nlet path = '/a and /b'\nlet result = jsxpath.process(path)\n----------\n// result => [1, 2]\n```",
+            "itemtype": "method",
+            "name": "&",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 497,
+            "description": "## or\nlogical or\n\n```js\nlet path = '/a or /b';\nlet result = jsxpath.process(path);\n----------\n// result => [1]\n```",
+            "itemtype": "method",
+            "name": "Ø",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 525,
+            "description": "## |\nunion\n\n```js\nlet path = '/a|/c';\nlet result = jsxpath.process(path);\n----------\n// result => [1, [3,  4]]\n```",
+            "itemtype": "method",
+            "name": "|",
+            "params": [
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value before `+`",
+                    "type": "Object|number"
+                }
+            ],
+            "return": {
+                "description": "A function that accepts the next parsed value argument",
+                "type": "Function"
+            },
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXOperatorTokens.js",
+            "line": 574,
+            "access": "private",
+            "tagname": "console log events for debugging purposes",
+            "description": "console log events for debugging purposes",
+            "itemtype": "method",
+            "name": "_outputDebug",
+            "params": [
+                {
+                    "name": "mode",
+                    "description": "- one of \"init\" or any",
+                    "type": "String"
+                },
+                {
+                    "name": "where",
+                    "description": "- the calling location",
+                    "type": "String"
+                },
+                {
+                    "name": "prev",
+                    "description": "- the previous parsed value",
+                    "type": "Object|number"
+                },
+                {
+                    "name": "next",
+                    "description": "- the next parsed value",
+                    "type": "Object|number"
+                },
+                {
+                    "name": "result",
+                    "description": "the result of the operation",
+                    "type": "Any"
+                }
+            ],
+            "class": "JSXOperatorTokens",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 55,
+            "description": "## node //TODO: jasmine\nretrieve the current node object containing the following properties { name, value, parent, children }\n\n[constructor](#constructor)\n```js\nlet path = '/int/*[node() = ';\nlet result = jsxpath.process(path);\n==========\n// result => { name: \"a\", value: 1, parent: \"int\", children: [] }\n```",
+            "deprecated": true,
+            "itemtype": "method",
+            "name": "node",
+            "return": {
+                "description": "current node object",
+                "type": "Object"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 74,
+            "description": "## nodeValue //TODO: jasmine\nretrieves the value/s of nodes. If no nodes are passed in, then the current node value is returned\n\n[constructor](#constructor)\n```js\nlet path = '/int/*[nodeValue() = 1]';\nlet result = jsxpath.process(path);\n==========\n// result => [1]\n```",
+            "itemtype": "method",
+            "name": "nodeValue",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "the value of the current node or an array of node values",
+                "type": "Any|Array<any>"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 105,
+            "description": "## text //TODO:jasmine\nretrieves the string formatted of nodes value/s. If no nodes are passed in, then the current node value text is returned\n\n[constructor](#constructor)\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n==========\n// result => \n```",
+            "itemtype": "method",
+            "name": "text",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "the value of the current node or an array of node values",
+                "type": "Any|Array<any>"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 132,
+            "description": "## contains\nvalidates that the source string contains the search string\n\n[constructor](#constructor)\n```js\nlet path = 'contains(/str/st2, \"E\")';\nlet result = jsxpath.process(path);\n==========\n// result => true\n``` \n\n```js\nlet path = 'contains(/str/st2, \"e\")';\nlet result = jsxpath.process(path);\n==========\n// result => false\n```",
+            "itemtype": "method",
+            "name": "contains",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- two arguments: [0] source string, [1] search string",
+                    "type": "Array<String>"
+                }
+            ],
+            "return": {
+                "description": "true of the source string contains the search string",
+                "type": "Boolean"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 162,
+            "description": "## concat\ncombines a set of strings and return the resulting string.\n\n[constructor](#constructor)\n```js\nlet path = 'concat(/str/st1, /str/st2, /str/st3, \" ZYW\")';\nlet result = jsxpath.process(path);\n==========\n// result => \"abcDEfgh ZYW\"\n```",
+            "itemtype": "method",
+            "name": "concat",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array<String>"
+                }
+            ],
+            "return": {
+                "description": "the combined string",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 187,
+            "description": "## substring\nreturns the substring of the source string given the starting index and optional substring length.\n\n[constructor](#constructor)\n```js\nlet path = 'substring(/str/st1, 1)';\nlet result = jsxpath.process(path);\n==========\n// result => bc\n``` \n\n```js\nlet path = 'substring(/str/st1, 1, 1)';\nlet result = jsxpath.process(path);\n==========\n// result => b\n```",
+            "itemtype": "method",
+            "name": "substring",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- two or three arguments: [0] source string, [1] start index number, [2] substring length number (optional)",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the combined string",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 222,
+            "description": "## substring-before\nreturns the substring-before of the source string before the start of the search string.\n\n[constructor](#constructor)\n```js\nlet path = 'substring-before(/str/st3, \"f\")';\nlet result = jsxpath.process(path);\n==========\n// result => \"e\"\n```",
+            "itemtype": "method",
+            "name": "substringBefore",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- two arguments: [0] source string, [1] search string",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the substring before the start of the search string",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 246,
+            "description": "## substring-after\nreturns the substring-after of the source string after the end of the search string.\n\n[constructor](#constructor)\n```js\nlet path = 'substring-after(/str/st3, \"f\")';\nlet result = jsxpath.process(path);\n==========\n// result => \"g\"\n```",
+            "itemtype": "method",
+            "name": "substringAfter",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- two arguments: [0] source string, [1] search string",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the substring after the end of the search string",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 270,
+            "description": "## translate //TODO: jasmine\nreturned the tranformed string given a 'from' list of characters to the 'to' list of characters.\n\n[constructor](#constructor)\n```js\nlet path = 'translate(\"abDE EDfg\", \"DE\", \"de\")';\nlet result = jsxpath.process(path);\n==========\n// result => \"abde edfg\"\n```",
+            "itemtype": "method",
+            "name": "translate",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- three arguments: [0] source string, [1] from string of characters, [2] to string of characters",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the translated string",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 304,
+            "description": "## string-length\nreturns the length of a given string.\n \n```js\nlet path = 'string-length(/str/st2)';\nlet result = jsxpath.process(path);\n==========\n// result => 2\n```",
+            "itemtype": "method",
+            "name": "stringLength",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one argument: [0] source string",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the length of the string",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 325,
+            "description": "## matches\nreturns true if the source string matches a string/regex pattern.\n\n[constructor](#constructor)\n```js\nlet path = 'matches(/str/st2, \"^D\")';\nlet result = jsxpath.process(path);\n==========\n// result => true\n```",
+            "itemtype": "method",
+            "name": "matches",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- two arguments: [0] source string, [1] pattern string/regex",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "a list of matched substring",
+                "type": "Boolean"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 350,
+            "description": "## replace\nReplaces substring matching a string/pattern with the replacement string and returns the result.\n \n```js\nlet path = 'replace(/str/st3, \"[\\w]g\", \"F\")';\nlet result = jsxpath.process(path);\n==========\n// result => \"eF\"\n```",
+            "itemtype": "method",
+            "name": "replace",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- three arguments: [0] source string, [1] pattern string/regex, [2] replacement string",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the transformed string",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 373,
+            "description": "## tokenize\nSplits the string based on the token pattern specified\n\n[constructor](#constructor)\n```js\nlet path = 'tokenize(/str/tok, \",\")';\nlet result = jsxpath.process(path);\n==========\n// result => [\"q\", \"u\", \"a\", \"n\", \"g\"]\n```",
+            "itemtype": "method",
+            "name": "tokenize",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- two arguments: [0] source string, [1] pattern string/regex",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "a list of splitted strings",
+                "type": "Array<String>"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 401,
+            "description": "## round\nRound a decimal number to it's nearest integer. If the decimal is greater than or equal to x.5, it will round up otherwise round down\n\n[constructor](#constructor)\n```js\nlet path = 'round(/dec/a)';\nlet result = jsxpath.process(path);\n==========\n// result => 2\n```\n\n```js\nlet path = 'round(/dec/b)';\nlet result = jsxpath.process(path);\n==========\n// result => 1\n```",
+            "itemtype": "method",
+            "name": "round",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one arguments: [0] source number",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the rounded integer value",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 430,
+            "description": "## floor\nFloor a decimal number to it's largest integer less than or equal to a given number.\n\n[constructor](#constructor)\n```js\nlet path = 'floor(/dec/b)';\nlet result = jsxpath.process(path);\n==========\n// result => 1\n```",
+            "itemtype": "method",
+            "name": "floor",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one arguments: [0] source number",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the floored integer value",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 452,
+            "description": "## ceiling\nCeiling a decimal number to it's smallest integer greater than or equal to a given number.\n\n[constructor](#constructor)\n```js\nlet path = 'ceiling(/dec/a)';\nlet result = jsxpath.process(path);\n==========\n// result => 2\n```",
+            "itemtype": "method",
+            "name": "ceiling",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one arguments: [0] source number",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the ceiling integer value",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 474,
+            "description": "## count\nReturns the number of nodes in a node set.\n\n[constructor](#constructor)\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n==========\n// result => \n```",
+            "itemtype": "method",
+            "name": "count",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one arguments: [0] source number",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the number of nodes",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 493,
+            "description": "## sum //TODO: jasmine\nReturns the sum of numbers and/or nodes that contains number value.\n\n[constructor](#constructor)\n```js\nlet path = 'sum(/int/a, /int/b)';\nlet result = jsxpath.process(path);\n==========\n// result => 3\n```",
+            "itemtype": "method",
+            "name": "sum",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array<Number|Object>",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "the summation result",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 537,
+            "description": "## name\nthe name of the node or the name of the current node if no argument is passed.\n\n[constructor](#constructor)\n```js\nlet path = '';\nlet result = jsxpath.process(path);\n==========\n// result => \n```",
+            "itemtype": "method",
+            "name": "name",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one arguments: [0] source number",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "the name of the node",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 570,
+            "description": "## local-name //TODO: jasmine\nReturns the current node name.\n\n[constructor](#constructor)\n```js\nlet path = '/int/*[local-name() = \"a\"]';\nlet result = jsxpath.process(path);\n==========\n// result => 1\n```",
+            "itemtype": "method",
+            "name": "localName",
+            "return": {
+                "description": "the current node name.",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 598,
+            "description": "## number //TODO: jasmine\nConverts the value of a node or primitive value to a number. If no arguments is given, the value of the current node is converted to a number if valid.\n\n[constructor](#constructor)\n```js\nlet path = 'number(/str/num)';\nlet result = jsxpath.process(path);\n==========\n// result => -10\n```",
+            "itemtype": "method",
+            "name": "number",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 626,
+            "description": "## string\nConverts the value of a node or primitive value to a string. If no argument is given, the value of the current node is converted to a string.\n\n[constructor](#constructor)\n```js\nlet path = 'string(/int/b)';\nlet result = jsxpath.process(path);\n==========\n// result => \"2\"\n```",
+            "itemtype": "method",
+            "name": "string",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 658,
+            "description": "## boolean //TODO code and jasmine\nConverts the value of a node or primitive value to a boolean. If no argument is given, the value of the current node is converted to a boolean.\n\n[constructor](#constructor)\n```js\nlet path = 'boolean(/notExists)';\nlet result = jsxpath.process(path);\n==========\n// result => false\n```\n\n```js\nlet path = 'boolean(';\nlet result = jsxpath.process(path);\n==========\n// result => \n```",
+            "itemtype": "method",
+            "name": "boolean",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Tokens/JSXPathFunctions.js",
+            "line": 702,
+            "description": "## not\nNegates the boolean value.\n\n[constructor](#constructor)\n```js\nlet path = 'not(/a = /b)';\nlet result = jsxpath.process(path);\n==========\n// result => true\n```",
+            "itemtype": "method",
+            "name": "not",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- one arguments: [0] node set or boolean value",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "JSXPathFunctions",
+            "module": "Tokens"
+        },
+        {
+            "file": "Utils/JSXError.js",
+            "line": 49,
+            "description": "Test the param is of a valid type. throw type jsx002 or jsx003 error if not valid.",
+            "params": [
+                {
+                    "name": "poArgs",
+                    "description": "{param, name, type, expectedType, at}",
+                    "type": "Object"
+                }
+            ],
+            "class": "JSXPath",
+            "module": "Tokens"
+        },
+        {
+            "file": "Utils/JSXUtils.js",
+            "line": 6,
+            "description": "_lastIndexOf returns the last index of a given series of stings",
+            "params": [
+                {
+                    "name": "psValue",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "paAvoid",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "pnFromIndex",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": "JSXPath",
+            "module": "Tokens"
+        },
+        {
+            "file": "Utils/JSXValidator.js",
+            "line": 11,
+            "description": "Validate that the input value is a number or a node object that contains a number.\nReturns a subset of nodes that contains number value, or the number if the input is a number.",
+            "params": [
+                {
+                    "name": "val",
+                    "description": "the value to be tested against",
+                    "type": "Any"
+                },
+                {
+                    "name": "caller",
+                    "description": "the name of the caller",
+                    "type": "String"
+                },
+                {
+                    "name": "throwError",
+                    "description": "flag to throw an error or not",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object|number|null"
+            },
+            "class": "JSXPath",
+            "module": "Tokens"
+        },
+        {
+            "file": "JSXPath.js",
+            "line": 233,
+            "description": "process the variable",
+            "params": [
+                {
+                    "name": "psPath",
+                    "description": "- the path to be parsed",
+                    "type": "String"
+                },
+                {
+                    "name": "poVars",
+                    "description": "- the variable object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "an array",
+                "type": "Array"
+            },
+            "class": "JSXPath",
+            "module": "JSXPath"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "unknown tag: privat",
+            "line": " Parser/JSXReplacer.js:148"
+        },
+        {
+            "message": "replacing incorrect tag: params with param",
+            "line": " Processor/JSXProcessor.js:13"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:73"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:117"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:179"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:211"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:249"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:293"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:339"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:352"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXAxisTokens.js:375"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:41"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:76"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:104"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:131"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:158"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:185"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:237"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:284"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:330"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:376"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:422"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:469"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:497"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:525"
+        },
+        {
+            "message": "replacing incorrect tag: function with method",
+            "line": " Tokens/JSXOperatorTokens.js:574"
+        },
+        {
+            "message": "Missing item type\nexplode the input json",
+            "line": " Exploder/JSXPloder.js:87"
+        },
+        {
+            "message": "Missing item type\nConverts function name and axes name containing dashes to Camel Case if any;",
+            "line": " Parser/JSXPathParser.js:56"
+        },
+        {
+            "message": "Missing item type\nTest the param is of a valid type. throw type jsx002 or jsx003 error if not valid.",
+            "line": " Utils/JSXError.js:49"
+        },
+        {
+            "message": "Missing item type\n_lastIndexOf returns the last index of a given series of stings",
+            "line": " Utils/JSXUtils.js:6"
+        },
+        {
+            "message": "Missing item type\nValidate that the input value is a number or a node object that contains a number.\nReturns a subset of nodes that contains number value, or the number if the input is a number.",
+            "line": " Utils/JSXValidator.js:11"
+        },
+        {
+            "message": "Missing item type\nprocess the variable",
+            "line": " JSXPath.js:233"
+        }
+    ]
+}
