@@ -1,5 +1,5 @@
 const JSXDebugConfig =  {
-	debugOn: true,
+	debugOn: false,
 	showExploded: false,
 	showProcessType: true,
 	showParseTokens: false,
