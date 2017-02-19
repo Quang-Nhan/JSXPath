@@ -115,7 +115,7 @@ describe("JSXReplacer", () => {
 
 		it("13 position predicate", () => {
 			let path = "a[1]";
-			let expected = "a[position(1)]";
+			let expected = "a[position(∏, =, 1)]";
 			let mode = "postAutoParenthesis";
 			let result = Replacer.replace(path, mode);
 			expect(result).toBe(expected);
@@ -123,26 +123,26 @@ describe("JSXReplacer", () => {
 
 		it("14 position predicate", () => {
 			let path = "a[position() = 1]";
-			let expected = "a[position(1)]";
+			let expected = "a[position(∏, =, 1)]";
 			let mode = "postAutoParenthesis";
 			let result = Replacer.replace(path, mode);
 			expect(result).toBe(expected);
 		});
 
 		it("15a position predicate", () => {
-			let path = "/a/b[3]/c[position() = 9]";
-			let expected = "@/a/b[3]/c[position() = 9]";
-			let mode = "preAutoParenthesis";
+			let path = "@/a/b[3]/c[position() = 9]";
+			let expected = "@/a/b[position(∏, =, 3)]/c[position(∏, =, 9)]";
+			let mode = "postAutoParenthesis";
 			let result = Replacer.replace(path, mode);
 			expect(result).toBe(expected);
 		});
 
 
 		it("15b position predicate", () => {
-			let path = "@/a/b[3]/c[position() = 9]";
-			let expected = "@/a/b[position(3)]/c[position(9)]";
+			let path = "/a/b[-1]/c[8 <= position()]";
+			let expected = "@/a/b[position(∏, =, -1)]/c[position(8 ,≤, ∏)]";
 			let mode = "postAutoParenthesis";
-			let result = Replacer.replace(path, mode);
+			let result = Replacer.replace(Replacer.replace(path, "preAutoParenthesis"), mode);
 			expect(result).toBe(expected);
 		});
 

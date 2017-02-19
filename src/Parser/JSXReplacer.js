@@ -39,8 +39,8 @@ class JSXReplacer {
 			, { key: "(/", when: "preAutoParenthesis", regex: /\(\//g, with: "(@/" }
 			, { key: "//", when: "postAutoParenthesis", regex: /(^\/{2}|[\s|\|]\/{2}|\/{2})/g, with: this._descendant}
 			, { key: "::", when: "postAutoParenthesis", regex:/(\@?[\/|\w|\d|\-]*:{2}[\w|\*|\$]*(\[.*\])*[\.|\/|\w]*)+/g, with: this._axis(this.variables) }
-			, { key: "position", when: "postAutoParenthesis", regex:/position\(\s*\)\s*\=\s*\d+/g, with: this._position(this.Utils, this.operatorTokensKeys) }
-			, { key: "[", when: "postAutoParenthesis", regex:/\[\s*\d+\s*(?=\])/g, with: this._position(this.Utils, this.operatorTokensKeys) }
+			, { key: "position(", when: "postAutoParenthesis", regex:/(\-?\d+\s?(\+|\÷|\=|\%|\≠|\¬|\-|\>|\<|\≤|\≥)\s?)?(position\(\s*\)){1}(\s?(\+|\÷|\=|\%|\≠|\¬|\-|\>|\<|\≤|\≥)\s?\-?\d+)?/g, with: this._position(this.Utils) }
+			, { key: "[", when: "postAutoParenthesis", regex:/\[\s*\-?\d+\s*(?=\])/g, with: this._position(this.Utils) }
 			, { key: "  ", when: "preAutoParenthesis", regex:/\s{2}/g, with: " " }
 		];
 	}
@@ -113,29 +113,6 @@ class JSXReplacer {
 	 * @return {String}
 	 */
 	_objectKey(poVariables, poKeys, Utils) {
-		// let isInPredicateExpression = (i, o) => {
-		// 	let nBracket = Utils.lastIndexOfString(o, ["[", "]"], i);
-		// 	return nBracket > -1 && o[nBracket] === "[" ? true : false;
-		// };
-
-		// let isInJSONExpression = (m, i, o) => {
-		// 	let sRegex = m + "|{|}";
-		// 	let oRegex = new RegExp(sRegex, "g");
-		// 	let aMatches = o.match(oRegex);
-		// 	let nCount = 0;
-		// 	for (var i = 0; i < aMatches.length; ++i) {
-		// 		if (aMatches[i] === m) {
-		// 			break;
-		// 		} else if (aMatches[i] === "{") {
-		// 			++nCount;
-		// 		} else {
-		// 			--nCount;
-		// 		}
-		// 	}
-
-		// 	return nCount !== 0 ? true : false;
-		// }
-
 		return (m, m1, m2, i, o) => {
 			let sSub = o.substring(i+1, i+m.length-1);
 			if (poKeys.indexOf(sSub) > -1) {
@@ -154,7 +131,7 @@ class JSXReplacer {
 	 * @return {String]}
 	 */
 	_root(m) {
-		return m[0] + " @/"; 
+		return m[0] + " @/";
 	}
 	/**
 	 * @private
@@ -205,18 +182,48 @@ class JSXReplacer {
 	 * @method _position
 	 * @description Replace function for position expression
 	 * @param  {Function} Utils Utility function
-	 * @param  {Array} operatorTokensKeys
 	 * @return {String}
 	 */
-	_position(Utils, operatorTokensKeys) {
-		return (m, i, o) => {
-			let nBeg = m.includes("position") ? Utils.lastIndexOfString(m, [" ", "="], m.length) : 1;
-			let nEnd = m.length;
-			let sPosIndex = m.substring(nBeg, nEnd).trim();
-			let sPos = "position(" + sPosIndex + ")";
-			let aKeys = operatorTokensKeys;
-			aKeys.push(" ");
-			return m[0] === "[" ? m[0] + sPos : sPos;
+	_position(Utils) {
+		return (m, a, b, c, d, e, i, o) => {
+			if (!i) i = a;
+			if (!o) o = b;
+			let bIndexOnly = m.includes("position") ? false : true;
+			let result = "";
+
+			if (bIndexOnly) { // eg a[12]
+				let digitMatch = m.match(/\-?\d+/);
+				result = "[position(∏, =, " + digitMatch[0] + ")";
+			} else { // eg a[position() > 12]
+				let nBeg, nEnd, sParamString;
+				// check if equality tokens on the left?
+				let aTokens = [">", "<", "≥", "≤", "=", "≠", "+", "~", "÷", "¬"];
+				let nPosIndex = m.indexOf("position") + i;
+				let nEqualityIndex = Utils.lastIndexOfString(o, aTokens.concat(["[", "("]), nPosIndex);
+				let nTokenIndex = aTokens.indexOf(o[nEqualityIndex]);
+
+				if (nEqualityIndex > -1 && nTokenIndex > -1) { // position is on the right of the expression
+					// find the index of the beginning of the left hand bracket;
+					nBeg = Utils.lastIndexOfString(o, ["(", "["], nEqualityIndex);
+					sParamString = o.substring(nBeg + 1, nEqualityIndex + 1).replace(aTokens[nTokenIndex], "," + aTokens[nTokenIndex]) + ", ∏";
+
+				} else { 
+					nEqualityIndex = Utils.nextIndexOfString(o, aTokens.concat(["]", ")"]), nPosIndex + "position()".length);
+					nTokenIndex = aTokens.indexOf(o[nEqualityIndex])
+					if (nEqualityIndex > -1 && nTokenIndex > -1) {
+						//position is on the left of the expression
+						nBeg = Utils.nextIndexOfString(o, aTokens.concat(["]", ")"]), nPosIndex + "position()".length);
+						nEnd = Utils.nextIndexOfString(o, [")", "]"], nBeg);
+						sParamString = "∏, " + o.substring(nEqualityIndex, nEnd).replace(aTokens[nTokenIndex], aTokens[nTokenIndex] + ",")
+					} else {
+						// TODO: just position() to get the current node position.
+					}
+				}
+
+				result = "position(" + sParamString.trim() + ")";
+			}
+
+			return result;
 		}
 	}
 	/**
@@ -232,7 +239,7 @@ class JSXReplacer {
 	 */
 	_descendant(m1, m2,  i, o) {
 		if (m1[0] === "/" && (o[i-1] === "(" || i === 0)) {
-			return "@/descendant::"
+			return "@/descendant::";
 		} else if (m1[0] === " ") {
 			return " @/descendant::";
 		}

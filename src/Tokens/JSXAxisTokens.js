@@ -20,7 +20,7 @@ var JSXDebugConfig = require("../JSXDebugConfig");
 class JSXAxisTokens {
 	constructor() {
 		this.DEBUG = JSXDebugConfig.debugOn;
-		this.SHOWCONTEXTTOKENS = JSXDebugConfig.showContextTokens;
+		this.SHOWAXISTOKENS = JSXDebugConfig.showAxisTokens;
 		this.tokens = {
 			/**
 			 * ## *
@@ -403,21 +403,6 @@ class JSXAxisTokens {
 				//compose a set nodes after self.
 
 			  }
-			, "position": (poRef, nPos) => {
-				//if array returns the index of the object
-				//otherwise returns the index according the the sorted children list
-				let current = poRef["."];
-				let result = {};
-				if (nPos < 1)
-					return console.log("position index:", nPos, " cannot be less than 1.");
-				if (current && current.value && Array.isArray(current.value)) {
-					if (nPos > current.value.length)
-						return console.log("position index:", nPos, " is greater than ", current.value.length);
-					return current.value[nPos-1];
-				}
-				// istanbul ignore next
-				this._outputDebug("JSXAxisTokens:position", result);
-			  }
 		};
 	}
 
@@ -425,9 +410,9 @@ class JSXAxisTokens {
 		return this.tokens;
 	}
 
-	_outputDebug(where) {
+	_outputDebug(where, result) {
 		// istanbul ignore next
-		if (this.DEBUG && this.SHOWCONTEXTTOKENS) console.log(new Date(), where, JSON.stringify(result));
+		if (this.DEBUG && this.SHOWAXISTOKENS) console.log(new Date(), where, JSON.stringify(result));
 	}
 }
 

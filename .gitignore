@@ -6,3 +6,7 @@ README.html
 md/*.html
 node_modules/
 coverage/
+*.gliffy
+docs/
+src/*.sublime*
+test.html

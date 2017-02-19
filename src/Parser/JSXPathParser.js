@@ -29,7 +29,7 @@ class JSXPathParser {
 
 		let aParsed = this._transform(sPath);
 		/* istanbul ignore if */
-		if (this.DEBUG) console.log(new Date(), "JSXPathParser:parse:aParsed", aParsed);
+		if (this.DEBUG) console.log(new Date(), "JSXPathParser:parse:aParsed", JSON.stringify(aParsed));
 
 		let aFinalParsed =  this._postParsedProcessing(aParsed); //used to group comma separate expressions
 		/* istanbul ignore if */
@@ -59,12 +59,12 @@ class JSXPathParser {
 	 * @return {string}         camelcased function name and axes path expressions
 	 */
 	_camelCase(psInput) {
-		let aMinusSplits = psInput.split(/\-(?=[\w|\-]*[\(|\:{2}])/);
+		let aMinusSplits = psInput.split(/\-(?=[\w|\-]+[\(|\:{2}])/);
 		let sCamelCase = aMinusSplits[0];
 		for (let i = 1; i < aMinusSplits.length; ++i) {
 			//grab the first character and replace with the capitalVersion
 			let sUpper = aMinusSplits[i][0].toUpperCase();
-			let sReplaced = sUpper + aMinusSplits[i].substring(1, aMinusSplits[i].length)
+			let sReplaced = sUpper + aMinusSplits[i].substring(1, aMinusSplits[i].length);
 			sCamelCase += sReplaced;
 		}
 		return sCamelCase;
