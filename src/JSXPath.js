@@ -45,7 +45,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * let result = sum(js.a, js.b) === 3 ? js.c : null;
  * ----------
- * // result => 'pass'
+ * // result => ['pass']
  *
  * // with JSXPath
  * let JSXPath = require("JSXPath");
@@ -56,7 +56,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 	console.log("Result => ", result)
  * });
  * ----------
- * // result => 'pass';
+ * // result => ['pass'];
  * ```
  *
  * ## Installation
@@ -74,7 +74,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * | Node Selection | Operators | Axes 				|
  * | -------------- | --------  | ----------------- |
- * | key  			| &#124; (todo)| self 		|
+ * | key  			| &#124; 	| self 				|
  * | . 	 		 	| + 		| ancestor 			|
  * | .. 	 		| - 		| ancestor-or-self	|
  * | / 		 	 	| * 		| child				|
@@ -111,7 +111,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 	console.log("Result => ", result)
  * });
  * ----------
- * // result => 100
+ * // result => [100]
  *
  * let path = '//tac[.>1]'
  * let result = jsxpath.process({path: path}, (err, result) => {
@@ -127,9 +127,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * ----------
  * // result => [];
  * ```
- * + If the predicate expression resolved to be true, and the result is a single value, then that is returned.
- * + If the predicate expression resolved to be true, and the result contains multiple values, then the returned value will be an array of values.
- * + If the predicate expression resolved to false, then the returned result will be an empty array.
+ * 
  *
  * #### Variables
  * JSXPath supports variables denoted by the '$' sign.
@@ -144,7 +142,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * let jsxpath = new JSXPath(js);
  * let result = jsxpath.process(path, vars);
  * ----------
- * // result => 17
+ * // result => [17]
  * ```
  * #### Custom Functions
  * Along with predefined JSXPath functions, JSXPath can also support custom functions.
@@ -177,7 +175,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 	console.log("Result => ", result)
  * });
  * ----------
- * // result => 3
+ * // result => [3]
  * ```
  * *__Note:__ the arguments passed in the function can be a number of values:*
  * - a primitive data type (number, string, boolean, undefined, null) value,
@@ -215,7 +213,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 	console.log("Result => ", result)
  * });
  * ----------
- * // result => true
+ * // result => [true]
  * ```
  * //or by using varibles to store the object;
  * 
@@ -224,7 +222,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * let path = '/b = $c';
  * let result = jsxpath.process(path, vars);
  * ----------
- * // result => true
+ * // result => [true]
  * ```
  * *__Note:__  The json expression must be a valid json format. Only equal (=) and not equal (!=) can be used for object comparison.
  *
@@ -301,12 +299,23 @@ class JSXPath {
 				// console.log("result", this.result);
 				// console.log(this.result.map(e => e.value));
 				
-				return this.result.map(e => {
+				this.result = this.result.map(e => {
 					return typeof e === "object" && (!isNaN(e.value) || e.value) ? e.value : e;
 				});
-			} else {
-				return this.result;
-			}
+
+				if (Array.isArray(this.result)) {
+					console.log("evalue")
+					this.result = this.result.map(e => {
+						console.log(e)
+						return e.value
+					});
+				} else {
+
+				}
+
+			} 
+			
+			return this.result;
 
 			// if (!this.result) {
 			// 	return [];

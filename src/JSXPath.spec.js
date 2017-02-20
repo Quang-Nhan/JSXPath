@@ -291,18 +291,18 @@ describe("JSXPath", () => {
 			expect(result).toEqual(expected);
 		});
 
-		fit("position 4", () => {
+		it("should return all children object of a since the evaluation returns true.", () => {
 			let jsxpath = new JSXPath(js);
-			let expected = [{ b: 3, k: 20 }];
+			let expected = [[{b: 1}, {b : {c: 9}}, {d: 'd'}, { b: 3, k: 20 }]];
 			let path = '/a[b = 3 and d="d"]';
 			let result = jsxpath.process({ path: path });
 			expect(result).toEqual(expected);
 		});
 
-		it("position 5", () => {
+		fit("should return an array of b nodes values whose parent is a", () => {
 			let jsxpath = new JSXPath(js);
-			let expected = { b: 2 };
-			let path = '/a/b[contains("abc", "c")]';
+			let expected = [1, {c: 9}, 3];
+			let path = '/a/b';
 			let result = jsxpath.process({ path: path });
 			expect(result).toEqual(expected);
 		});

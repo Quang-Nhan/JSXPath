@@ -243,6 +243,10 @@ class JSXOperatorTokens {
 						result = _.isEqual(prevValue, nextValue);
 					}
 
+					if (Array.isArray(result) && ((prev && prev.value) || (next && next.value))) {
+						result = result.length ? true : false;
+					}
+
 					// istanbul ignore next
 					this._outputDebug("result", "JSXOperatorTokens:=", prevValue, nextValue, result);
 					return result;
