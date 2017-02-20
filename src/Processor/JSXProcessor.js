@@ -74,11 +74,14 @@ class JSXProcessor {
 		/* istanbul ignore if */
 		if (this.DEBUG) console.log(new Date(), "JSXProcessor:this.parsedPath", JSON.stringify(this.parsedPath));
 
-
 		this.ErrorHandler.test("Defined", { data: this.path, name: "this.path", at: "JSXProcessor.process" });
 		this.ErrorHandler.test("Defined", { data: this.json, name: "this.json", at: "JSXProcessor.process" });
 
-		return this._processPath(this.parsedPath, this.exploded);
+		let result = this._processPath(this.parsedPath, this.exploded);
+		if (!Array.isArray(result)) {
+			result = !result ? [] : [result];
+		}
+		return result;
 	}
 	/**
 	 * @private
@@ -118,7 +121,6 @@ class JSXProcessor {
 					aArg.push(result);
 					this.Exploder.resetCurrentContext();
 				}
-
 			}
 		}
 
@@ -161,12 +163,14 @@ class JSXProcessor {
 				case "": 
 					break;
 				default:
+					console.log(pasNodes[i]);
 					if (this.variables.hasOwnProperty(pasNodes[i])) {
 						pasNodes[i] = this.variables[pasNodes[i]];
 					}
 					this.Exploder.setCurrentToChildNode(pasNodes[i]);
 			}
 		}
+		console.log("_processCurrentNode", this.Exploder.current())
 		return this.Exploder.current();
 	}
 	/**
@@ -180,6 +184,18 @@ class JSXProcessor {
 	 */
 	_tests(paPath, exploded) {
 		let result =  this._processPath(paPath, exploded);
+		let currentContext = this.Exploder.contextList();
+		console.log("______tests", result, currentContext)
+		if (Array.isArray(result)) {
+			if (result.every((e) => { 
+				return currentContext[currentContext.length-1].name === e.name || currentContext[currentContext.length-1].name === e.parent }
+				)) {
+				return result;
+			} else {
+				return true;
+			}
+		}
+		
 		return result;
 	}
 	/**

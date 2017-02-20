@@ -1,5 +1,5 @@
 var JSXProcessor = require("./Processor/JSXProcessor");
-const DEBUG = require("./JSXDebugConfig").debugOn;
+var DEBUG = require("./JSXDebugConfig").debugOn;
 
 /**
  * JSXPath
@@ -52,7 +52,9 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * let jsxpath = new JSXPath(json);
  *
  * let path = '/c[sum(/a, /b) = 3]';
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
  * // result => 'pass';
  * ```
@@ -105,17 +107,23 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * let path = '/toe[/tic = 1 and /tac > 9]';
  * 
  * let jsxpath = new JSXPath(js);
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
  * // result => 100
  *
  * let path = '//tac[.>1]'
- * let result = jsxpath.process(path)
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * })
  * ----------
  * // result => [10, 20];
  *
  * let path = '/toe[/tac = 3]'
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
  * // result => [];
  * ```
@@ -165,7 +173,9 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * let jsxpath = new JSXPath(js, customFunctions);
  * let path = 'max(/a, /b, /c)';
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
  * // result => 3
  * ```
@@ -201,7 +211,9 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * };
  * let jsxpath = new JSXPath(js);
  * let path = '/b = {"c": 2}';
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
  * // result => true
  * ```
@@ -219,84 +231,129 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * @module JSXPath
  * @class JSXPath 
+ * @constructor
+ * @param {Object} poSource
+ * @param {Object} poCustomFunctions
  * 
  */
 class JSXPath {
-	constructor(poJSON, poCustomFunctions) {
+	constructor(poSource, poCustomFunctions) {
 		this.processor = new JSXProcessor(poCustomFunctions);
-		this.json = poJSON || {};
+		this.source = poSource || {};
 		this.variables = null;
 		this.result = null;
+		this.path = null;
 		this.history = [];
 	}
 
 	/**
-	 * 
+	 * { path, source }
 	 * 
 	 * process the variable
 	 * @param  {string} psPath - the path to be parsed
-	 * @param  {object} poVars - the variable object
+	 * @param  {object} this.variables - the variable object
 	 * @return {array}        an array
 	 */
-	process(psPath, poVars) {
-		this.variables = poVars;
+	process(poParam) {
+		let param = (poParam && typeof poParam === "object" && !Array.isArray(poParam)) && poParam;
+		let path = (param && param.path) || this.path;
+		let mode = (param && path.mode) || "value" // can be value || node
+
+		if (!param) {
+			throw new Error("param is not defined");
+		}
+		if (!path) {
+			throw new Error("path is not defined.")
+		}
+		if (!this.source && ((param && !param.source) || (!param))) {
+			throw new Error("Source JSON is not defined.")
+		}
+		if (param.source) {
+			this.source = param.source;
+		}
+
+		this.path = path;
+		this.variables = poParam.variables;
+
 		// istanbul ignore if 
 		if (DEBUG) {
-			console.log(new Date(), "JSXPath:psPath", psPath);
-			console.log(new Date(), "JSXPath:poVars", poVars);
+			console.log(new Date(), "JSXPath:this.path", this.path);
+			console.log(new Date(), "JSXPath:this.variables", this.variables);
 		}
 		try {
-			this.result = this.processor.process(psPath, this.json, poVars);
+			this.result = this.processor.process(this.path, this.source, this.variables);
 			this.history.push({
 				at: new Date(),
 				node: this.result,
-				path: psPath,
-				variables: poVars && poVars || null
+				path: path,
+				variables: this.variables
 			});
+			console.log("final Result", this.result);			
 
 			// istanbul ignore if 
 			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
-			
+
 			if (!this.result) {
 				return [];
-			} else if (this.result !== {}) {
-				if (Array.isArray(this.result) && this.result[0] && this.result[0].name) {
-					this.result.sort((nodeA, nodeB) => {
-						if (nodeA.name === nodeB.name)
-							return nodeA.parent > nodeB.parent;
-						else 
-							return nodeA.name > nodeB.name;
-					});
-					var result = [];
-					for (let i = 0; i < this.result.length; ++i) {
-						result.push(this.result[i].value);
-					}
-					return result;
-				} else if (Array.isArray(this.result.value) && this.result.value.length && this.result.value[0].name) {
-					var result = [];
-					for (let i = 0; i < this.result.value.length; ++i) {
-						result.push(this.result.value[i].value);
-					}
-					return result;
-				}
-					
-				return (typeof this.result === "object" && this.result.hasOwnProperty("value")) ? this.result.value : this.result;
-			} else {
-				return [];
 			}
+
+			if (mode === "value") {
+				// console.log("result", this.result);
+				// console.log(this.result.map(e => e.value));
+				
+				return this.result.map(e => {
+					return typeof e === "object" && (!isNaN(e.value) || e.value) ? e.value : e;
+				});
+			} else {
+				return this.result;
+			}
+
+			// if (!this.result) {
+			// 	return [];
+			// } else if (this.result !== {}) {
+			// 	if (Array.isArray(this.result) && this.result[0] && this.result[0].name) {
+			// 		this.result.sort((nodeA, nodeB) => {
+			// 			if (nodeA.name === nodeB.name)
+			// 				return nodeA.parent > nodeB.parent;
+			// 			else 
+			// 				return nodeA.name > nodeB.name;
+			// 		});
+			// 		var result = [];
+			// 		for (let i = 0; i < this.result.length; ++i) {
+			// 			result.push(this.result[i].value);
+			// 		}
+			// 		this.result = result;
+			// 		// return result;
+			// 	} else if (Array.isArray(this.result.value) && this.result.value.length && this.result.value[0].name) {
+			// 		var result = [];
+			// 		for (let i = 0; i < this.result.value.length; ++i) {
+			// 			result.push(this.result.value[i].value);
+			// 		}
+			// 		this.result = result;
+			// 		// return result;
+			// 	}
+			// 	// return (typeof this.result === "object" && this.result.hasOwnProperty("value")) ? this.result.value : this.result;
+			// 	this.result = (typeof this.result === "object" && this.result.hasOwnProperty("value")) ? this.result.value : this.result;
+			// } else {
+			// 	this.result = [];
+			// 	// return [];
+			// }
+			// this.processor.reset();
+			return this.result;
 		} catch(e) {
 			this.history.push({
 				at: new Date(),
 				err: e,
-				path: psPath,
-				variables: poVars && poVars || null
+				path: path,
+				variables: this.variables && this.variables || null
 			});
-			console.error(this.history);
+			// console.error(this.history);
+			return null;
 		}
 	}
 
 	clearHistory() {
-		this.history.lenght = 0;
+		this.history.length = 0;
 	}
 
 	getLastHistory() {

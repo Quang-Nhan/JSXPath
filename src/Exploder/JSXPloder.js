@@ -8,6 +8,7 @@ class JSXPloder {
 		this.currentContexts = []; //stores current array before 
 		this.DEBUG = JSXDebugConfig.debugOn;
 		this.SHOW_EXPLODE = JSXDebugConfig.showExplode;
+		this.SHOW_CONTEXT = JSXDebugConfig.showContext;
 	}
 
 	contextList() {
@@ -32,7 +33,7 @@ class JSXPloder {
 		} else if (Object.keys(this.ContextTokens.tokens["*"](this.json)).indexOf(psName) > -1) {
 			this.updateCurrent({ 
 				name: psName, 
-				parent: this.json["."].name 
+				parent: this.json["."].name
 			});
 		} else {
 			if (this.DEBUG && this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:setCurrentToChildNode: creating error node", psName);
@@ -52,6 +53,7 @@ class JSXPloder {
 
 	addCurrentContext() {
 		this.currentContexts.push(Object.assign( {}, this.json["."]));
+		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:addCurrentContext:", this.contextList());
 	}
 
 	resetCurrentContext() {
@@ -74,6 +76,7 @@ class JSXPloder {
 			name: popped.name, 
 			parent: popped.parent
 		});
+		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:removeCurrentContext:", this.contextList());
 	}
 
 	createErrorNode() {
@@ -130,7 +133,7 @@ class JSXPloder {
 			this._updateCurrentToNodes(poParam.values);
 		}
 
-		if (this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:updateCurrent: this.json[\".\"]", this.json["."]);	
+		if (this.DEBUG && this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:updateCurrent: this.json[\".\"]", this.json["."], "poParam", poParam);	
 	}
 
 	_updateCurrentToNode(psName, psParent) {
@@ -144,7 +147,7 @@ class JSXPloder {
 				}
 			}
 			if (result.length > 1) {
-				this._updateCurrentToNodes(this.json[psName]);
+				this._updateCurrentToNodes(result);
 				this.parent = psParent;
 			} else if (result.length === 1) {
 				return this.json["."] = result[0];
