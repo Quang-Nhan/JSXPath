@@ -1,4 +1,5 @@
 var JSXProcessor = require("./Processor/JSXProcessor");
+var _ = require("lodash");
 var DEBUG = require("./JSXDebugConfig").debugOn;
 
 /**
@@ -286,7 +287,7 @@ class JSXPath {
 				path: path,
 				variables: this.variables
 			});
-			console.log("final Result", this.result);			
+			console.log("final Result", this.result);		
 
 			// istanbul ignore if 
 			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
@@ -299,19 +300,12 @@ class JSXPath {
 				// console.log("result", this.result);
 				// console.log(this.result.map(e => e.value));
 				
-				this.result = this.result.map(e => {
-					return typeof e === "object" && (!isNaN(e.value) || e.value) ? e.value : e;
-				});
-
-				if (Array.isArray(this.result)) {
-					console.log("evalue")
-					this.result = this.result.map(e => {
-						console.log(e)
-						return e.value
-					});
-				} else {
-
-				}
+				// this.result = this.result.map(e => {
+				// 	return typeof e === "object" && (!isNaN(e.value) || e.value) ? e.value : e;
+				// });
+				// console.log("TEST")
+				// console.log("final final", this._getNodeValues(this.result))
+				this.result = this._getNodeValues(this.result);
 
 			} 
 			
@@ -359,6 +353,62 @@ class JSXPath {
 			// console.error(this.history);
 			return null;
 		}
+	}
+
+	/**
+	 * @method _getNodeValues
+	 * @param  {[type]} poNode [description]
+	 * @return {[type]}        [description]
+	 */
+	_getNodeValues(poNode) {
+		let values = [];
+		let result;
+
+		console.log("_getNodeValues", poNode)
+		if (Array.isArray(poNode)) {
+			for (let i = 0; i < poNode.length; ++i) {
+				if (this._isJSXNode(poNode[i])) {
+					// console.log("*1")
+					result = this._getNodeValues(poNode[i].value);
+					values = this._flatten(result, values);
+				} else {
+					// console.log("*2")
+					values.push(poNode[i]);
+				}
+			}
+		} else if (this._isJSXNode(poNode)) {
+			if (Array.isArray(poNode.value)) {
+				// console.log("*3")
+				result = this._getNodeValues(poNode.value);
+				values = this._flatten(result, values);
+			} else if (this._isJSXNode(poNode.value)) {
+				// console.log("*4")
+				values.push(this._getNodeValues(poNode.value));
+			} else {
+				// console.log("*5")
+				values.push(poNode.value);
+			}
+		} else {
+			// console.log("*6", poNode)
+			values.push(poNode);
+		}
+		console.log("_getNodeValues return", values);
+
+		return values;
+	}
+
+	_flatten(paNew, paOld) {
+		console.log("__flatten", paNew)
+		let aO = paOld;
+		for (let i = 0; i < paNew.length; ++i) {
+			aO.push(paNew[i]);
+		}
+		console.log("___return aO", aO)
+		return aO;
+	}
+
+	_isJSXNode(poNode) {
+		return _.has(poNode, "name") && _.has(poNode, "value") && _.has(poNode, "parent") && _.has(poNode, "children");
 	}
 
 	clearHistory() {

@@ -299,7 +299,7 @@ describe("JSXPath", () => {
 			expect(result).toEqual(expected);
 		});
 
-		fit("should return an array of b nodes values whose parent is a", () => {
+		it("should return an array of b nodes values whose parent is a", () => {
 			let jsxpath = new JSXPath(js);
 			let expected = [1, {c: 9}, 3];
 			let path = '/a/b';
