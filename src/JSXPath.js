@@ -32,6 +32,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * Example return the value of json.c if the sum of values json.a and json.b is equal to 3;
  * ```js
  * let js = {a:1, b:2, c: "pass"}
+ * 
  * //without JSXPath
  * function sum(pa, pb) {
  * if (!isNumber(pa) || isNumber(pb)) {
@@ -53,9 +54,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * let jsxpath = new JSXPath(json);
  *
  * let path = '/c[sum(/a, /b) = 3]';
- * let result = jsxpath.process({path: path}, (err, result) => {
- * 	console.log("Result => ", result)
- * });
+ * let result = jsxpath.process({path: path});
  * ----------
  * // result => ['pass'];
  * ```
@@ -67,6 +66,12 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * - The '@' symbol is not used in JSXPath expression since JSON only consists of key value pair. '@' in XML denotes an attribute.
  * - The axis 'preceding', 'preceding-sibling', 'following', and 'following-sibling' is currently not supported. JSON is a hash map, the keys are not always returned in a particular order. (although future implentations may involve sorting the the node set and returns the relevant siblings and nodes based on this order). 
  * - The operator token keywords are reserved. This means that the keys in the json cannot contain the following symbols (|,/,+, -, %, *, =, >, <) and spaces (future implemenation may cater for this using quotes to denote a key)
+ *
+ * ## Expected Result
+ * The return value of JSXPath processing: 
+ * - If the process function passes mode = 'node' as part of the param object, the return value will be an array of JSXPath node/s (a JSXPath node consists of name, value, parent and children keys).
+ * - If the process function passes mode = 'value' or has no mode key, the return value will be an array of values.
+ * - If an error had occurred, JSXPath will return an object that contains an 'error' key.
  * 
  * ## Features
  *
@@ -108,23 +113,17 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * let path = '/toe[/tic = 1 and /tac > 9]';
  * 
  * let jsxpath = new JSXPath(js);
- * let result = jsxpath.process({path: path}, (err, result) => {
- * 	console.log("Result => ", result)
- * });
+ * let result = jsxpath.process({path: path});
  * ----------
  * // result => [100]
  *
  * let path = '//tac[.>1]'
- * let result = jsxpath.process({path: path}, (err, result) => {
- * 	console.log("Result => ", result)
- * })
+ * let result = jsxpath.process({path: path});
  * ----------
  * // result => [10, 20];
  *
  * let path = '/toe[/tac = 3]'
- * let result = jsxpath.process({path: path}, (err, result) => {
- * 	console.log("Result => ", result)
- * });
+ * let result = jsxpath.process({path: path});
  * ----------
  * // result => [];
  * ```
@@ -172,9 +171,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * let jsxpath = new JSXPath(js, customFunctions);
  * let path = 'max(/a, /b, /c)';
- * let result = jsxpath.process({path: path}, (err, result) => {
- * 	console.log("Result => ", result)
- * });
+ * let result = jsxpath.process({path: path});
  * ----------
  * // result => [3]
  * ```
@@ -210,9 +207,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
  * };
  * let jsxpath = new JSXPath(js);
  * let path = '/b = {"c": 2}';
- * let result = jsxpath.process({path: path}, (err, result) => {
- * 	console.log("Result => ", result)
- * });
+ * let result = jsxpath.process({path: path});
  * ----------
  * // result => [true]
  * ```
@@ -246,12 +241,11 @@ class JSXPath {
 	}
 
 	/**
-	 * TODO: Write test case for mode = 'node'. Update doco.
-	 * { path, source, mode }
+	 * @TODO: Write test case for mode = 'node'. Update doco.
 	 * 
-	 * process the variable
-	 * @param  {string} psPath - the path to be parsed
-	 * @param  {object} this.variables - the variable object
+	 * 
+	 * @description 
+	 * @param  {object} psPath - { path, source, mode }
 	 * @return {array}        an array
 	 */
 	process(poParam) {
@@ -303,25 +297,25 @@ class JSXPath {
 
 			this.history.push(oRecord);
 			// istanbul ignore if 
-			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
+			if (DEBUG) console.log(new Date(), "JSXPath:result", this.getLastHistory());
 
 			return this.result;
 		} catch(e) {
 			this.history.push({
 				at: new Date(),
-				err: e,
+				error: e,
 				path: path,
 				variables: this.variables && this.variables || null
 			});
-			return null;
+			return this.getLastHistory();
 		}
 	}
 
 	/**
-	 * TODO: refactor this function for readability
+	 * @TODO: refactor this function for readability
 	 * @method _getNodeValues
-	 * @param  {[type]} poNode [description]
-	 * @return {[type]}        [description]
+	 * @param  {Any} poNode
+	 * @return {Array}        an array of values
 	 */
 	_getNodeValues(poNode) {
 		let values = [];

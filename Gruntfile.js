@@ -65,7 +65,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['jasmine_node', 'docs']);
   grunt.registerTask('markdown', ['exec:md_readme', 'exec:md_axis', 'exec:md_functions', 'exec:md_operators']);
-  grunt.registerTask('mdhtml', ['exec:html_readme', 'exec:html_axis', 'exec:html_functions', 'exec:html_operators'])
+  grunt.registerTask('mdhtml', ['exec:html_readme', 'exec:html_axis', 'exec:html_functions', 'exec:html_operators']);
+  grunt.registerTask('md', ['markdown', 'mdhtml']);
   grunt.registerTask('docs', 'exec:docs_generate');
   grunt.registerTask('docwatch', 'exec:docs_server');
 }

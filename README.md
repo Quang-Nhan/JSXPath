@@ -8,14 +8,14 @@ If you are already familiar with the construct of [XPath], using this should be 
 
 ## Contents
 - Home
-	- [Why JSXPath?](#user-content-why-jsxpath)
-	- [Installation](#user-content-installation)
-	- [Differences & Limitations](#user-content-differences--limitations)
-	- [Features](#user-content-features)
-		- [Predicate Expressions](#user-content-predicate-expressions)
-		- [Variables](#user-content-variables)
-		- [Custom Functions](#user-content-custom-functions)
-		- [Object Comparison](#user-content-object-comparison)
+	- [Why JSXPath?](#why-jsx-path)
+	- [Installation](#installation)
+	- [Differences & Limitations](#differences-amp-limitations)
+	- [Features](#features)
+		- [Predicate Expressions](#predicate-expressions)
+		- [Variables](#variables)
+		- [Custom Functions](#custom-functions)
+		- [Object Comparison](#object-comparison)
 - [Axis](md/AXIS.html)
 - [Functions](md/FUNCTIONS.html)
 - [Node Selection](md/NODESELECTION.html)
@@ -27,6 +27,7 @@ IF you only require a simple retrieval of a value in an object without the need 
 Example return the value of json.c if the sum of values json.a and json.b is equal to 3;
 ```js
 let js = {a:1, b:2, c: "pass"}
+
 //without JSXPath
 function sum(pa, pb) {
 if (!isNumber(pa) || isNumber(pb)) {
@@ -41,25 +42,31 @@ function isNumber(num) {
 
 let result = sum(js.a, js.b) === 3 ? js.c : null;
 ----------
-// result => 'pass'
+// result => ['pass']
 
 // with JSXPath
 let JSXPath = require("JSXPath");
 let jsxpath = new JSXPath(json);
 
 let path = '/c[sum(/a, /b) = 3]';
-let result = jsxpath.process(path);
+let result = jsxpath.process({path: path});
 ----------
-// result => 'pass';
+// result => ['pass'];
 ```
 
-`## Installation
+## Installation
 
 ## Differences & Limitations
 There are some notable differences and limiations between xml and json that the query langauge do not support.
 - The '@' symbol is not used in JSXPath expression since JSON only consists of key value pair. '@' in XML denotes an attribute.
 - The axis 'preceding', 'preceding-sibling', 'following', and 'following-sibling' is currently not supported. JSON is a hash map, the keys are not always returned in a particular order. (although future implentations may involve sorting the the node set and returns the relevant siblings and nodes based on this order). 
 - The operator token keywords are reserved. This means that the keys in the json cannot contain the following symbols (|,/,+, -, %, *, =, >, <) and spaces (future implemenation may cater for this using quotes to denote a key)
+
+## Expected Result
+The return value of JSXPath processing: 
+- If the process function passes mode = 'node' as part of the param object, the return value will be an array of JSXPath node/s (a JSXPath node consists of name, value, parent and children keys).
+- If the process function passes mode = 'value' or has no mode key, the return value will be an array of values.
+- If an error had occurred, JSXPath will return an object that contains an 'error' key.
 
 ## Features
 
@@ -68,7 +75,7 @@ JSXPath supports most of the expressions found in xpath.
 
 | Node Selection | Operators | Axes 				|
 | -------------- | --------  | ----------------- |
-| key  			| &#124; (todo)| self 		|
+| key  			| &#124; 	| self 				|
 | . 	 		 	| + 		| ancestor 			|
 | .. 	 		| - 		| ancestor-or-self	|
 | / 		 	 	| * 		| child				|
@@ -101,23 +108,21 @@ let js = {
 let path = '/toe[/tic = 1 and /tac > 9]';
 
 let jsxpath = new JSXPath(js);
-let result = jsxpath.process(path);
+let result = jsxpath.process({path: path});
 ----------
-// result => 100
+// result => [100]
 
 let path = '//tac[.>1]'
-let result = jsxpath.process(path)
+let result = jsxpath.process({path: path});
 ----------
 // result => [10, 20];
 
-let path = "/toe[/tac = 3]"
-let result = jsxpath.process(path);
+let path = '/toe[/tac = 3]'
+let result = jsxpath.process({path: path});
 ----------
 // result => [];
 ```
-+ If the predicate expression resolved to be true, and the result is a single value, then that is returned.
-+ If the predicate expression resolved to be true, and the result contains multiple values, then the returned value will be an array of values.
-+ If the predicate expression resolved to false, then the returned result will be an empty array.
+
 
 #### Variables
 JSXPath supports variables denoted by the '$' sign.
@@ -132,7 +137,7 @@ let vars = { $v1: 19, $v2: 20 };
 let jsxpath = new JSXPath(js);
 let result = jsxpath.process(path, vars);
 ----------
-// result => 17
+// result => [17]
 ```
 #### Custom Functions
 Along with predefined JSXPath functions, JSXPath can also support custom functions.
@@ -160,10 +165,10 @@ let js = {
 };
 
 let jsxpath = new JSXPath(js, customFunctions);
-let path = "max(/a, /b, /c)";
-let result = jsxpath.process(path);
+let path = 'max(/a, /b, /c)';
+let result = jsxpath.process({path: path});
 ----------
-// result => 3
+// result => [3]
 ```
 *__Note:__ the arguments passed in the function can be a number of values:*
 - a primitive data type (number, string, boolean, undefined, null) value,
@@ -197,21 +202,22 @@ let js = {
 };
 let jsxpath = new JSXPath(js);
 let path = '/b = {"c": 2}';
-let result = jsxpath.process(path);
+let result = jsxpath.process({path: path});
 ----------
-// result => true
+// result => [true]
 ```
 //or by using varibles to store the object;
 
 ```js
 let vars = { $c: {c:2} };
-let path = "/b = $c";
+let path = '/b = $c';
 let result = jsxpath.process(path, vars);
 ----------
-// result => true
+// result => [true]
 ```
+*__Note:__  The json expression must be a valid json format. Only equal (=) and not equal (!=) can be used for object comparison.
 
 
 
 
-process the variable
+
