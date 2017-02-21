@@ -8,6 +8,7 @@ class JSXPloder {
 		this.currentContexts = []; //stores current array before 
 		this.DEBUG = JSXDebugConfig.debugOn;
 		this.SHOW_EXPLODE = JSXDebugConfig.showExplode;
+		this.SHOW_CONTEXT = JSXDebugConfig.showContext;
 	}
 
 	contextList() {
@@ -32,7 +33,7 @@ class JSXPloder {
 		} else if (Object.keys(this.ContextTokens.tokens["*"](this.json)).indexOf(psName) > -1) {
 			this.updateCurrent({ 
 				name: psName, 
-				parent: this.json["."].name 
+				parent: this.json["."].name
 			});
 		} else {
 			if (this.DEBUG && this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:setCurrentToChildNode: creating error node", psName);
@@ -52,6 +53,7 @@ class JSXPloder {
 
 	addCurrentContext() {
 		this.currentContexts.push(Object.assign( {}, this.json["."]));
+		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:addCurrentContext:", this.contextList());
 	}
 
 	resetCurrentContext() {
@@ -74,6 +76,7 @@ class JSXPloder {
 			name: popped.name, 
 			parent: popped.parent
 		});
+		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:removeCurrentContext:", this.contextList());
 	}
 
 	createErrorNode() {
@@ -127,20 +130,27 @@ class JSXPloder {
 		if (poParam.name) {
 			this._updateCurrentToNode(poParam.name, poParam.parent);
 		} else if (Array.isArray(poParam.values)) {
-			this._updateCurrentToNodes(poParam.values)
-		}		
+			this._updateCurrentToNodes(poParam.values);
+		}
+
+		if (this.DEBUG && this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:updateCurrent: this.json[\".\"]", this.json["."], "poParam", poParam);	
 	}
 
 	_updateCurrentToNode(psName, psParent) {
 		if (!this.json.hasOwnProperty(psName))
 			throw new Error("Key " + psName + " does not exists.")
-		
 		if (Array.isArray(this.json[psName])) {
+			let result = [];
 			for (var i = 0; i < this.json[psName].length; ++i) {
 				if (psParent === this.json[psName][i].parent) {
-					this.json["."] = this.json[psName][i];
-					break;
+					result.push(this.json[psName][i]);
 				}
+			}
+			if (result.length > 1) {
+				this._updateCurrentToNodes(result);
+				this.parent = psParent;
+			} else if (result.length === 1) {
+				return this.json["."] = result[0];
 			}
 		} else if (psParent === this.json[psName].parent) {
 			this.json["."] = this.json[psName];
@@ -167,12 +177,6 @@ class JSXPloder {
 			children: []
 		}
 	}
-
-	// _onCurrentNodeChange() {
-	// 	for (let key in this.ContextTokens.tokens) {
-	// 		this.json[key] = this.ContextTokens.tokens[key].apply(this, [this.json, this._explode()]);
-	// 	}
-	// }
 
 	_updateChildren() {
 		this.json["*"] = this.ContextTokens.tokens["*"](this.json);
@@ -221,7 +225,6 @@ class JSXPloder {
 	_setDefaultProperties(poInput) {
 		this.json["@"] = this._createProperty("@", poInput, null);
 		this.json["."] = this.json["@"];
-		// this._onCurrentNodeChange(this.json);
 	}
 
 	_createProperty(psName, pValue, psParent) {

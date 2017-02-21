@@ -1,8 +1,8 @@
 {
   "name": "jsxpath",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "An Adaptation of XPath notation to query a JSON document.",
-  "main": "src/JSXPath.js",
+  "main": "index.js",
   "scripts": {
     "test": "grunt test"
   },
@@ -28,6 +28,7 @@
     "url": "https://github.com/Quang-Nhan/JSXPath"
   },
   "dependencies": {
-    "lodash": "^4.17.2"
+    "lodash": "^4.17.2",
+    "moment": "^2.17.1"
   }
 }

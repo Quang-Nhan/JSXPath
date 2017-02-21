@@ -22,21 +22,21 @@ class JSXProcessor {
 		this.SHOWEXPLODED = JSXDebugConfig.showExploded;
 		this.SHOWPROCESSTYPE = JSXDebugConfig.showProcessType;
 
-		//Objects
-		this.PathParser = new JSXPathParser();
-		this.Exploder = new JSXPloder();
-		this.PathFunctions = new JSXPathFunctions(undefined, poCustomFunctions);
-		this.OperatorTokens = new JSXOperatorTokens();
-		this.ContextTokens = new JSXAxisTokens();
-		this.ErrorHandler = new JSXError();
-		this.Validator = new JSXValidator();
-
 		//variables
 		this.variables = {};
 		this.path = null;
 		this.parsedPath = [];
 		this.json = null;
-		this.exploded = {};
+		this.exploded = null;
+		this.customFunctions = poCustomFunctions;
+
+		//Objects
+		this.PathParser = new JSXPathParser();
+		this.Exploder = new JSXPloder();
+		this.OperatorTokens = new JSXOperatorTokens();
+		this.ContextTokens = new JSXAxisTokens();
+		this.ErrorHandler = new JSXError();
+		this.Validator = new JSXValidator();
 	}
 
 
@@ -64,6 +64,7 @@ class JSXProcessor {
 		if (poJSON) {
 			this.json = poJSON;
 			this.exploded = this.Exploder.explode(this.json);
+			this.PathFunctions = new JSXPathFunctions(this.exploded, this.customFunctions);
 			/* istanbul ignore if */
 			if (this.DEBUG && this.SHOWEXPLODED) console.log(new Date(), "JSXProcessor:this.exploded", this.exploded);
 		}
@@ -73,11 +74,14 @@ class JSXProcessor {
 		/* istanbul ignore if */
 		if (this.DEBUG) console.log(new Date(), "JSXProcessor:this.parsedPath", JSON.stringify(this.parsedPath));
 
-
 		this.ErrorHandler.test("Defined", { data: this.path, name: "this.path", at: "JSXProcessor.process" });
 		this.ErrorHandler.test("Defined", { data: this.json, name: "this.json", at: "JSXProcessor.process" });
 
-		return this._processPath(this.parsedPath, this.exploded);
+		let result = this._processPath(this.parsedPath, this.exploded);
+		if (!Array.isArray(result)) {
+			result = !result ? [] : [result];
+		}
+		return result;
 	}
 	/**
 	 * @private
@@ -101,17 +105,17 @@ class JSXProcessor {
 				if (!result || Array.isArray(result) && !result.length) {
 					return result;
 				} else if (Array.isArray(result)){
-					this.Exploder.updateCurrent({values: result})
+					this.Exploder.updateCurrent({values: result});
 				} else {
 					return this.Exploder.current();
 				}
 				break;
 			} else {
 				result = this._processArrayElement(aArg && aArg || result, paPath[i], paPath[i+1], exploded);
-				if (!result) //tests resturns a false result
+				if (!result)  {//tests resturns a false result
 					return result;
-
-				if (this.OperatorTokens.tokens[paPath[i]]) {
+				}
+				if (this.OperatorTokens.tokens[paPath[i]] && (!aArg || aArg.indexOf("∏") === -1) && paPath[i+1] !== "∏") { // ∏ = position symbol
 					++i;
 				} else if (bArg) {
 					aArg.push(result);
@@ -177,7 +181,19 @@ class JSXProcessor {
 	 * @return {any} Processed result
 	 */
 	_tests(paPath, exploded) {
-		return this._processPath(paPath, exploded);
+		let result =  this._processPath(paPath, exploded);
+		let currentContext = this.Exploder.contextList();
+		if (Array.isArray(result)) {
+			if (result.every((e) => { 
+				return currentContext[currentContext.length-1].name === e.name || currentContext[currentContext.length-1].name === e.parent }
+				)) {
+				return result;
+			} else {
+				return true;
+			}
+		}
+		
+		return result;
 	}
 	/**
 	 * @private
@@ -204,7 +220,7 @@ class JSXProcessor {
 			return "operator";
 		else if (poRef[pPath])
 			return "node";
-		else if (/*pPath.indexOf("@") > -1 && */pPath.indexOf("/") > -1)
+		else if (pPath.indexOf("/") > -1)
 			return "path";
 		else if (pPath.indexOf("(") > -1)
 			return "function";
@@ -214,6 +230,8 @@ class JSXProcessor {
 			return "args";
 		else if (pPath === "[") //preprocessed
 			return "tests";
+		else if (pPath === "∏")
+			return "position";
 		else {
 			return null;
 		}
@@ -281,14 +299,21 @@ class JSXProcessor {
 				}
 				break;
 			case "operator":
-				var opfunc = this.OperatorTokens.tokens[current].apply(this, [prev]);
-				var nextResult = this._processArrayElement(null, next, null, exploded);
-				result = opfunc.apply(null, [nextResult]);
-				this.Exploder.resetCurrentContext();
+				if (!Array.isArray(prev) || (prev.indexOf("∏") === -1 && next !== "∏")) { // does not have position symbol
+					var opfunc = this.OperatorTokens.tokens[current].apply(this, [prev]);
+					var nextResult = this._processArrayElement(null, next, null, exploded);
+					result = opfunc.apply(null, [nextResult]);
+					this.Exploder.resetCurrentContext();
+				} else {
+					result = current;
+				}
 				break;
 			case "variable":
 				this.ErrorHandler.test("Defined", {data: this.variables[current], name: current, at: "JSXProcessor:_processArrayElement"});
 				result = this.variables[current];
+				break;
+			case "position":
+				result = current;
 				break;
 			case "args": //handled in preporcess
 				break;

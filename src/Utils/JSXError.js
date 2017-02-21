@@ -8,8 +8,9 @@ class JSXError {
 			, "jsx004": (args) => args.name + " is not a valid JSX Node. A JSXNode must contain {name, children, parent and value} properties. Thrown in " + args.at + "." 
 			, "jsx005": (args) => args.name + " contains invalid number of arguments. Thrown at " + args.at + "."
 			, "jsx006": (args) => args.name + " was expecting an array. Thrown in " + args.at + "."
-			, "jsx007": (args) => args.name + " was expecting an arry of type: " + args.expectedType + "." + " Thrown at " + args.at
+			, "jsx007": (args) => args.name + " was expecting an arry of type: " + args.expectedType + "." + " Thrown at " + args.at + "."
 			, "jsx008": (args) => args.data + " is not a valid JSON." + ". Thrown at " + args.at + "."
+			, "jsx009": (args) => "Position index of " + args.pos + " cannot be" + (args.key === ">" ? " greater than " : " less than ") + args.length + ". Thrown at " + arg.at + "."
 		}
 	}
 

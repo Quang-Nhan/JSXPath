@@ -2,13 +2,17 @@ const JSXDebugConfig =  {
 	debugOn: false,
 	showExploded: false,
 	showProcessType: true,
-	showParseTokens: false,
-	showReplacer: false,
-	showContextTokens: false,
-	showExplode: true,
-	showOperatorTokens: false,
+	showParseTokens: true,
+	showReplacer: true,
+	showAxisTokens: true,
+	showOperatorTokens: true,
 
-	showPathFunctions: false,
-	showPathParser: false
+	// JSXExploder
+	showExplode: false,
+	showContext: true,
+	
+
+	showPathFunctions: true,
+	showPathParser: true
 }
 module.exports = JSXDebugConfig;

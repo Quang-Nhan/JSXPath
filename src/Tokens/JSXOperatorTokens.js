@@ -10,6 +10,7 @@ var JSXDebugConfig = require("../JSXDebugConfig");
  * - [Node Selection](NODESELECTION.html)
  * - Operators
  * 
+ * TODO: update all variables to work with arrays. Eg = operator
  * # Operators 
  * ##### [+](#+) , [-](#-2) , [*](#-3) , [div](#div) , [mod](#mod) , [=](#-4) , [!=](#-5) , [>](#gt) , [<](#lt) , [>=](#gt-2) , [<=](#lt-2) , [and](#and) , [or](#or) , [|](#-6)
  * Operators are symbols used to perform operation/tests on its left and right values.
@@ -202,6 +203,7 @@ class JSXOperatorTokens {
 					
 					let prevValue = this.Validator.validateNumber(prev, "=");
 					let nextValue = this.Validator.validateNumber(next, "=");
+					let result;
 
 					if (prevValue === null) {
 						prevValue = this.Validator.validateString(prev, "=");
@@ -228,7 +230,24 @@ class JSXOperatorTokens {
 						nextValue = this.Validator.validateNode(next, "=");
 					}
 
-					let result = _.isEqual(prevValue, nextValue);
+					if (prevValue && prevValue.value){
+						result = _.isEqual(prevValue.value, nextValue);
+					} else if (nextValue && nextValue.value) {
+						result = _.isEqual(prevValue, nextValue.value);
+					} else if (Array.isArray(prevValue) && Array.isArray(nextValue)) {
+						result = _.isEqual(prevValue, nextValue)
+					} else if (Array.isArray(prevValue)) {
+						result = _.filter(prevValue, {value: nextValue});
+					} else if (Array.isArray(nextValue)) {
+						result = _.filter(nextValue, {value: prevValue});
+					} else {
+						result = _.isEqual(prevValue, nextValue);
+					}
+
+					if (Array.isArray(result) && ((prev && prev.value) || (next && next.value))) {
+						result = result.length ? true : false;
+					}
+
 					// istanbul ignore next
 					this._outputDebug("result", "JSXOperatorTokens:=", prevValue, nextValue, result);
 					return result;
@@ -486,9 +505,28 @@ class JSXOperatorTokens {
 					// istanbul ignore next
 					this._outputDebug("init", "JSXOperatorTokens:and", prev, next);
 
-					let prevValue = this.Validator.validateBoolean(prev, "and", true);
-					let nextValue = this.Validator.validateBoolean(next, "and", true);
-					let result = prevValue && nextValue;
+					let prevValue = this.Validator.isArray(prev, "and");
+					let nextValue = this.Validator.isArray(next, "and");
+					let result;
+					
+					if (prevValue && nextValue) { // Node Array check
+						result = _.intersection(prevValue, nextValue);
+					} else if (prevValue && !nextValue) {
+						nextValue = this.Validator.validateBoolean(next, "and", true);
+						if (nextValue === true) {
+							result = prevValue;
+						}
+					} else if (!prevValue && nextValue) {
+						prevValue = this.Validator.validateBoolean(prev, "and", true);
+						if (prevValue === true) {
+							result = nextValue;
+						}
+					} else {
+						nextValue = this.Validator.validateBoolean(next, "and", true);
+						prevValue = this.Validator.validateBoolean(prev, "and", true);
+						result = prevValue && nextValue;
+					}
+
 					// istanbul ignore next
 					this._outputDebug("result", "JSXOperatorTokens:and", prevValue, nextValue, result);
 					return result;

@@ -1,6 +1,7 @@
 var JSXValidator = require("../Utils/JSXValidator");
 var JSXError = require("../Utils/JSXError");
 var JSXDebugConfig = require("../JSXDebugConfig");
+var moment = require("moment");
 
 /**
  * JSXPath 
@@ -48,6 +49,7 @@ class JSXPathFunctions {
 	constructor(exploded, poCustomFunctions) {
 		this.DEBUG = JSXDebugConfig.debugOn;
 		this.SHOW_PATH_FUNCTIONS = JSXDebugConfig.showPathFunctions;
+		this.exploded = exploded;
 		this.Validator = new JSXValidator();
 		this.ErrorHandler = new JSXError();
 		this.customs = poCustomFunctions;
@@ -487,8 +489,13 @@ class JSXPathFunctions {
 			   * @param  {Array} args - one arguments: [0] source number
 			   * @return {Number} the number of nodes
 			   */
-			, "count": () => {
+			, "count": (args) => {
+				//TODO write test cases
+				this.ErrorHandler.test("ArgumentLength", {name: "count()", data: args.length !== 1, at: "JSXPathFunctions:count()"});
+				if (!args[0] || args[0] === []) return Number(0);
+				let source = this.Validator.isArray(args[0], "");
 
+				return source ? source.length : 1;
 			  }
 			/**
 			 * ## sum //TODO: jasmine
@@ -696,9 +703,56 @@ class JSXPathFunctions {
 			, "false": () => {
 
 			  }
+			, "position": (args) => {
+				let current = this.exploded["."];
+				let result = [];
+				// console.log("Position start", args)
+				if (Array.isArray(current.value) && current.value.length) {
+					let num = isNaN(args[0]) ? args[2] : args[0];
+					switch(args[1]) {
+						case "=":
+							if (num > 0 && num < current.value.length) {
+								result.push(current.value[num-1]);
+							}
+							break;
+						case "≠":
+							for (let i = 0; i < current.value.length; ++i) {
+								if (i !== num-1) {
+									result.push(current.value[i]);
+								}
+							}
+							break;
+						case ">":
+							args[1] = "<";
+						case "≥":
+							// swap
+							let tmp = args[0];
+							args[0] = args[2];
+							args[2] = tmp;
+							args[1] = "≤";
+						case "<":
+						case "≤":
+							result = current.value.filter((e, i) => {
+								return args[0] === num && num < i+1 || i+1 < num;
+							});
+							if (args[1] === "≤" && num <= current.value.length) {
+								result.push(current.value[num-1]);
+							}
+							break;
+					}
+				}
+				return result;
+
+			}
 			, "disctinct-values": () => {
 
 			 }
+			, "now": (args) => {
+				return new moment();
+			}
+			, "years" : (args) => {
+
+			}
 			/**
 			 * ## not
 			 * Negates the boolean value.
@@ -722,8 +776,80 @@ class JSXPathFunctions {
 					result = this.Validator.validateBoolean(args[0], "not()", true);
 				return !result;
 			}
+			, "min": (args) => {
+		  		let min = this.Validator.validateNumber(args[0], "min()", true);
+		  		for (let i = 1; i < args.length; i++) {
+		  			let n = this.Validator.validateNumber(args[i], "min()", true);
+		 			if (n < min) {
+		 			  min = n;
+		 			}
+		 		}
+		 		return min;
+			}
+			, "max": () => {
+
+			}
+			, "avg": () => {
+
+			}
+			, "currentDate": () => {
+
+			}
+			, "currentDateTime": () => {
+
+			}
+			, "formatDate": () => {
+
+			}
+			, "formatDateTime": () => {
+
+			}
+			, "formatTime": () => {
+
+			}
+			, "dayFromDate": () => {
+
+			}
+			, "dayFromDateTime": () => {
+
+			}
+			, "hoursFromDateTime": () => {
+				
+			}
+			, "minutesFromDateTime": () => {
+
+			}
+			, "secondsFromDatTime": () => {
+
+			}
+			, "timezoneFromDateTime": () => {
+
+			}
+			, "yearFromDate": () => {
+
+			}
+			, "monthFromDate": () => {
+
+			}
+			, "dayFromDate": () => {
+
+			}
+			, "timezoneFromDate": () => {
+
+			}
+			, "hoursFromTime": () => {
+
+			}
+			, "minutesFromTime": () => {
+
+			}
+			, "secondsFromTime": () => {
+
+			}
+			, "timezoneFromTime": () => {
+
+			}
 		}
-		this.exploded = exploded;
 	}
 
 	tokens() {

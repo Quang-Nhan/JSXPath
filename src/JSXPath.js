@@ -1,5 +1,6 @@
 var JSXProcessor = require("./Processor/JSXProcessor");
-const DEBUG = require("./JSXDebugConfig").debugOn;
+var _ = require("lodash");
+var DEBUG = require("./JSXDebugConfig").debugOn;
 
 /**
  * JSXPath
@@ -45,16 +46,18 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * let result = sum(js.a, js.b) === 3 ? js.c : null;
  * ----------
- * // result => 'pass'
+ * // result => ['pass']
  *
  * // with JSXPath
  * let JSXPath = require("JSXPath");
  * let jsxpath = new JSXPath(json);
  *
  * let path = '/c[sum(/a, /b) = 3]';
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
- * // result => 'pass';
+ * // result => ['pass'];
  * ```
  *
  * ## Installation
@@ -72,7 +75,7 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * | Node Selection | Operators | Axes 				|
  * | -------------- | --------  | ----------------- |
- * | key  			| &#124; (todo)| self 		|
+ * | key  			| &#124; 	| self 				|
  * | . 	 		 	| + 		| ancestor 			|
  * | .. 	 		| - 		| ancestor-or-self	|
  * | / 		 	 	| * 		| child				|
@@ -105,23 +108,27 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * let path = '/toe[/tic = 1 and /tac > 9]';
  * 
  * let jsxpath = new JSXPath(js);
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
- * // result => 100
+ * // result => [100]
  *
  * let path = '//tac[.>1]'
- * let result = jsxpath.process(path)
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * })
  * ----------
  * // result => [10, 20];
  *
  * let path = '/toe[/tac = 3]'
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
  * // result => [];
  * ```
- * + If the predicate expression resolved to be true, and the result is a single value, then that is returned.
- * + If the predicate expression resolved to be true, and the result contains multiple values, then the returned value will be an array of values.
- * + If the predicate expression resolved to false, then the returned result will be an empty array.
+ * 
  *
  * #### Variables
  * JSXPath supports variables denoted by the '$' sign.
@@ -136,7 +143,7 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * let jsxpath = new JSXPath(js);
  * let result = jsxpath.process(path, vars);
  * ----------
- * // result => 17
+ * // result => [17]
  * ```
  * #### Custom Functions
  * Along with predefined JSXPath functions, JSXPath can also support custom functions.
@@ -165,9 +172,11 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * 
  * let jsxpath = new JSXPath(js, customFunctions);
  * let path = 'max(/a, /b, /c)';
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
- * // result => 3
+ * // result => [3]
  * ```
  * *__Note:__ the arguments passed in the function can be a number of values:*
  * - a primitive data type (number, string, boolean, undefined, null) value,
@@ -201,9 +210,11 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * };
  * let jsxpath = new JSXPath(js);
  * let path = '/b = {"c": 2}';
- * let result = jsxpath.process(path);
+ * let result = jsxpath.process({path: path}, (err, result) => {
+ * 	console.log("Result => ", result)
+ * });
  * ----------
- * // result => true
+ * // result => [true]
  * ```
  * //or by using varibles to store the object;
  * 
@@ -212,91 +223,153 @@ const DEBUG = require("./JSXDebugConfig").debugOn;
  * let path = '/b = $c';
  * let result = jsxpath.process(path, vars);
  * ----------
- * // result => true
+ * // result => [true]
  * ```
  * *__Note:__  The json expression must be a valid json format. Only equal (=) and not equal (!=) can be used for object comparison.
  *
  * 
  * @module JSXPath
  * @class JSXPath 
+ * @constructor
+ * @param {Object} poSource
+ * @param {Object} poCustomFunctions
  * 
  */
 class JSXPath {
-	constructor(poJSON, poCustomFunctions) {
+	constructor(poSource, poCustomFunctions) {
 		this.processor = new JSXProcessor(poCustomFunctions);
-		this.json = poJSON || {};
+		this.source = poSource || {};
 		this.variables = null;
 		this.result = null;
+		this.path = null;
 		this.history = [];
 	}
 
 	/**
-	 * 
+	 * TODO: Write test case for mode = 'node'. Update doco.
+	 * { path, source, mode }
 	 * 
 	 * process the variable
 	 * @param  {string} psPath - the path to be parsed
-	 * @param  {object} poVars - the variable object
+	 * @param  {object} this.variables - the variable object
 	 * @return {array}        an array
 	 */
-	process(psPath, poVars) {
-		this.variables = poVars;
+	process(poParam) {
+		let param = (poParam && typeof poParam === "object" && !Array.isArray(poParam)) && poParam;
+		let path = (param && param.path) || this.path;
+		let mode = (param && param.mode) || "value" // can be value || node
+
+		if (!param) {
+			throw new Error("param is not defined");
+		}
+		if (!path) {
+			throw new Error("path is not defined.")
+		}
+		if (!this.source && ((param && !param.source) || (!param))) {
+			throw new Error("Source JSON is not defined.")
+		}
+		if (param.source) {
+			this.source = param.source;
+		}
+
+		this.path = path;
+		this.variables = poParam.variables;
+
 		// istanbul ignore if 
 		if (DEBUG) {
-			console.log(new Date(), "JSXPath:psPath", psPath);
-			console.log(new Date(), "JSXPath:poVars", poVars);
+			console.log(new Date(), "JSXPath:this.path", this.path);
+			console.log(new Date(), "JSXPath:this.variables", this.variables);
 		}
 		try {
-			this.result = this.processor.process(psPath, this.json, poVars);
-			this.history.push({
+			let aProcessedResult = this.processor.process(this.path, this.source, this.variables);
+			let oRecord = {
 				at: new Date(),
-				node: this.result,
-				path: psPath,
-				variables: poVars && poVars || null
-			});
+				mode: mode,
+				nodes: aProcessedResult,
+				path: path,
+				variables: this.variables
+			};
 
-			// istanbul ignore if 
-			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
-			
+			this.result = _.cloneDeep(aProcessedResult);
+
 			if (!this.result) {
 				return [];
-			} else if (this.result !== {}) {
-				if (Array.isArray(this.result) && this.result[0] && this.result[0].name) {
-					this.result.sort((nodeA, nodeB) => {
-						if (nodeA.name === nodeB.name)
-							return nodeA.parent > nodeB.parent;
-						else 
-							return nodeA.name > nodeB.name;
-					});
-					var result = [];
-					for (let i = 0; i < this.result.length; ++i) {
-						result.push(this.result[i].value);
-					}
-					return result;
-				} else if (Array.isArray(this.result.value) && this.result.value.length && this.result.value[0].name) {
-					var result = [];
-					for (let i = 0; i < this.result.value.length; ++i) {
-						result.push(this.result.value[i].value);
-					}
-					return result;
-				}
-					
-				return (typeof this.result === "object" && this.result.hasOwnProperty("value")) ? this.result.value : this.result;
-			} else {
-				return [];
 			}
+
+			if (mode === "value") {
+				this.result = this._getNodeValues(this.result);
+				oRecord.values = this.result;
+			}
+
+			this.history.push(oRecord);
+			// istanbul ignore if 
+			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
+
+			return this.result;
 		} catch(e) {
 			this.history.push({
 				at: new Date(),
 				err: e,
-				path: psPath,
-				variables: poVars && poVars || null
+				path: path,
+				variables: this.variables && this.variables || null
 			});
-			console.error(this.history);
+			return null;
 		}
 	}
 
+	/**
+	 * TODO: refactor this function for readability
+	 * @method _getNodeValues
+	 * @param  {[type]} poNode [description]
+	 * @return {[type]}        [description]
+	 */
+	_getNodeValues(poNode) {
+		let values = [];
+		let result;
+
+		if (Array.isArray(poNode)) {
+			for (let i = 0; i < poNode.length; ++i) {
+				if (this._isJSXNode(poNode[i])) {
+					result = this._getNodeValues(poNode[i].value);
+					if (_.isArray(poNode[i].value) && !this._isJSXNode(poNode[i].value[0])) {
+						values.push(result);
+					} else {
+						values = this._flatten(result, values);
+					}
+				} else {
+					values.push(poNode[i]);
+				}
+			}
+		} else if (this._isJSXNode(poNode)) {
+			if (Array.isArray(poNode.value)) {
+				result = this._getNodeValues(poNode.value);
+				values = this._flatten(result, values);
+			} else if (this._isJSXNode(poNode.value)) {
+				values.push(this._getNodeValues(poNode.value));
+			} else {
+				values.push(poNode.value);
+			}
+		} else {
+			values.push(poNode);
+		}
+
+		return values;
+	}
+
+	_flatten(paNew, paOld) {
+		let aO = paOld;
+		for (let i = 0; i < paNew.length; ++i) {
+			aO.push(paNew[i]);
+		}
+		return aO;
+	}
+
+	_isJSXNode(poNode) {
+		return _.has(poNode, "name") && _.has(poNode, "value") && _.has(poNode, "parent") && _.has(poNode, "children");
+	}
+
 	clearHistory() {
-		this.history.lenght = 0;
+		this.history.length = 0;
 	}
 
 	getLastHistory() {
