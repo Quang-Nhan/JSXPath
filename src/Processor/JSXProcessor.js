@@ -163,14 +163,12 @@ class JSXProcessor {
 				case "": 
 					break;
 				default:
-					console.log(pasNodes[i]);
 					if (this.variables.hasOwnProperty(pasNodes[i])) {
 						pasNodes[i] = this.variables[pasNodes[i]];
 					}
 					this.Exploder.setCurrentToChildNode(pasNodes[i]);
 			}
 		}
-		console.log("_processCurrentNode", this.Exploder.current())
 		return this.Exploder.current();
 	}
 	/**
@@ -185,7 +183,6 @@ class JSXProcessor {
 	_tests(paPath, exploded) {
 		let result =  this._processPath(paPath, exploded);
 		let currentContext = this.Exploder.contextList();
-		console.log("______tests", result, currentContext)
 		if (Array.isArray(result)) {
 			if (result.every((e) => { 
 				return currentContext[currentContext.length-1].name === e.name || currentContext[currentContext.length-1].name === e.parent }

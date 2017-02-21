@@ -253,7 +253,7 @@ describe("JSXPath", () => {
 		});
 	});
 
-	fdescribe("ARRAY", () => {
+	describe("ARRAY", () => {
 		let js;
 		beforeEach(() => {
 			js = {

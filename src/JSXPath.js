@@ -246,7 +246,8 @@ class JSXPath {
 	}
 
 	/**
-	 * { path, source }
+	 * TODO: Write test case for mode = 'node'. Update doco.
+	 * { path, source, mode }
 	 * 
 	 * process the variable
 	 * @param  {string} psPath - the path to be parsed
@@ -256,7 +257,7 @@ class JSXPath {
 	process(poParam) {
 		let param = (poParam && typeof poParam === "object" && !Array.isArray(poParam)) && poParam;
 		let path = (param && param.path) || this.path;
-		let mode = (param && path.mode) || "value" // can be value || node
+		let mode = (param && param.mode) || "value" // can be value || node
 
 		if (!param) {
 			throw new Error("param is not defined");
@@ -280,68 +281,30 @@ class JSXPath {
 			console.log(new Date(), "JSXPath:this.variables", this.variables);
 		}
 		try {
-			this.result = this.processor.process(this.path, this.source, this.variables);
-			this.history.push({
+			let aProcessedResult = this.processor.process(this.path, this.source, this.variables);
+			let oRecord = {
 				at: new Date(),
-				node: this.result,
+				mode: mode,
+				nodes: aProcessedResult,
 				path: path,
 				variables: this.variables
-			});
-			console.log("final Result", this.result);		
+			};
 
-			// istanbul ignore if 
-			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
+			this.result = _.cloneDeep(aProcessedResult);
 
 			if (!this.result) {
 				return [];
 			}
 
 			if (mode === "value") {
-				// console.log("result", this.result);
-				// console.log(this.result.map(e => e.value));
-				
-				// this.result = this.result.map(e => {
-				// 	return typeof e === "object" && (!isNaN(e.value) || e.value) ? e.value : e;
-				// });
-				// console.log("TEST")
-				// console.log("final final", this._getNodeValues(this.result))
 				this.result = this._getNodeValues(this.result);
+				oRecord.values = this.result;
+			}
 
-			} 
-			
-			return this.result;
+			this.history.push(oRecord);
+			// istanbul ignore if 
+			if (DEBUG) console.log(new Date(), "JSXPath:result", this.history[this.history.length-1]);
 
-			// if (!this.result) {
-			// 	return [];
-			// } else if (this.result !== {}) {
-			// 	if (Array.isArray(this.result) && this.result[0] && this.result[0].name) {
-			// 		this.result.sort((nodeA, nodeB) => {
-			// 			if (nodeA.name === nodeB.name)
-			// 				return nodeA.parent > nodeB.parent;
-			// 			else 
-			// 				return nodeA.name > nodeB.name;
-			// 		});
-			// 		var result = [];
-			// 		for (let i = 0; i < this.result.length; ++i) {
-			// 			result.push(this.result[i].value);
-			// 		}
-			// 		this.result = result;
-			// 		// return result;
-			// 	} else if (Array.isArray(this.result.value) && this.result.value.length && this.result.value[0].name) {
-			// 		var result = [];
-			// 		for (let i = 0; i < this.result.value.length; ++i) {
-			// 			result.push(this.result.value[i].value);
-			// 		}
-			// 		this.result = result;
-			// 		// return result;
-			// 	}
-			// 	// return (typeof this.result === "object" && this.result.hasOwnProperty("value")) ? this.result.value : this.result;
-			// 	this.result = (typeof this.result === "object" && this.result.hasOwnProperty("value")) ? this.result.value : this.result;
-			// } else {
-			// 	this.result = [];
-			// 	// return [];
-			// }
-			// this.processor.reset();
 			return this.result;
 		} catch(e) {
 			this.history.push({
@@ -350,12 +313,12 @@ class JSXPath {
 				path: path,
 				variables: this.variables && this.variables || null
 			});
-			// console.error(this.history);
 			return null;
 		}
 	}
 
 	/**
+	 * TODO: refactor this function for readability
 	 * @method _getNodeValues
 	 * @param  {[type]} poNode [description]
 	 * @return {[type]}        [description]
@@ -364,46 +327,40 @@ class JSXPath {
 		let values = [];
 		let result;
 
-		console.log("_getNodeValues", poNode)
 		if (Array.isArray(poNode)) {
 			for (let i = 0; i < poNode.length; ++i) {
 				if (this._isJSXNode(poNode[i])) {
-					// console.log("*1")
 					result = this._getNodeValues(poNode[i].value);
-					values = this._flatten(result, values);
+					if (_.isArray(poNode[i].value) && !this._isJSXNode(poNode[i].value[0])) {
+						values.push(result);
+					} else {
+						values = this._flatten(result, values);
+					}
 				} else {
-					// console.log("*2")
 					values.push(poNode[i]);
 				}
 			}
 		} else if (this._isJSXNode(poNode)) {
 			if (Array.isArray(poNode.value)) {
-				// console.log("*3")
 				result = this._getNodeValues(poNode.value);
 				values = this._flatten(result, values);
 			} else if (this._isJSXNode(poNode.value)) {
-				// console.log("*4")
 				values.push(this._getNodeValues(poNode.value));
 			} else {
-				// console.log("*5")
 				values.push(poNode.value);
 			}
 		} else {
-			// console.log("*6", poNode)
 			values.push(poNode);
 		}
-		console.log("_getNodeValues return", values);
 
 		return values;
 	}
 
 	_flatten(paNew, paOld) {
-		console.log("__flatten", paNew)
 		let aO = paOld;
 		for (let i = 0; i < paNew.length; ++i) {
 			aO.push(paNew[i]);
 		}
-		console.log("___return aO", aO)
 		return aO;
 	}
 

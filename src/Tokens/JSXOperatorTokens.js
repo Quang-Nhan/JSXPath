@@ -10,6 +10,7 @@ var JSXDebugConfig = require("../JSXDebugConfig");
  * - [Node Selection](NODESELECTION.html)
  * - Operators
  * 
+ * TODO: update all variables to work with arrays. Eg = operator
  * # Operators 
  * ##### [+](#+) , [-](#-2) , [*](#-3) , [div](#div) , [mod](#mod) , [=](#-4) , [!=](#-5) , [>](#gt) , [<](#lt) , [>=](#gt-2) , [<=](#lt-2) , [and](#and) , [or](#or) , [|](#-6)
  * Operators are symbols used to perform operation/tests on its left and right values.
