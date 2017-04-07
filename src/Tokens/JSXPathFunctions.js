@@ -706,12 +706,11 @@ class JSXPathFunctions {
 			, "position": (args) => {
 				let current = this.exploded["."];
 				let result = [];
-				// console.log("Position start", args)
 				if (Array.isArray(current.value) && current.value.length) {
 					let num = isNaN(args[0]) ? args[2] : args[0];
 					switch(args[1]) {
 						case "=":
-							if (num > 0 && num < current.value.length) {
+							if (num > 0 && num <= current.value.length) {
 								result.push(current.value[num-1]);
 							}
 							break;
@@ -729,22 +728,23 @@ class JSXPathFunctions {
 							let tmp = args[0];
 							args[0] = args[2];
 							args[2] = tmp;
-							args[1] = "≤";
+							if (args[1] === "≥")
+								args[1] = "≤";
 						case "<":
 						case "≤":
 							result = current.value.filter((e, i) => {
-								return args[0] === num && num < i+1 || i+1 < num;
+								if (args[0] === num) {
+									return args[1] === "≤" ? num <= i+1 : num < i+1
+								} else {
+									return args[1] === "≤" ? i+1 <= num : i+1 < num;
+								}
 							});
-							if (args[1] === "≤" && num <= current.value.length) {
-								result.push(current.value[num-1]);
-							}
 							break;
 					}
 				}
 				return result;
-
 			}
-			, "disctinct-values": () => {
+			, "distinct-values": () => {
 
 			 }
 			, "now": (args) => {
