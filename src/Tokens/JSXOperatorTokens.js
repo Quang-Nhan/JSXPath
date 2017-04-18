@@ -200,7 +200,6 @@ class JSXOperatorTokens {
 			"=": (prev) => {
 				return (next) => {
 					this._outputDebug("init", "JSXOperatorTokens:=", prev, next);
-					
 					let prevValue = this.Validator.validateNumber(prev, "=");
 					let nextValue = this.Validator.validateNumber(next, "=");
 					let result;
@@ -229,6 +228,12 @@ class JSXOperatorTokens {
 					if (nextValue === null) {
 						nextValue = this.Validator.validateNode(next, "=");
 					}
+					if (prevValue === null) {
+						prevValue = this.Validator.validateBoolean(prev, "=");
+					}
+					if (nextValue === null) {
+						nextValue = this.Validator.validateBoolean(next, "=");
+					}
 
 					if (prevValue && prevValue.value){
 						result = _.isEqual(prevValue.value, nextValue);
@@ -236,16 +241,16 @@ class JSXOperatorTokens {
 						result = _.isEqual(prevValue, nextValue.value);
 					} else if (Array.isArray(prevValue) && Array.isArray(nextValue)) {
 						result = _.isEqual(prevValue, nextValue)
+					} else if (Array.isArray(prevValue) && prevValue.length === 1 && prevValue[0].hasOwnProperty('value') && !isNaN(nextValue)) {
+						result = prevValue[0].value === nextValue;
+					} else if (Array.isArray(nextValue) && nextValue.length === 1 && nextValue[0].hasOwnProperty('value') && !isNaN(prevValue)) {
+						result = prevValue === nextValue[0].value;
 					} else if (Array.isArray(prevValue)) {
 						result = _.filter(prevValue, {value: nextValue});
 					} else if (Array.isArray(nextValue)) {
 						result = _.filter(nextValue, {value: prevValue});
 					} else {
 						result = _.isEqual(prevValue, nextValue);
-					}
-
-					if (Array.isArray(result) && ((prev && prev.value) || (next && next.value))) {
-						result = result.length ? true : false;
 					}
 
 					// istanbul ignore next
@@ -272,29 +277,64 @@ class JSXOperatorTokens {
 				return (next) => {
 					this._outputDebug("init", "JSXOperatorTokens:≠", prev, next);
 
-					let prevValue = this.Validator.validateNumber(prev, "=");
-					let nextValue = this.Validator.validateNumber(next, "=");
+					let prevValue = this.Validator.validateNumber(prev, "≠");
+					let nextValue = this.Validator.validateNumber(next, "≠");
+					let result;
 
 					if (prevValue === null) {
-						prevValue = this.Validator.validateString(prev, "=");
+						prevValue = this.Validator.validateString(prev, "≠");
 					}
 					if (nextValue === null) {
-						nextValue = this.Validator.validateString(next, "=");
+						nextValue = this.Validator.validateString(next, "≠");
 					}
 					if (prevValue === null) {
-						prevValue = this.Validator.isArray(prev, "=");
+						prevValue = this.Validator.isArray(prev, "≠");
 					}
 					if (nextValue === null) {
-						nextValue = this.Validator.isArray(next, "=");
+						nextValue = this.Validator.isArray(next, "≠");
 					}
 					if (prevValue === null) {
-						prevValue = this.Validator.validateNode(prev, "=");
+						prevValue = this.Validator.validateObject(prev, "≠");
 					}
 					if (nextValue === null) {
-						nextValue = this.Validator.validateNode(next, "=");
+						nextValue = this.Validator.validateObject(next, "≠");
+					}
+					if (prevValue === null) {
+						prevValue = this.Validator.validateNode(prev, "≠");
+					}
+					if (nextValue === null) {
+						nextValue = this.Validator.validateNode(next, "≠");
+					}
+					if (prevValue === null) {
+						prevValue = this.Validator.validateBoolean(prev, "≠");
+					}
+					if (nextValue === null) {
+						nextValue = this.Validator.validateBoolean(next, "≠");
 					}
 
-					let result = !_.isEqual(prevValue, nextValue);
+
+					if (prevValue && prevValue.value){
+						result = !_.isEqual(prevValue.value, nextValue);
+					} else if (nextValue && nextValue.value) {
+						result = !_.isEqual(prevValue, nextValue.value);
+					} else if (Array.isArray(prevValue) && Array.isArray(nextValue)) {
+						result = !_.isEqual(prevValue, nextValue)
+					} else if (Array.isArray(prevValue) && prevValue.length === 1 && prevValue[0].hasOwnProperty('value') && !isNaN(nextValue)) {
+						result = prevValue[0].value !== nextValue;
+					} else if (Array.isArray(nextValue) && nextValue.length === 1 && nextValue[0].hasOwnProperty('value') && !isNaN(prevValue)) {
+						result = prevValue !== nextValue[0].value;
+					} else if (Array.isArray(prevValue)) {
+						result = _.filter(prevValue, function(pv) {
+							return pv.value !== nextValue;
+						});
+					} else if (Array.isArray(nextValue)) {
+						result = _.filter(nextValue, function(nv) {
+							return nv.value !== prevValue;
+						});
+					} else {
+						result = !_.isEqual(prevValue, nextValue);
+					}
+
 					// istanbul ignore next
 					this._outputDebug("result", "JSXOperatorTokens:≠", prevValue, nextValue, result);
 					return result;
@@ -318,7 +358,6 @@ class JSXOperatorTokens {
 			">": (prev) => {
 				return (next) => {
 					this._outputDebug("init", "JSXOperatorTokens:>", prev, next);
-
 					let prevValue = this.Validator.validateNumber(prev, ">", true);
 					let nextValue = this.Validator.validateNumber(next, ">", true);
 					let result = [];

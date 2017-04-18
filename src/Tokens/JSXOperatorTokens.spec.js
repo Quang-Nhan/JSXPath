@@ -177,6 +177,10 @@ describe("JSXOperatorTokens", () => {
 				expect(result).toBe(true);
 			});
 
+			it("", () => {
+				let prev = {}
+			});
+
 		});
 
 		//not equal to

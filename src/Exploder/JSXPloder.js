@@ -15,6 +15,10 @@ class JSXPloder {
 		return this.currentContexts;
 	}
 
+	getCurrentContext() {
+		return this.currentContexts.length ? this.currentContexts[this.currentContexts.length-1] : null;
+	}
+
 	current() {
 		return this.json["."];
 	}
@@ -77,6 +81,12 @@ class JSXPloder {
 			parent: popped.parent
 		});
 		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:removeCurrentContext:", this.contextList());
+	}
+
+	updateParentContext(pValue) {
+		if (this.currentContexts.length > 1) {
+			this.currentContexts[this.currentContexts.length - 2] = pValue;
+		}
 	}
 
 	createErrorNode() {
@@ -159,6 +169,10 @@ class JSXPloder {
 	}
 
 	_updateCurrentToNodes(paValues) {
+		if (!paValues.length) {
+			this.json["."] = paValues;
+			return;
+		}
 		let sName = null;
 		for (let i = 0; i < paValues.length; ++i) {
 			if (paValues[i].name && sName !== undefined) {
@@ -169,11 +183,13 @@ class JSXPloder {
 				}
 			}
 		}
+		// debugger;
+		const PARENT = paValues[0].parent;
 
 		this.json["."] = {
 			name: sName,
 			value: paValues,
-			parent: null,
+			parent: paValues.every((e) => e.parent === PARENT) ? PARENT : null,
 			children: []
 		}
 	}

@@ -301,9 +301,11 @@ class JSXPath {
 
 			return this.result;
 		} catch(e) {
+			console.log("error", e)
 			this.history.push({
 				at: new Date(),
-				error: e,
+				error: e.message,
+				stack: e.stackTrace,
 				path: path,
 				variables: this.variables && this.variables || null
 			});

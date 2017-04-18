@@ -29,6 +29,7 @@ class JSXValidator {
 		if (this.Utils.isNumber(val)) {
 			return val;
 		}
+		console.log("validationNumber", val)
 		if (throwError) {
 			this.ErrorHandler.throw("jsx002", { name: caller, type: typeof val, expectedType: "number", at: "JSXValidator.validateNumber"});
 		}
