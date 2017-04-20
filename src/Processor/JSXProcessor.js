@@ -76,8 +76,9 @@ class JSXProcessor {
 
 		this.ErrorHandler.test("Defined", { data: this.path, name: "this.path", at: "JSXProcessor.process" });
 		this.ErrorHandler.test("Defined", { data: this.json, name: "this.json", at: "JSXProcessor.process" });
-
+		this.Exploder.addCurrentContext();
 		let result = this._processPath(this.parsedPath, this.exploded);
+		this.Exploder.removeCurrentContext();
 		if (!Array.isArray(result)) {
 			result = !result ? [] : [result];
 		}
@@ -94,24 +95,24 @@ class JSXProcessor {
 	_processPath(paPath, exploded) {
 		var result, aArg;
 		var bArg = false;
-		this.Exploder.addCurrentContext();
 
 		for (var i = 0; i < paPath.length; ++i) {
 			if (paPath[i] === ",") {
 				aArg = [];
 				bArg = true;
 			} else if (paPath[i] === "[") {
+				this.Exploder.addCurrentContext();
 				result = this._tests(paPath.slice(i + 1, paPath.length), exploded);
+				this.Exploder.removeCurrentContext();
 				if (!result || Array.isArray(result) && !result.length) {
 					return result;
-				} else if (Array.isArray(result)){
-					this.Exploder.updateCurrent({values: result});
-				} else {
-					return this.Exploder.current();
+				} else if (Array.isArray(this.Exploder.getCurrentContext())){
+					this.Exploder.updateCurrent({values: this.Exploder.getCurrentContext()});
 				}
+				return this.Exploder.current();
 				break;
 			} else {
-				result = this._processArrayElement(aArg && aArg || result, paPath[i], paPath[i+1], exploded);
+				result = this._processArrayElements(aArg && aArg || result, paPath[i], paPath[i+1], exploded);
 				if (!result)  {//tests resturns a false result
 					return result;
 				}
@@ -128,7 +129,6 @@ class JSXProcessor {
 			return aArg;
 		}
 
-		this.Exploder.removeCurrentContext();
 		return result;
 	}
 	/**
@@ -184,15 +184,13 @@ class JSXProcessor {
 		let result =  this._processPath(paPath, exploded);
 		let currentContext = this.Exploder.contextList();
 		if (Array.isArray(result)) {
-			if (result.every((e) => { 
-				return currentContext[currentContext.length-1].name === e.name || currentContext[currentContext.length-1].name === e.parent }
-				)) {
-				return result;
-			} else {
-				return true;
+			if (result.every((e) => currentContext[currentContext.length-1].name === e.name )) {
+				this.Exploder.updateParentContext(result);
+			} else if (result.every((e) => currentContext[currentContext.length-1].name === e.parent )) {
+				this.Exploder.updateCurrent({values: result})
 			}
+			result = true;
 		}
-		
 		return result;
 	}
 	/**
@@ -216,6 +214,8 @@ class JSXProcessor {
 			return "string";
 		else if (parseFloat(pPath) === parseFloat(pPath))
 			return "number";
+		else if (pPath === 'true' || pPath === 'false')
+			return 'boolean';
 		else if (this.OperatorTokens.tokens[pPath])
 			return "operator";
 		else if (poRef[pPath])
@@ -239,7 +239,7 @@ class JSXProcessor {
 	/**
 	 * @private
 	 * 
-	 * @method _processArrayElement
+	 * @method _processArrayElements
 	 * @description Process the current element
 	 * @param  {any} prev The previous parsed element
 	 * @param  {any} current The current element
@@ -247,9 +247,9 @@ class JSXProcessor {
 	 * @param  {Object} exploded The flattened/exploded json
 	 * @return {Object} The parsed result of the current element.
 	 */
-	_processArrayElement(prev, current, next, exploded) {
+	_processArrayElements(prev, current, next, exploded) {
 		var result;
-		let sType = this._type(current, exploded)
+		let sType = this._type(current, exploded);
 		switch (sType) {
 			case "array": 
 				result = this._processPath(current, exploded);
@@ -267,20 +267,22 @@ class JSXProcessor {
 			case "string": 
 				result = current.substring(1, current.length - 1);
 				break;
+			case 'boolean':
+				result = current === 'true' ? true : false;
+				break;
 			case "function": 
 				var args = Array.isArray(prev) ? prev : [prev];
 				let sFName = current.substring(0, current.length - 1).trim();
 				if (this.ContextTokens.tokens[sFName]) {
+					this.Exploder.resetCurrentContext();
 					result = this.ContextTokens.tokens[sFName].apply(this, [this.exploded, prev, this.Exploder._explode()]);
 					if (Array.isArray(result)) {
 						this.Exploder.updateCurrent({ values: result });
-						this.Exploder.addCurrentContext();
 					} else if (result.name) {
 						this.Exploder.updateCurrent({
 							name: result.name, 
 							parent: result.parent
 						});
-						this.Exploder.addCurrentContext();
 					}
 				} else if (this.PathFunctions.customs && this.PathFunctions.customs.hasOwnProperty(sFName)) {
 					result = this.PathFunctions.customs[sFName].apply(this, [args, this.Validator]);
@@ -301,15 +303,16 @@ class JSXProcessor {
 			case "operator":
 				if (!Array.isArray(prev) || (prev.indexOf("∏") === -1 && next !== "∏")) { // does not have position symbol
 					var opfunc = this.OperatorTokens.tokens[current].apply(this, [prev]);
-					var nextResult = this._processArrayElement(null, next, null, exploded);
+					var nextResult = this._processArrayElements(null, next, null, exploded);
 					result = opfunc.apply(null, [nextResult]);
-					this.Exploder.resetCurrentContext();
+					if (this.Exploder.contextList().length)
+						this.Exploder.resetCurrentContext();
 				} else {
 					result = current;
 				}
 				break;
 			case "variable":
-				this.ErrorHandler.test("Defined", {data: this.variables[current], name: current, at: "JSXProcessor:_processArrayElement"});
+				this.ErrorHandler.test("Defined", {data: this.variables[current], name: current, at: "JSXProcessor:_processArrayElements"});
 				result = this.variables[current];
 				break;
 			case "position":
@@ -320,11 +323,11 @@ class JSXProcessor {
 			case "tests": //handled in preprocess
 				break;
 			default:
-				// this.ErrorHandler.throw("jsx000", {name: current, at: "JSXProcessor:_processArrayElement"})
+				// this.ErrorHandler.throw("jsx000", {name: current, at: "JSXProcessor:_processArrayElements"})
 				console.log("default", current, "prev", prev, this.Exploder.current());
 		}
 		/* istanbul ignore if */
-		if (this.DEBUG && this.SHOWPROCESSTYPE) console.log(new Date(), "JSXProcessor:" + sType.toUpperCase(), "current", JSON.stringify(current), "result:", JSON.stringify(result));
+		if (this.DEBUG && this.SHOWPROCESSTYPE) console.log(new Date(), "JSXProcessor:" + (sType && sType.toUpperCase() || ''), "current", JSON.stringify(current), "result:", JSON.stringify(result));
 		return result;
 	}
 };

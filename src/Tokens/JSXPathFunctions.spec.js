@@ -14,7 +14,6 @@ describe("JSXPathFunctions", () => {
 		func = new JSXPathFunctions(exploded);
 	});
 	
-	//TODO
 	describe("token functions", () => {
 		describe("contains()", () => {
 			it("should return true for source string ABCDE and search string CD", () => {
@@ -546,9 +545,172 @@ describe("JSXPathFunctions", () => {
 			//same functionality as name()
 		});
 
-		//TOOD:
 		describe("position()", () => {
+			
+			beforeEach(() => {
+				let exploded = {
+					".": {
+						value: [
+					    {
+					      "name": "b",
+					      "value": 1,
+					      "parent": "a",
+					      "children": []
+					    },
+					    {
+					      "name": "b",
+					      "value": 2,
+					      "parent": "a",
+					      "children": []
+					    },
+					    {
+					      "name": "b",
+					      "value": 4,
+					      "parent": "a",
+					      "children": []
+					    }
+					  ]
+					}
+				}
+				func = new JSXPathFunctions(exploded);
+			});
 
+			describe("with = operator", () => {
+				it("should return the first matched positioned node.", () => {
+					let args = ["∏", "=", 1];
+					let result = func.tokens.position(args);
+					let expected = [{
+			      "name": "b",
+			      "value": 1,
+			      "parent": "a",
+			      "children": []
+			    }];
+					expect(result).toEqual(expected);
+				});
+
+				it("should return the 3rd matched positioned node.", () => {
+					let args = [3, "=", "∏"];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 4,
+						"parent": "a",
+						"children": []
+					}];
+					expect(result).toEqual(expected);
+				})
+			});
+			describe("with != operator", () => {
+				it("should return the all matched postioned nodes except the first node.", () => {
+					let args = ["∏", "≠", 1];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 2,
+						"parent": "a",
+						"children": []
+					},{
+						"name": "b",
+						"value": 4,
+						"parent": "a",
+						"children": []
+					}]
+					expect(result).toEqual(expected);
+				});
+			});
+
+			describe("with > operator", () => {
+				it("should return all matched positioned nodes whose postion is greater than 1.", () => {
+					let args = ["∏", ">", 1];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 2,
+						"parent": "a",
+						"children": []
+					},{
+						"name": "b",
+						"value": 4,
+						"parent": "a",
+						"children": []
+					}];
+					expect(result).toEqual(expected);
+				});
+
+				it("should return all matched positioned nodes whose posiion is greater than 2.",() => {
+					let args = ["∏", ">", 2];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 4,
+						"parent": "a",
+						"children": []
+					}];
+					expect(result).toEqual(expected);
+				});
+			});
+
+			describe("with < operator", () => {
+				it("should return all matched positioned nodes whose position is less than 4", () => {
+					let args = ["∏", "<", 4];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 1,
+						"parent": "a",
+						"children": []
+					},{
+						"name": "b",
+						"value": 2,
+						"parent": "a",
+						"children": []
+					},{
+						"name": "b",
+						"value": 4,
+						"parent": "a",
+						"children": []
+					}];
+					expect(result).toEqual(expected);
+				});
+			});
+
+			describe("with ≥ operator", () => {
+				it("should return all matched positioned nodes whose position is greater or equal to 2", () => {
+					let args = ["∏", "≥", 2];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 2,
+						"parent": "a",
+						"children": []
+					},{
+						"name": "b",
+						"value": 4,
+						"parent": "a",
+						"children": []
+					}];
+					expect(result).toEqual(expected);
+				});
+			});
+
+			describe("with ≤ operator", () => {
+				it("should return all matched position nodes whose position is less than or equal to 2", () => {
+					let args = ["∏", "≤", 2];
+					let result = func.tokens.position(args);
+					let expected = [{
+						"name": "b",
+						"value": 1,
+						"parent": "a",
+						"children": []
+					},{
+						"name": "b",
+						"value": 2,
+						"parent": "a",
+						"children": []
+					}];
+					expect(result).toEqual(expected);
+				})
+			});
 		});
 
 		//TODO:

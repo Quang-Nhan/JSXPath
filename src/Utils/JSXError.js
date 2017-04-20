@@ -3,7 +3,7 @@ class JSXError {
 		this.tokens = {
 			"jsx000" : (args) => args.name + " is an unrecognisable element. Thrown in " + args.at + "."
 			, "jsx001": (args) => args.name + " is not defined. Thrown in " + args.at + "." 
-			, "jsx002": (args) => args.name + " was expecting a null object. Thrown at" + args.at + "."
+			, "jsx002": (args) => args.name + " was expecting " + args.expectedType + " type, instead received type " + args.type + ". Thrown at " + args.at + "."
 			, "jsx003": (args) => args.name + " is type: " + args.type + ". Expected type '" + args.expectedType + "'. Thrown in " + args.at + "."
 			, "jsx004": (args) => args.name + " is not a valid JSX Node. A JSXNode must contain {name, children, parent and value} properties. Thrown in " + args.at + "." 
 			, "jsx005": (args) => args.name + " contains invalid number of arguments. Thrown at " + args.at + "."
@@ -53,8 +53,10 @@ class JSXError {
 	 */
 	testType(poArgs) {
 		//assumed poArgs.param exists
-		if (poArgs.data && poArgs.expectedType === "null" && poArgs.type === "object" && poArgs.data) 
+		if (poArgs.data && poArgs.expectedType === "null" && poArgs.type === "object" && poArgs.data)  {
+			// throw new Error("TEST")
 			throw new Error(this.tokens["jsx002"](poArgs))
+		}
 		if (poArgs.data && poArgs.type !== poArgs.expectedType) 
 			throw new Error(this.tokens["jsx003"](poArgs));
 	}
