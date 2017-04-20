@@ -301,7 +301,6 @@ class JSXPath {
 
 			return this.result;
 		} catch(e) {
-			console.log("error", e)
 			this.history.push({
 				at: new Date(),
 				error: e.message,

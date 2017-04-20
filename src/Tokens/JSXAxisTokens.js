@@ -41,8 +41,10 @@ class JSXAxisTokens {
 			"*": (poRef, psNode) => {
 				let result = {};
 				let oChildren = {};
-				let asChildren = poRef["."].children;
+				let current = poRef["."];
+				let asChildren = (current.meta.type === "nodelist") ? current.value.reduce((r, v) => { return r.push(v.children) && r; }, []) : current.children;
 				let sParent = poRef["."].name;
+				
 				if (0 < asChildren.length) {
 					for (let i = asChildren.length-1; i >= 0; --i) {
 						let c = asChildren[i];

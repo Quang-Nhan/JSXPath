@@ -6,18 +6,27 @@ describe("JSXAxisTokens", () => {
 		ct = new JSXAxisTokens();
 		exploded = {
 			"a": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "a",
 				"value": "A",
 				"parent": "@",
 				"children": []
 			},
 			"b": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "b",
 				"value": 1,
 				"parent": "@",
 				"children": []
 			},
 			"c": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "c",
 				"value": [
 					"d",
@@ -27,24 +36,36 @@ describe("JSXAxisTokens", () => {
 				"children": []
 			},
 			"f": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "f",
 				"value": { "g": { "h": "H"} },
 				"parent": "@",
 				"children": ["g"]
 			},
 			"g": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "g",
 				"value": { "h": "H"},
 				"parent": "f",
 				"children": ["h"]
 			},
 			"h": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "h",
 				"value": "H",
 				"parent": "g",
 				"children": []
 			},
 			"@": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "@",
 				"value": {
 					"a": "A",
@@ -64,6 +85,9 @@ describe("JSXAxisTokens", () => {
 				]
 			},
 			".": {
+				"meta": {
+					"type": "node"
+				},
 				"name": "@",
 				"value": {
 					"a": "A",
@@ -203,7 +227,7 @@ describe("JSXAxisTokens", () => {
 
 		describe("ancestorOrSelf", () => {
 			it("should return the ancestor-or-self.", () => {
-				exploded["."] = { name: "a", "parent": "@", children: [], value: "A" };
+				exploded["."] = { "meta": {"type": "node"}, name: "a", "parent": "@", children: [], value: "A" };
 				let expected = {
 					"@": exploded["@"],
 					"a": exploded.a

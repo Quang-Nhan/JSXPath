@@ -1,5 +1,6 @@
 var JSXAxisTokens = require("../Tokens/JSXAxisTokens");
 var JSXDebugConfig = require("../JSXDebugConfig");
+var JSXNode = require("../Node/JSXNode");
 
 class JSXPloder {
 	constructor() {
@@ -186,12 +187,13 @@ class JSXPloder {
 		// debugger;
 		const PARENT = paValues[0].parent;
 
-		this.json["."] = {
+		this.json["."] = new JSXNode({
+			type: "nodelist",
 			name: sName,
 			value: paValues,
 			parent: paValues.every((e) => e.parent === PARENT) ? PARENT : null,
 			children: []
-		}
+		});
 	}
 
 	_updateChildren() {
@@ -259,12 +261,13 @@ class JSXPloder {
 		} else if (null !== pValue && "object" === typeof pValue) {
 			children = Object.keys(pValue);
 		}
-		return {
+		return new JSXNode({
+			type: "node",
 			name: psName,
 			value: pValue,
 			parent: psParent,
 			children: children
-		}
+		});
 	}
 }
 
