@@ -188,7 +188,7 @@ class JSXReplacer {
 		return (m, a, b, c, d, e, i, o) => {
 			if (!i) i = a;
 			if (!o) o = b;
-			let bIndexOnly = m.includes("position") ? false : true;
+			const bIndexOnly = m.includes("position") ? false : true;
 			let result = "";
 
 			if (bIndexOnly) { // eg a[12]
@@ -197,7 +197,7 @@ class JSXReplacer {
 			} else { // eg a[position() > 12]
 				let nBeg, nEnd, sParamString;
 				// check if equality tokens on the left?
-				let aTokens = [">", "<", "≥", "≤", "=", "≠", "+", "~", "÷", "¬"];
+				const aTokens = [">", "<", "≥", "≤", "=", "≠", "+", "~", "÷", "¬"];
 				let nPosIndex = m.indexOf("position") + i;
 				let nEqualityIndex = Utils.lastIndexOfString(o, aTokens.concat(["[", "("]), nPosIndex);
 				let nTokenIndex = aTokens.indexOf(o[nEqualityIndex]);

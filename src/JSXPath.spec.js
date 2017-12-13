@@ -42,7 +42,7 @@ describe("JSXPath", () => {
 				let path = '//tac[.>1]';
 				let expected = [10, 20];
 				let result = jsxpath.process({ path: path });
-				expect(result).toEqual(expected);
+				expect(result.sort()).toEqual(expected.sort());
 			});
 
 			it("should return an empty array when the predicate expression resolved to be false.", () => {
@@ -267,6 +267,14 @@ describe("JSXPath", () => {
 			}
 		});
 
+		it("should return the filtered subset of a that contains b < 4", () => {
+			let jsxpath = new JSXPath(js);
+			let expected = [[{b: 1}, {b:3, k: 20}]];
+			let path = '/a[b < 4]';
+			let result = jsxpath.process({ path: path });
+			expect(result).toEqual(expected);
+		});
+
 		it("should return object {c: 9} from using index predicate only with node b.", () => {
 			let jsxpath = new JSXPath(js);
 			let expected = [{c: 9}];
@@ -291,10 +299,19 @@ describe("JSXPath", () => {
 			expect(result).toEqual(expected);
 		});
 
+		it("should return an empty array since filter does not return object contains valid result.", () => {
+			let jsxpath = new JSXPath(js);
+			let expected = [];
+			let path = '/a[b = 3 and d="d"]';
+			let result = jsxpath.process({ path: path });
+			expect(result).toEqual(expected);
+		});
+
+
 		it("should return all children object of a since the evaluation returns true.", () => {
 			let jsxpath = new JSXPath(js);
-			let expected = [[{b: 1}, {b : {c: 9}}, {d: 'd'}, { b: 3, k: 20 }]];
-			let path = '/a[b = 3 and d="d"]';
+			let expected = [[{ b: 3, k: 20 }]];
+			let path = '/a[b = 3 and k=20]';
 			let result = jsxpath.process({ path: path });
 			expect(result).toEqual(expected);
 		});
@@ -304,6 +321,38 @@ describe("JSXPath", () => {
 			let expected = [1, {c: 9}, 3];
 			let path = '/a/b';
 			let result = jsxpath.process({ path: path });
+			expect(result).toEqual(expected);
+		});
+
+		it("should filter out irrelevant path", () => {
+			let jsxpath = new JSXPath(js);
+			let expected = [3];
+			let path  = '/a//b[../k = 20]';
+			let result = jsxpath.process({path: path});
+
+		});
+
+		it("should return ", () => {
+			let jsxpath = new JSXPath(js);
+			let expected = [{c: 9}];
+			let path = '//b[c = 9]';
+			let result = jsxpath.process({path: path});
+			expect(result).toEqual(expected);
+		});
+		
+		it("should return an array with a single node b value.", () => {
+			let jsxpath = new JSXPath(js);
+			let expected = [[js.a[0]]];
+			let path = '/a[b= 1 and /b=19]';
+			let result = jsxpath.process({path: path});
+			expect(result).toEqual(expected);
+		});
+
+		it("should return an empty array as the predicate test is falsy", () => {
+			let jsxpath = new JSXPath(js);
+			let expected = [];
+			let path = '/a[b= 1 and /b>19]';
+			let result = jsxpath.process({path: path});
 			expect(result).toEqual(expected);
 		});
 	});

@@ -23,15 +23,15 @@ class JSXPathParser {
 			throw new Error("Path expression is not of type 'string'.");
 		this.Replacer = new JSXReplacer(poVariables, poJSONKeys);
 
-		let sPath = this._normalise(psPath).trim();
+		const sPath = this._normalise(psPath).trim();
 		/* istanbul ignore if */
 		if (this.DEBUG) console.log(new Date(), "JSXPathParser:parse:sPath", sPath);
 
-		let aParsed = this._transform(sPath);
+		const aParsed = this._transform(sPath);
 		/* istanbul ignore if */
 		if (this.DEBUG) console.log(new Date(), "JSXPathParser:parse:aParsed", JSON.stringify(aParsed));
 
-		let aFinalParsed =  this._postParsedProcessing(aParsed); //used to group comma separate expressions
+		const aFinalParsed =  this._postParsedProcessing(aParsed); //used to group comma separate expressions
 		/* istanbul ignore if */
 		if (this.DEBUG) console.log(new Date(), "JSXPathParser:parse:aFinalParsed", aFinalParsed);
 		return aFinalParsed;
@@ -78,6 +78,7 @@ class JSXPathParser {
 			, { level: 3, regex: /[\<|\>|\≤|\≥]/g } 
 			, { level: 4, regex: /[\=|\≠]/g }
 			, { level: 5, regex: /[\&|\Ø]/g }
+			, { level: 6, regex: /\s@/g }
 		]
 		var oUpdated = {};
 
@@ -103,8 +104,8 @@ class JSXPathParser {
 					}
 				}
 			}
+			if (this.DEBUG) console.log(new Date(), "JSXPathParser:_autoParenthesis:level " + PRECEDENCE[i].level + ": " + PRECEDENCE[i].regex, sAutoParen);
 		}
-
 		return sAutoParen;
 	}
 
@@ -123,7 +124,7 @@ class JSXPathParser {
 
 	_autoParenAt(psInput, pnIndex) {
 		let sAutoParened = psInput;
-		let nLeftScope = this._findInsertPosition("left", sAutoParened, pnIndex);
+		let nLeftScope = psInput[pnIndex+1] === '@' ? pnIndex : this._findInsertPosition("left", sAutoParened, pnIndex);
 		let nRightScope = this._findInsertPosition("right", sAutoParened, pnIndex);
 
 		nLeftScope = nLeftScope === 0 ? 0 : nLeftScope + 1;
@@ -140,11 +141,13 @@ class JSXPathParser {
 		let oCounts = {
 			parenCount: 0,
 			brackCount: 0,
+			root: 0,
 			run: {
 				"]": (self) => --self.brackCount,
 				")": (self) => --self.parenCount,
 				"[": (self) => ++self.brackCount,
-				"(": (self) => ++self.parenCount
+				"(": (self) => ++self.parenCount,
+				"@": (self) => ++self.root
 			}
 		}
 
@@ -183,7 +186,7 @@ class JSXPathParser {
 						nPointer = nSpace + nSubParen;
 					} else {
 						nPointer = nSpace + nSubBrack;
-					} 
+					}
 					nInsertsAt = nPointer;
 					break;
 				}
@@ -213,7 +216,7 @@ class JSXPathParser {
 			} else if (poCounts.run[psInput[i]]) {
 				nPointer =  i;
 				poCounts.run[psInput[i]](poCounts);
-				if (poCounts.parenCount === poCounts.brackCount && poCounts.parenCount === 0) {
+				if (poCounts.parenCount === poCounts.brackCount && poCounts.parenCount === 0 && poCounts.root === 0) {
 					let sSub, nSubParen, nSubBrack;
 					let nSpace = this.Utils.nextIndexOfString(psInput, [" "], nPointer);
 					sSub = psInput.substring(nPointer, nSpace);
@@ -221,6 +224,7 @@ class JSXPathParser {
 					nSubBrack = sSub.indexOf("]");
 
 					if (nSpace === -1) {
+						// nPointer = psInput.length;
 					} else if (nSubParen === nSubBrack && nSubParen === -1) {
 						nPointer = nSpace;
 					} else if (nSubParen <= nSubBrack) {
@@ -239,7 +243,7 @@ class JSXPathParser {
 			return nInsertsAt === -1 ? psInput.length : nInsertsAt;
 		}
 
-		return nInsertsAt;
+		return nInsertsAt === -1 ? psInput.length : nInsertsAt;
 	}
 
 

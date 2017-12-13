@@ -1,5 +1,6 @@
 var JSXProcessor = require("./Processor/JSXProcessor");
-var _ = require("lodash");
+var cloneDeep = require("lodash/cloneDeep");
+
 var DEBUG = require("./JSXDebugConfig").debugOn;
 
 /**
@@ -233,7 +234,7 @@ var DEBUG = require("./JSXDebugConfig").debugOn;
 class JSXPath {
 	constructor(poSource, poCustomFunctions) {
 		this.processor = new JSXProcessor(poCustomFunctions);
-		this.source = poSource || {};
+		this.source = poSource && cloneDeep(poSource) || {};
 		this.variables = null;
 		this.result = null;
 		this.path = null;
@@ -284,7 +285,7 @@ class JSXPath {
 				variables: this.variables
 			};
 
-			this.result = _.cloneDeep(aProcessedResult);
+			this.result = cloneDeep(aProcessedResult);
 
 			if (!this.result) {
 				return [];
@@ -326,7 +327,7 @@ class JSXPath {
 			for (let i = 0; i < poNode.length; ++i) {
 				if (this._isJSXNode(poNode[i])) {
 					result = this._getNodeValues(poNode[i].value);
-					if (_.isArray(poNode[i].value) && !this._isJSXNode(poNode[i].value[0])) {
+					if (Array.isArray(poNode[i].value) && !this._isJSXNode(poNode[i].value[0])) {
 						values.push(result);
 					} else {
 						values = this._flatten(result, values);
@@ -360,7 +361,7 @@ class JSXPath {
 	}
 
 	_isJSXNode(poNode) {
-		return _.has(poNode, "name") && _.has(poNode, "value") && _.has(poNode, "parent") && _.has(poNode, "children");
+		return poNode.hasOwnProperty("name") && poNode.hasOwnProperty("value") && poNode.hasOwnProperty("parent") && poNode.hasOwnProperty("children");
 	}
 
 	clearHistory() {

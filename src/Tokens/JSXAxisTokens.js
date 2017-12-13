@@ -1,4 +1,7 @@
-var JSXDebugConfig = require("../JSXDebugConfig");
+const JSXDebugConfig = require("../JSXDebugConfig");
+const JSXValidator = require("../Utils/JSXValidator");
+
+const Validator = new JSXValidator();
 
 /**
  * JSXPath 
@@ -18,9 +21,10 @@ var JSXDebugConfig = require("../JSXDebugConfig");
  * @constructor
  */
 class JSXAxisTokens {
-	constructor() {
+	constructor(context) {
 		this.DEBUG = JSXDebugConfig.debugOn;
 		this.SHOWAXISTOKENS = JSXDebugConfig.showAxisTokens;
+		this.context = context;
 		this.tokens = {
 			/**
 			 * ## *
@@ -39,38 +43,22 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			"*": (poRef, psNode) => {
-				let result = {};
-				let oChildren = {};
-				let current = poRef["."];
-				let asChildren = (current.meta.type === "nodelist") ? current.value.reduce((r, v) => { return r.push(v.children) && r; }, []) : current.children;
-				let sParent = poRef["."].name;
-				
-				if (0 < asChildren.length) {
-					for (let i = asChildren.length-1; i >= 0; --i) {
-						let c = asChildren[i];
-						let oChild = poRef[c];
-						if (Array.isArray(oChild)) {
-							let thisChildren = [];
-							for (let j = oChild.length-1; j >= 0; --j) {
-								if (sParent === oChild[j].parent) {
-									thisChildren.push(oChild[j]);
-								}
-							}
-							oChildren[c] = thisChildren;
-						} else {
-							oChildren[c] = oChild;
-						}
-					}
-				}
+				// let lookup = this.context.pop();
+				// const current = this.context.getLatestItem();
+				// let children = [];
+				// if (Validator.validateNode(current)) {
+				// 	if (Array.isArray(current)) {
+				// 		curent.forEach(c => {
+				// 			children = children.concat(c.children);
+				// 		});
+				// 	} else {
+				// 		children = children.concat(current.children);
+				// 	}
+				// }
 
-				if (!psNode) {
-					result = oChildren;
-				} else if (oChildren[psNode]) {
-					result = oChildren[psNode];
-				}
-				// istanbul ignore next
-				this._outputDebug("JSXAxisTokens:*", result);
-				return result;
+				// // istanbul ignore next
+				// this._outputDebug("JSXAxisTokens:*", oChildren);
+				// return children;
 			  }
 			/**
 			 * ## ..
@@ -91,12 +79,13 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "..": (poRef, psNode) => {
+				// debugger;
 				let result = {};
 				let parent = {};
 				if (poRef["."] === poRef["@"]) {
 					return parent;
 				}
-				let oCurrent = poRef[poRef["."].parent] || [];
+				let oCurrent = poRef[poRef["."].parent.name] || [];
 				let sChildName = poRef["."].name;
 
 				if (Array.isArray(oCurrent)) {
@@ -139,7 +128,7 @@ class JSXAxisTokens {
 				if (poRef["."] === poRef["@"]) {
 					result = siblings;
 				} else {
-					let oCurrent = poRef[poRef["."].parent] || [];
+					let oCurrent = poRef[poRef["."].parent.name] || [];
 					let sChildName = poRef["."].name;
 					let values = [];
 					let nodes = [];
@@ -158,7 +147,7 @@ class JSXAxisTokens {
 							let oNode = poRef[c];
 							if (Array.isArray(oNode)){
 								for (let i = 0; i < oNode.length; ++i) {
-									if (oNode[i].parent = p) {
+									if (oNode[i].parent.name === p) {
 										oNode = oNode[i];
 										break;
 									}
@@ -195,17 +184,32 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "descendant": (poRef, psNode, pfExplode) => {
-				let result = {};
-				let oCurrent = poRef["."];
-				let descendant = {};
-				if (null !== oCurrent && "object" === typeof oCurrent.value) {
-					descendant = pfExplode.apply(this, [oCurrent.value]);
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let descendants = [];
+				let result;
+
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
 				}
-				if (!psNode || psNode === "*") {
-					result = descendant; 
-				} else if (descendant[psNode]) {
-					result = descendant[psNode];
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							descendants = descendants.concat(c.descendants);
+						});
+					} else {
+						descendants = descendants.concat(current.descendants);
+					}
 				}
+
+				if (!lookup || lookup === "*") {
+					result = descendants;
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = descendants.filter((node) => {
+						return node.name === lookup;
+					});
+				}
+
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:descendant", result);
 				return result;
@@ -266,7 +270,7 @@ class JSXAxisTokens {
 
 				do {
 					child = current.name;
-					parent = current.parent;
+					parent = current.parent && curent.parent.name || null;
 
 					if (parent !== null) {
 						current = poRef[parent];
@@ -312,7 +316,7 @@ class JSXAxisTokens {
 
 				do {
 					child = current.name;
-					parent = current.parent;
+					parent = current.parent && current.parent.name || null;
 
 					if (parent !== null) {
 						current = poRef[parent];

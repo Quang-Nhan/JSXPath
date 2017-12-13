@@ -1,4 +1,5 @@
-var JSXPathFunctions = require("./JSXPathFunctions");
+const JSXPathFunctions = require("./JSXPathFunctions");
+const JSXContext = require("../Exploder/JSXContext");
 
 describe("JSXPathFunctions", () => {
 	var func;
@@ -545,7 +546,7 @@ describe("JSXPathFunctions", () => {
 			//same functionality as name()
 		});
 
-		describe("position()", () => {
+		fdescribe("position()", () => {
 			
 			beforeEach(() => {
 				let exploded = {
@@ -570,9 +571,12 @@ describe("JSXPathFunctions", () => {
 					      "children": []
 					    }
 					  ]
-					}
+					},
+					"$_clone": () => {}
 				}
 				func = new JSXPathFunctions(exploded);
+				// func.context = new JSXContext(exploded);
+				// spyOn(func.context, 'getLatestItem').and.returnValue(exploded['.']);
 			});
 
 			describe("with = operator", () => {
@@ -580,11 +584,11 @@ describe("JSXPathFunctions", () => {
 					let args = ["∏", "=", 1];
 					let result = func.tokens.position(args);
 					let expected = [{
-			      "name": "b",
-			      "value": 1,
-			      "parent": "a",
-			      "children": []
-			    }];
+						"name": "b",
+						"value": 1,
+						"parent": "a",
+						"children": []
+					}];
 					expect(result).toEqual(expected);
 				});
 

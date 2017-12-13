@@ -13,3 +13,5 @@ test.html
 npm-debug.log
 *.sublime-project
 *.sublime-workspace
+
+.vscode/launch.json

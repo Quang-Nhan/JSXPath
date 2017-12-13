@@ -55,7 +55,7 @@ class JSXParseTokens {
 				return paBracket;
 			},
 			/*
-			 * 
+			 * [expression] => ['[', '(', expression]
 			 */
 			"[": function(paBracket, psPath, pnCIndex, pnPIndex) {
 				var nTokenIndex = self.Utils.lastIndexOfString(psPath, [" ", "[", "(", ")", "]"], pnCIndex);
@@ -77,7 +77,10 @@ class JSXParseTokens {
 				if (nOpenPredicate === -1)
 					throw Error("Invalid path expression. Expecting to have a pair of '[' and ']'.");
 				// if (nOpenPredicate !== paBracket.length - 1)
-					aPredicate = paBracket.splice(nOpenPredicate, paBracket.length - nOpenPredicate + 1);
+				aPredicate = paBracket.splice(nOpenPredicate, paBracket.length - nOpenPredicate + 1);
+				if (!Array.isArray(aPredicate[1]) && aPredicate.length > 1) {
+					aPredicate = [aPredicate[0], aPredicate.slice(1)];
+				}
 				if (sCurrentString !== "")
 					aPredicate.push(sCurrentString);
 				paBracket.push(aPredicate);
