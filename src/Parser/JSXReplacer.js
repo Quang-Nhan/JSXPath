@@ -24,7 +24,7 @@ class JSXReplacer {
 		this.REPLACE_MAP = [ 
 			{ key: "{", when: "preAutoParenthesis", regex: /\s*\{.*\}(?=[^\}])?/g, with: this._object("{", this.variables, []) }
 			, { key: "[", when: "preAutoParenthesis", regex: /\s*\[.*\](?=[^\]])?/g, with: this._object("[", this.variables, this.operatorTokensKeys) }
-			, { key: "'", when: "preAutoParenthesis", regex: /(\'.*\')|(\".*\")/g, with: this._objectKey(poVariables, poJSONKeys, this.Utils)}
+			, { key: "'", when: "preAutoParenthesis", regex: /(\'[\w|\s\d]*\')|(\"[\w|\s\d]*\")/g, with: this._objectKey(poVariables, poJSONKeys, this.Utils)}
 			, { key: "--", when: "preAutoParenthesis", regex: /--/g, with: " ¬ ◊"}
 			, { key: "-", when: "preAutoParenthesis", regex: /-(?![\w|\-]*[\(|\:]|\d+\W)\s*/g, with: " ¬ " }//requires negative lookback to fully function
 			, { key: "◊", when: "preAutoParenthesis", regex: /◊/g, with: "-" }
@@ -115,7 +115,7 @@ class JSXReplacer {
 	_objectKey(poVariables, poKeys, Utils) {
 		return (m, m1, m2, i, o) => {
 			let sSub = o.substring(i+1, i+m.length-1);
-			if (poKeys.indexOf(sSub) > -1) {
+			if (poKeys.indexOf(sSub) > -1 || sSub.includes(' ')) {
 				poVariables["$objectKey" + i] = sSub;
 				return ("$objectKey" + i);
 			}
@@ -188,7 +188,7 @@ class JSXReplacer {
 		return (m, a, b, c, d, e, i, o) => {
 			if (!i) i = a;
 			if (!o) o = b;
-			let bIndexOnly = m.includes("position") ? false : true;
+			const bIndexOnly = m.includes("position") ? false : true;
 			let result = "";
 
 			if (bIndexOnly) { // eg a[12]
@@ -197,7 +197,7 @@ class JSXReplacer {
 			} else { // eg a[position() > 12]
 				let nBeg, nEnd, sParamString;
 				// check if equality tokens on the left?
-				let aTokens = [">", "<", "≥", "≤", "=", "≠", "+", "~", "÷", "¬"];
+				const aTokens = [">", "<", "≥", "≤", "=", "≠", "+", "~", "÷", "¬"];
 				let nPosIndex = m.indexOf("position") + i;
 				let nEqualityIndex = Utils.lastIndexOfString(o, aTokens.concat(["[", "("]), nPosIndex);
 				let nTokenIndex = aTokens.indexOf(o[nEqualityIndex]);

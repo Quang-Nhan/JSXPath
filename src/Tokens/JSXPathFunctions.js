@@ -46,12 +46,13 @@ var moment = require("moment");
  * @constructor
  */
 class JSXPathFunctions {
-	constructor(exploded, poCustomFunctions) {
+	constructor(exploded, poCustomFunctions, context) {
 		this.DEBUG = JSXDebugConfig.debugOn;
 		this.SHOW_PATH_FUNCTIONS = JSXDebugConfig.showPathFunctions;
 		this.exploded = exploded;
 		this.Validator = new JSXValidator();
 		this.ErrorHandler = new JSXError();
+		this.context = context;
 		this.customs = poCustomFunctions;
 		this.tokens = {
 			/**
@@ -72,7 +73,7 @@ class JSXPathFunctions {
 			 */
 			"node": () => {
 				return this.exploded["."];
-			  }
+			}
 			  /**
 			   * ## nodeValue //TODO: jasmine
 			   * retrieves the value/s of nodes. If no nodes are passed in, then the current node value is returned
@@ -704,20 +705,20 @@ class JSXPathFunctions {
 
 			  }
 			, "position": (args) => {
-				let current = this.exploded["."];
+				let current = this.context.getLatestItem(); //this.exploded["."];
 				let result = [];
-				if (Array.isArray(current.value) && current.value.length) {
+				if (this.Validator.validateNode(current) && Array.isArray(current)) {
 					let num = isNaN(args[0]) ? args[2] : args[0];
 					switch(args[1]) {
 						case "=":
-							if (num > 0 && num <= current.value.length) {
-								result.push(current.value[num-1]);
+							if (num > 0 && num <= current.length) {
+								result.push(current[num-1]);
 							}
 							break;
 						case "≠":
-							for (let i = 0; i < current.value.length; ++i) {
+							for (let i = 0; i < current.length; ++i) {
 								if (i !== num-1) {
-									result.push(current.value[i]);
+									result.push(current[i]);
 								}
 							}
 							break;
@@ -732,7 +733,7 @@ class JSXPathFunctions {
 								args[1] = "≤";
 						case "<":
 						case "≤":
-							result = current.value.filter((e, i) => {
+							result = current.filter((e, i) => {
 								if (args[0] === num) {
 									return args[1] === "≤" ? num <= i+1 : num < i+1
 								} else {

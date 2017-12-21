@@ -11,6 +11,7 @@ class JSXError {
 			, "jsx007": (args) => args.name + " was expecting an arry of type: " + args.expectedType + "." + " Thrown at " + args.at + "."
 			, "jsx008": (args) => args.data + " is not a valid JSON." + ". Thrown at " + args.at + "."
 			, "jsx009": (args) => "Position index of " + args.pos + " cannot be" + (args.key === ">" ? " greater than " : " less than ") + args.length + ". Thrown at " + arg.at + "."
+			, "jsx010": (args) => args.parentName + " does not have property " + args.child + ". Thrown at " + args.at  + "." 
 		}
 	}
 
@@ -34,6 +35,9 @@ class JSXError {
 			case "ArgumentLength":
 				this.testNumberOfArguments(poArgs);
 				break;
+			case "hasProperty":
+				this.testHasProperty(poArgs);
+				break;
 			default: 
 				console.log("Unsupported Error test case.");
 		}
@@ -44,7 +48,7 @@ class JSXError {
 	}
 
 	testDefined(poArgs) {
-		if (!poArgs.data) throw new Error(this.tokens["jsx001"](poArgs));
+		if (poArgs.data === undefined) throw new Error(this.tokens["jsx001"](poArgs));
 	}
 
 	/**
@@ -54,7 +58,6 @@ class JSXError {
 	testType(poArgs) {
 		//assumed poArgs.param exists
 		if (poArgs.data && poArgs.expectedType === "null" && poArgs.type === "object" && poArgs.data)  {
-			// throw new Error("TEST")
 			throw new Error(this.tokens["jsx002"](poArgs))
 		}
 		if (poArgs.data && poArgs.type !== poArgs.expectedType) 
@@ -77,7 +80,15 @@ class JSXError {
 
 	testNumberOfArguments(poArgs) {
 		if (poArgs.data) {
-			throw new Error(this.tokens["jsx005"](poArgs))
+			throw new Error(this.tokens["jsx005"](poArgs));
+		}
+	}
+
+	testHasProperty(poArgs) {
+		this.testType({data: poArgs.parent, expectedType: 'object', type: typeof poArgs.parent});
+		this.testType({data: poArgs.child, expectedType: 'string', type: typeof poArgs.child});
+		if (!poArgs.parent.hasOwnProperty(poArgs.child)) {
+			throw new Error(this.tokens["jsx010"](poArgs));
 		}
 	}
 }

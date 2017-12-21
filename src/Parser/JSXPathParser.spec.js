@@ -26,7 +26,7 @@ describe("JSXPathParser", () => {
 
 		it("3", () => {
 			let path = '/a/ancestor-or-self::b/d+/k/sibling::c';
-			let expected = [[["@/a",["'b'","ancestorOrSelf("],"/d"],"+",["@/k",["'c'","sibling("]]]] ;
+			let expected = [[["@/a",["'b'","ancestorOrSelf("],"/d"],"+",[["@/k",["'c'","sibling("]]]]] ;
 			let result = pathParser.parse(path);
 			expect(result).toEqual(expected);
 		});

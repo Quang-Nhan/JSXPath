@@ -1,6 +1,6 @@
 var JSXAxisTokens = require("./JSXAxisTokens");
 
-describe("JSXAxisTokens", () => {
+xdescribe("JSXAxisTokens", () => {
 	var exploded, ct;
 	beforeEach(() => {
 		ct = new JSXAxisTokens();
@@ -108,7 +108,7 @@ describe("JSXAxisTokens", () => {
 	});
 
 	describe("this.tokens", () => {
-		describe("*", () => {
+		xdescribe("*", () => {
 			it("should return children nodes.", () => {
 				let expected = {
 					"a": exploded.a,
