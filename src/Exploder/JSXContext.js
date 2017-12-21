@@ -25,19 +25,19 @@ class JSXContext {
 	
 	getLatestItem() {
 		const lastItem  = this.current.getLastListedItem();
-		this.audit.push("Retrieve the last item on " + this.current.getId() + " list.");
+		this.audit.push(["Retrieve the last item on " + this.current.getId() + " list.", lastItem]);
 		return lastItem;
 	}
 
 	getPreviousItem() {
 		const previousItem = this.current.getItemBeforeLastListedItem();
-		this.audit.push("Retreive the item before the last item on " + this.current.getId() + " list.");
+		this.audit.push(["Retreive the item before the last item on " + this.current.getId() + " list.", previousItem]);
 		return previousItem;
 	}
 
 	getFirstItem() {
 		const firstItem = this.current.getFirstListedItem();
-		this.audit.push("Retrieve the first item on " + this.current.getId() + " list.");
+		this.audit.push(["Retrieve the first item on " + this.current.getId() + " list."], firstItem);
 		return firstItem;
 	}
 
@@ -53,7 +53,7 @@ class JSXContext {
 			}
 		}
 		newContext.setParentContext(this.current);
-		this.audit.push("Spawned a new context " + this.current.getId());
+		this.audit.push("Spawned a new context from " + this.current.getId());
 
 		this.current.addChildContext(newContext);
 		this.current = newContext;
@@ -62,22 +62,14 @@ class JSXContext {
 		this.addNode(item);
 	}
 
-	addOperationalNode(psOperation) {
-		this.current.addOperationalNode(psOperation);
-	}
-
-	operate() {
-		this.current.operate();
-		this.audit.push("Executed operation on " + this.current.getId())
-	}
-
 	setContextToParent() {
 		this.current = this.current.getParentContext();
+		this.audit.push(["Switched current context to parent context " + this.current.getId(), this.current]);
 	}
 
 	pop() {
 		const popped = this.current.pop();
-		this.audit.push("Popped the last item on " + this.current.getId());
+		this.audit.push(["Popped the last item on " + this.current.getId(), popped]);
 		return popped;
 	}
 
@@ -109,11 +101,17 @@ class JSXContext {
 		return this.current.parent;
 	}
 
-	setContextToNearestPredicateContext() {
+	setContextToNearestPredicateContext(current) {
+		if (!current) {
+			current = this.current;
+		}
 		if (!this.current.isPredicate && this.current.parent) {
 			this.current = this.current.parent;
-			this.setContextToNearestPredicateContext();
+			this.setContextToNearestPredicateContext(current);
+		} else if (!this.current.isPredicate && !this.current.parent) {
+			this.current = current;
 		}
+		// current is now predicate
 	}
 
 	isPredicateContext() {
@@ -121,13 +119,16 @@ class JSXContext {
 	}
 
 	setIsPosition(pbValue) {
-		this.current.isPosition = pbValue;
+		if (typeof pbValue === 'boolean') {
+			this.current.isPosition = pbValue;
+		}
 	}
 
 	isPositionContext() {
 		return this.current.isPosition;
 	}
 
+	// TOOD: function is not complete
 	setContextToContextWithId(psId) {
 		if (this.current.getId() !== psId) {
 			if (this.current.parent.id === psId) {

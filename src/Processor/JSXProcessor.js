@@ -74,7 +74,7 @@ const processElements = (prev, current, next, exploded, jsxProcessor) => {
 		return result(processPath, processElements, jsxProcessor);
 	}
 	/* istanbul ignore if */
-	if (jsxProcessor.DEBUG && jsxProcessor.SHOWPROCESSTYPE) console.log(new Date(), "JSXProcessor:" + (sType && sType.toUpperCase() || ''), "current", JSON.stringify(current), "result:", JSON.stringify(result));
+	if (jsxProcessor.DEBUG && jsxProcessor.SHOWPROCESSTYPE) console.log(new Date(), "JSXProcessor:" + (sType && sType.toUpperCase() || ''), "current", JSON.stringify(current), "result:", result);
 	return result;
 }
 
@@ -191,13 +191,14 @@ class JSXProcessor {
 		this.pathFunctions = new JSXPathFunctions(this.exploded, this.customFunctions, this.context);
 		this.processorTokens = new JSXProcessorTokens(this.context, this.exploded, this.variables);
 
-		// this.Exploder.addCurrentContext();
 		let result = processPath(this.parsedPath, this.exploded, this);
-		// this.Exploder.removeCurrentContext();
 		if (!Array.isArray(result)) {
 			result = !result ? [] : [result];
 		}
-		this.context.cleanUp()
+		/* istanbul ignore if */
+		if (this.DEBUG) console.log(new Date(), "JSXPROCESSOR:this.context", this.context);
+
+		this.context.cleanUp();
 		return result;
 	}
 };

@@ -9,7 +9,7 @@ class JSXNode {
 		}
 		this.value = poArgs.value;
 		this.parent = poArgs.parent;
-		this.children = poArgs.children;
+		this.children = poArgs.children || [];
 		this.name = poArgs.name;
 		this.siblings = poArgs.siblings || [];
 		this.depth = poArgs.depth || 0;

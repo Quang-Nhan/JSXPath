@@ -11,7 +11,6 @@ class JSXPloder {
 	constructor() {
 		this.ContextTokens = new JSXAxisTokens();
 		this.json = {};
-		this.currentContexts = []; //stores current array before 
 		this.DEBUG = JSXDebugConfig.debugOn;
 		this.SHOW_EXPLODE = JSXDebugConfig.showExplode;
 		this.SHOW_CONTEXT = JSXDebugConfig.showContext;
@@ -19,92 +18,10 @@ class JSXPloder {
 		this.json['@_id'] = 0;
 	}
 
-	contextList() {
-		return this.currentContexts;
-	}
-
-	getCurrentContext() {
-		return this.currentContexts.length ? this.currentContexts[this.currentContexts.length-1] : null;
-	}
-
-	current() {
-		return this.json["."];
-	}
-
 	axis() {
 		object.keys(this.ContextTokens.tokens);
 	}
 
-	processAxis(psAxis, paArgs) {
-		oResult = this.ContextTokens.tokens[key].apply(this, [this.json, this._explode()]);
-		return oResult;
-	}
-
-	setCurrentToChildNode(psName) {
-		const children = this.ContextTokens.tokens["*"](this.json);
-		if (psName === "@" || psName === "*") { //do nothing
-		} else if (children.hasOwnProperty(psName)) {
-			this.updateCurrent(children[psName].length > 1 ? {values: children[psName]} : children[psName][0]);
-		} else {
-			if (this.DEBUG && this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:setCurrentToChildNode: creating error node", psName);
-			this.createErrorNode();
-		}
-		// return this.json["."];
-	}
-
-	setParentAsCurrent(){
-		let oParent = this.ContextTokens.tokens[".."](this.json);
-		let sParentKey = Object.keys(oParent)[0];
-		this.updateCurrent({
-			name: sParentKey, 
-			parent: oParent[sParentKey].parent
-		});
-	}
-
-	addCurrentContext() {
-		const node = this.json[this.json['.'].name];
-		this.currentContexts.push(node);
-		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:addCurrentContext:", this.contextList());
-	}
-
-	resetCurrentContext() {
-		if (this.currentContexts.length === 0) {
-			throw new Error("thrown in triggerCurrentNodesReset, no node item to reference to.")
-		}
-		let resetTo = this.currentContexts[this.currentContexts.length-1];
-		this.updateCurrent({ 
-			name: resetTo.name, 
-			parent: resetTo.parent
-		});
-	}
-
-	removeCurrentContext() {
-		if (this.currentContexts.length === 0) {
-			throw new Error("thrown in triggerTestsEnd, cannot pop an empty list.");
-		}
-		let popped = this.currentContexts.pop();
-		this.updateCurrent({
-			name: popped.name, 
-			parent: popped.parent && popped.parent.name
-		});
-		if (this.DEBUG && this.SHOW_CONTEXT) console.log(new Date(), "JSXPloder:removeCurrentContext:", this.contextList());
-	}
-
-	updateParentContext(pValue) {
-		if (this.currentContexts.length > 1) {
-			this.currentContexts[this.currentContexts.length - 2] = pValue;
-		}
-	}
-
-	createErrorNode() {
-		this.json["."] = {
-			name: "#ERR",
-			parent: null,
-			value: [],
-			children: [],
-			siblings: []
-		}
-	}
 	/**
 	 * explode the input json
 	 * @param  {object} poInput  the input json
@@ -147,72 +64,6 @@ class JSXPloder {
 			oRef['$_isOriginal'] = false;
 			return oRef;
 		}
-	}
-
-	reset() {
-		this.updateCurrent("@", null);
-		this.currentContexts.length = 0;
-	}
-
-	updateCurrent(poParam) {
-		if (poParam.name) {
-			this._updateCurrentToNode(poParam);
-		} else if (Array.isArray(poParam.values)) {
-			this._updateCurrentToNodes(poParam.values);
-		}
-
-		if (this.DEBUG && this.SHOW_EXPLODE) console.log(new Date(), "JSXPloder:updateCurrent: this.json[\".\"]", this.json["."], "poParam", poParam);	
-	}
-
-	_updateCurrentToNode(poNode) {
-		if (!this.json.hasOwnProperty(poNode.name))
-			throw new Error("Key " + poNode.name + " does not exists.")
-		if (Array.isArray(this.json[poNode.name])) {
-			let result = [];
-			for (var i = 0; i < this.json[poNode.name].length; ++i) {
-				if (psParent === this.json[poNode.name][i].parent.name) {
-					result.push(this.json[poNode.name][i]);
-				}
-			}
-			if (result.length > 1) {
-				this._updateCurrentToNodes(result);
-				this.parent = psParent;
-			} else if (result.length === 1) {
-				return this.json["."] = result[0];
-			}
-		} else {
-			const parentName = this.json[poNode.name].parent && this.json[poNode.name].parent.name;
-			if (!poNode.parent || (poNode.parent && poNode.parent.name === parentName)) {
-				this.json["."] = this.json[poNode.name];
-			}
-		}
-		this._updateChildren();
-	}
-
-	_updateCurrentToNodes(paValues) {
-		if (!paValues.length) {
-			this.json["."] = paValues;
-			return;
-		}
-		let sName = null;
-		for (let i = 0; i < paValues.length; ++i) {
-			if (paValues[i].name && sName !== undefined) {
-				if (sName !== null && sName !== paValues[i].name) {
-					sName = undefined;
-				} else {
-					sName = paValues[i].name;
-				}
-			}
-		}
-		const PARENT = paValues[0].parent;
-
-		this.json["."] = new JSXNode({
-			type: "nodelist",
-			name: sName,
-			value: paValues,
-			parent: paValues.every((e) => e.parent === PARENT) ? PARENT : null,
-			children: []
-		});
 	}
 
 	_updateChildren() {
@@ -272,21 +123,8 @@ class JSXPloder {
 	_setDefaultProperties(poInput, poRef) {
 		poRef["@"] = this.createNode("@", poInput, null, poRef);
 		poRef["."] = poRef["@"]; // TODO delete
-		poRef['$_clone'] = () => {
-			return this._explode(poRef['@_id'] + 1)(cloneDeep(poRef['@'].value));
-		}
-		poRef["$_find"] = (pNode) => {
-			const isNode = !!Validator.validateNode(pNode);
-			if (isNode && Array.isArray(pNode)) {
-				return pNode.map(n => {
-					return Array.isArray(poRef[n.name]) ? poRef[n.name][n.index] : poRef[n.name];
-				});
-			} else if (isNode) {
-				return Array.isArray(poRef[pNode.name]) ? poRef[pNode.name][pNode.index] : poRef[pNode.name];
-			} else {
-				return poRef[pNode];
-			}
-		}
+		poRef['$_clone'] = this.clone(poRef);
+		poRef["$_find"] = this.find(poRef);
 		poRef["$_prune"] = this.prune;
 	}
 
@@ -362,16 +200,11 @@ class JSXPloder {
 		}
 	}
 
-	prune(filteredNodes) {
-		// const composeValue = (node) => {
-		// 	return node.siblings.reduce((r, sibling) => {
-		// 		r[sibling.name] = sibling.value;
-		// 		return r;
-		// 	}, {[node.name]: node.value});
-		// };
-		const contains = (list, ob) => {
+	clone(poRef) {
+		return () => this._explode(poRef['@_id'] + 1)(cloneDeep(poRef['@'].value));
+	}
 
-		};
+	prune(filteredNodes) {
 		const updateParentValue = (node) => {
 			if (node._keep && node.meta.type === "nodeList") {
 				node._keep.forEach(child => {
@@ -403,22 +236,33 @@ class JSXPloder {
 		filteredNodes.forEach(node => {
 			if (node.parent.hasOwnProperty('_keep')) {
 				node.parent._keep.push(node);
-				// node.parent._keepValue.push(node.value);
 			} else {
 				node.parent._keep = [node];
-				// node.parent._keepValue = [{[node.name] : node.value}];
 			}
 			
 		});
 		filteredNodes.forEach(node => {
 			if (node.parent._keep) {				
 				updateParentValue(node.parent);
-				// node.parent.children = node.parent._keep.concat(node.siblings);
 				delete node.parent._keep;
-				// delete node.parent._keepValue;
 			}
 		})
 		console.log('pruned complete', filteredNodes);
+	}
+
+	find (poRef) {
+		return (pNode) => {
+			const isNode = !!Validator.validateNode(pNode);
+			if (isNode && Array.isArray(pNode)) {
+				return pNode.map(n => {
+					return Array.isArray(poRef[n.name]) ? poRef[n.name][n.index] : poRef[n.name];
+				});
+			} else if (isNode) {
+				return Array.isArray(poRef[pNode.name]) ? poRef[pNode.name][pNode.index] : poRef[pNode.name];
+			} else {
+				return poRef[pNode];
+			}
+		}
 	}
 }
 

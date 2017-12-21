@@ -3,6 +3,16 @@ const JSXValidator = require("../Utils/JSXValidator");
 
 const Validator = new JSXValidator();
 
+const mergeUnique = (source, list) => {
+	const mergedList = source;
+	list.forEach(item => {
+		if (!mergedList.includes(item)) {
+			mergedList.push(item);
+		}
+	});
+	return mergedList;
+};
+
 /**
  * JSXPath 
  *=======
@@ -16,6 +26,28 @@ const Validator = new JSXValidator();
  * #### [*](#) , [..](#) , [siblings](#) , [descendant](#) , [descendant-or-self](#) , [ancestor](#) , [ancestor-or-self](#) , [//](#) , [self](#) , [parent](#)
  * Axis expressions are used to navigate around the node tree to retrieve a node set relative to the current node
  *
+ * ##### constructor
+ * ```js
+ * var js = {
+ * 	int: {
+ * 		a: 1,
+ * 		b: 2
+ * 	},
+ * 	dec: {
+ * 		a: 1.5,
+ * 		b: 1.4
+ * 	}
+ * 	str: {
+ * 		st1: "abc",
+ * 		st2: "DE",
+ * 		st3: "efg",
+ * 		tok: "q,u,a,n,g",
+ * 		num: "-10"
+ * 	}
+ * }
+ * var jsxpath = new JSXPath(js);
+ * ```
+ * 
  * @module Tokens
  * @class JSXAxisTokens
  * @constructor
@@ -43,22 +75,35 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			"*": (poRef, psNode) => {
-				// let lookup = this.context.pop();
-				// const current = this.context.getLatestItem();
-				// let children = [];
-				// if (Validator.validateNode(current)) {
-				// 	if (Array.isArray(current)) {
-				// 		curent.forEach(c => {
-				// 			children = children.concat(c.children);
-				// 		});
-				// 	} else {
-				// 		children = children.concat(current.children);
-				// 	}
-				// }
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let children = [];
+				let result;
+
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
+				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							children = mergeUnique(children, c.children);
+						});
+					} else {
+						children = children.concat(current.children);
+					}
+				}
+
+				if (!lookup || lookup === "*") {
+					result = children;
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = children.filter((node) => {
+						return node.name === lookup;
+					});
+				}
 
 				// // istanbul ignore next
-				// this._outputDebug("JSXAxisTokens:*", oChildren);
-				// return children;
+				this._outputDebug("JSXAxisTokens:*", result);
+				return result;
 			  }
 			/**
 			 * ## ..
@@ -79,28 +124,32 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "..": (poRef, psNode) => {
-				// debugger;
-				let result = {};
-				let parent = {};
-				if (poRef["."] === poRef["@"]) {
-					return parent;
-				}
-				let oCurrent = poRef[poRef["."].parent.name] || [];
-				let sChildName = poRef["."].name;
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let parents = [];
+				let result;
 
-				if (Array.isArray(oCurrent)) {
-					for (let i = 0; i < oCurrent.length; ++i) {
-						if (oCurrent[i].children.indexOf(sChildName) > -1) {
-							oCurrent = oCurrent[i];
-							break;
-						}
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
+				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							parents = mergeUnique(parents, c.parent);
+						});
+					} else {
+						parents = parents.concat(current.parent);
 					}
-				} 
-				parent[oCurrent.name] = oCurrent;
-
-				if (psNode && psNode===oCurrent.name || psNode === "*" || !psNode) {
-					result = parent;
 				}
+
+				if (!lookup || lookup === "*") {
+					result = parents;
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = parents.filter((node) => {
+						return node.name === lookup;
+					});
+				}
+
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:..", result);
 				return result;
@@ -113,7 +162,7 @@ class JSXAxisTokens {
 			 * let path = '';
 			 * let result = jsxpath.process(path);
 			 * ----------
-			 * // result => 
+			 * // result => \
 			 * ```
 			 * 
 			 * @function siblings
@@ -122,47 +171,34 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "siblings": (poRef, psNode, pfExplode) => {
-				let result = {};
-				let siblings = {};
-				let self = this;
-				if (poRef["."] === poRef["@"]) {
-					result = siblings;
-				} else {
-					let oCurrent = poRef[poRef["."].parent.name] || [];
-					let sChildName = poRef["."].name;
-					let values = [];
-					let nodes = [];
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let siblings = [];
+				let result;
 
-					if (Array.isArray(oCurrent)) {
-						for (let i = 0; i < oCurrent.length; ++i) {
-							if (oCurrent[i].children.indexOf(sChildName) > -1) {
-								oCurrent = oCurrent[i];
-								break;
-							}
-						}
-					}
-					oCurrent.children.forEach((c) => {
-						if (c !== sChildName) {
-							let p = oCurrent.name;
-							let oNode = poRef[c];
-							if (Array.isArray(oNode)){
-								for (let i = 0; i < oNode.length; ++i) {
-									if (oNode[i].parent.name === p) {
-										oNode = oNode[i];
-										break;
-									}
-								}
-							}
-							siblings[c] = oNode;
-						}
-					});
-
-					if (!psNode || psNode === "*") {
-						result = siblings;
-					} else if (siblings[psNode]) {
-						result = siblings[psNode];
-					} 
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
 				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							if (!siblings.includes(c)) {
+								siblings = mergeUnique(siblings, c.siblings);
+							}
+						});
+					} else {
+						siblings = siblings.concat(current.siblings);
+					}
+				}
+
+				if (!lookup || lookup === "*") {
+					result = siblings;
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = siblings.filter((node) => {
+						return node.name === lookup;
+					});
+				}
+
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:siblings", result);
 				return result;
@@ -184,10 +220,10 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "descendant": (poRef, psNode, pfExplode) => {
-				let lookup = this.context.pop();
-				const current = this.context.getLatestItem();
 				let descendants = [];
 				let result;
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
 
 				if (Validator.validateNode(lookup)) {
 					lookup = lookup.name;
@@ -195,7 +231,7 @@ class JSXAxisTokens {
 				if (Validator.validateNode(current)) {
 					if (Array.isArray(current)) {
 						current.forEach(c => {
-							descendants = descendants.concat(c.descendants);
+							descendants = mergeUnique(descendants, c.descendants)
 						});
 					} else {
 						descendants = descendants.concat(current.descendants);
@@ -233,20 +269,31 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "descendantOrSelf": (poRef, psNode, pfExplode) => {
-				var result = {};
-				let oCurrent = poRef["."];
-				let dos = {};
-				if (null !== oCurrent && "object" === typeof oCurrent.value)
-					dos = pfExplode(oCurrent.value);
-				dos[oCurrent.name] = oCurrent;
-				// if (psNode && dos[psNode]) {
-				// 	result = dos[psNode];
-				// }
+				let descendants = [];
+				let result;
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
 
-				if (!psNode || psNode === '*') {
-					result = dos;
-				} else if (dos[psNode]) {
-					result = dos[psNode];
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
+				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							descendants = mergeUnique(descendants, c.descendants.concat(c));
+						});
+					} else {
+						descendants = descendants.concat(current.descendants);
+						descendants.push(current);
+					}
+				}
+
+				if (!lookup || lookup === "*") {
+					result = descendants;
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = descendants.filter((node) => {
+						return node.name === lookup;
+					});
 				}
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:descendantOrSelf", result);
@@ -256,41 +303,42 @@ class JSXAxisTokens {
 			  * ## ancestor
 			 * retrieves all ancestors of current node excluding self
 			 * 
+			 * * ```js
+			 * let path = '';
+			 * let result = jsxpath.process(path);
+			 * ----------
+			 * // result => 
+			 * 
 			 * @function ancestor
 			 * @param  {object} poRef - the exploded input json
 			 * @param  {string} [psNode] - the name of the node
 			 * @return {object} Key Value object
 			 */
 			, "ancestor": (poRef, psNode) => {
-				let result = {};
-				let current = poRef["."];
-				let child = null;
-				let parent = null;
-				let ancestors = {};
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let ancestors = [];
+				let result;
 
-				do {
-					child = current.name;
-					parent = current.parent && curent.parent.name || null;
-
-					if (parent !== null) {
-						current = poRef[parent];
-
-						if (Array.isArray(current)) {
-							for (let i = 0; i < current.length; ++i) {
-								if (current[i].children.indexOf(child) > -1) {
-									current = current[i];
-									break;
-								}
-							} 
-						} 
-						ancestors[current.name] = current;
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
+				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							ancestors = mergeUnique(ancestors, c.ancestors);
+						});
+					} else {
+						ancestors = ancestors.concat(current.ancestors);
 					}
-				} while(null !== parent);
+				}
 
-				if (!psNode) {
+				if (!lookup || lookup === "*") {
 					result = ancestors;
-				} else if (ancestors[psNode]) {
-					result = ancestors[psNode];
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = ancestors.filter((node) => {
+						return node.name === lookup;
+					});
 				}
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:ancestor", result);
@@ -306,37 +354,31 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "ancestorOrSelf": (poRef, psNode) => {
-				let result = {};
-				let current = poRef["."];
-				let child = null;
-				let parent = null;
-				let ancestors = {}
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let ancestors = [];
+				let result;
 
-				ancestors[current.name] = current;
-
-				do {
-					child = current.name;
-					parent = current.parent && current.parent.name || null;
-
-					if (parent !== null) {
-						current = poRef[parent];
-
-						if (Array.isArray(current)) {
-							for (let i = 0; i < current.length; ++i) {
-								if (current[i].children.indexOf(child) > -1) {
-									current = current[i];
-									break;
-								}
-							} 
-						} 
-						ancestors[current.name] = current;
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
+				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							ancestors = mergeUnique(ancestors, c.ancestors.concat);
+						});
+					} else {
+						ancestors = ancestors.concat(current.ancestors);
+						ancestors.push(current);
 					}
-				} while(null !== parent);
-				
-				if (!psNode || psNode === "*") {
+				}
+
+				if (!lookup || lookup === "*") {
 					result = ancestors;
-				} else  if (ancestors[psNode]) {
-					result = ancestors[psNode];
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = ancestors.filter((node) => {
+						return node.name === lookup;
+					});
 				}
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:ancestorOrSelf", result);
@@ -358,7 +400,6 @@ class JSXAxisTokens {
 			/**
 			 * ## self
 			 * current node
-			 * alias: [descendant-or-self](#)
 			 * 
 			 * @function self
 			 * @param  {object} poRef - the exploded input json
@@ -366,13 +407,31 @@ class JSXAxisTokens {
 			 * @return {object} Key Value object
 			 */
 			, "self": (poRef, psNode) => {
-				let current = poRef["."];
-				let result = {};
+				let lookup = this.context.pop();
+				const current = this.context.getLatestItem();
+				let children = [];
+				let result;
 
-				if (!psNode) {
-					result = current;
-				} else {
-					result = this.tokens["*"](poRef, psNode);
+				if (Validator.validateNode(lookup)) {
+					lookup = lookup.name;
+				}
+				if (Validator.validateNode(current)) {
+					if (Array.isArray(current)) {
+						current.forEach(c => {
+							children = mergeUnique(children, c.children.concat(c));
+						});
+					} else {
+						children = children.concat(current.children);
+						children.push(current);
+					}
+				}
+
+				if (!lookup || lookup === "*") {
+					result = children;
+				} else if (poRef.hasOwnProperty(lookup)) {
+					result = children.filter((node) => {
+						return node.name === lookup;
+					});
 				}
 				// istanbul ignore next
 				this._outputDebug("JSXAxisTokens:self", result);
@@ -418,7 +477,7 @@ class JSXAxisTokens {
 
 	_outputDebug(where, result) {
 		// istanbul ignore next
-		if (this.DEBUG && this.SHOWAXISTOKENS) console.log(new Date(), where, JSON.stringify(result));
+		if (this.DEBUG && this.SHOWAXISTOKENS) console.log(new Date(), where, result);
 	}
 }
 

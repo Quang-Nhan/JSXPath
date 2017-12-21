@@ -1,6 +1,6 @@
 var JSXParseTokens = require("./JSXParseTokens");
 
-describe("JSXParseTokens", () => {
+xdescribe("JSXParseTokens", () => {
 	var parseTokens;
 	beforeEach(() => {
 		parseTokens = new JSXParseTokens();

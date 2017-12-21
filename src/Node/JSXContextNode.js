@@ -49,12 +49,12 @@ class JSXContextNode {
             const getNodeChildren = (r, item) => {
                 const children = item.getChildren([pValue]);
                 if (children.length) {
-                    r.push(children);
+                    r = r.concat(children);
                 }
                 return r;
             }
             let nodesChildren = null;
-            if (Validator.validateNode(lastItem)) {
+            if (Validator.validateNode(lastItem) && pValue !== '*') {
                 nodesChildren = Array.isArray(lastItem) ? lastItem.reduce(getNodeChildren, []) : lastItem.getChildren([pValue]);
             } 
             
@@ -98,28 +98,6 @@ class JSXContextNode {
         } else if (lastItem && lastItem.parent) {
             this.list.push(lastItem.parent);
         }
-    }
-
-    addOperationalNode(psOperation) {
-        const operationalNode = new JSXOperationNode({
-            lhs: this.children[0],
-            rhs: this.children[1],
-            operation: psOperation
-        });
-        operationalNode.operate();
-        this.operationNodes.push(operationalNode);
-        
-    }
-
-    update(poParams) {
-        if (poParams.type) {
-            this.type = type;
-        }
-        
-    }
-
-    getList() {
-        return this.list;
     }
 
     getLastListedItem() {

@@ -36,6 +36,18 @@ const preEvaluate = (prev, next, psToken) => {
 		isNextNode
 	}
 }
+
+const isDescendant = (primary, secondary) => {
+	const descendants = primary.siblings.reduce((r, sibling) => {
+		r = r.concat(sibling.descendants);
+		return r;
+	}, primary.descendants);
+	return descendants.includes(secondary);
+};
+
+const isSiblings = (pr, ne) => {
+	return pr.index === ne.index || pr.siblings.includes(ne) && ne.siblings.includes(pr);
+};
 /**
  * JSXPath
  * =======
@@ -296,66 +308,43 @@ class JSXOperatorTokens {
 				return (next) => {
 					this._outputDebug("init", "JSXOperatorTokens:≠", prev, next);
 
-					let prevValue = Validator.validateNumber(prev, "≠");
-					let nextValue = Validator.validateNumber(next, "≠");
-					let result;
+					const preEval = preEvaluate(prev, next, "≠");
+					let result;			
+					
+					if (preEval.isPrevNode && Array.isArray(preEval.prevValue) && preEval.isNextNode && Array.isArray(preEval.nextValue)) { // both node arrays
+						result = this.intersect(preEval.prevValue, preEval.nextValue);
 
-					if (prevValue === null) {
-						prevValue = Validator.validateString(prev, "≠");
-					}
-					if (nextValue === null) {
-						nextValue = Validator.validateString(next, "≠");
-					}
-					if (prevValue === null) {
-						prevValue = Validator.isArray(prev, "≠");
-					}
-					if (nextValue === null) {
-						nextValue = Validator.isArray(next, "≠");
-					}
-					if (prevValue === null) {
-						prevValue = Validator.validateObject(prev, "≠");
-					}
-					if (nextValue === null) {
-						nextValue = Validator.validateObject(next, "≠");
-					}
-					if (prevValue === null) {
-						prevValue = Validator.validateNode(prev, "≠");
-					}
-					if (nextValue === null) {
-						nextValue = Validator.validateNode(next, "≠");
-					}
-					if (prevValue === null) {
-						prevValue = Validator.validateBoolean(prev, "≠");
-					}
-					if (nextValue === null) {
-						nextValue = Validator.validateBoolean(next, "≠");
+					} else if (preEval.isPrevNode && Array.isArray(preEval.prevValue) && preEval.isNextNode) { // prev is array nodes while next is node
+						result = preEval.prevValue.filter(node => !_.isEqual(node.value, preEval.nextValue.value));
+
+					} else if (preEval.isPrevNode && preEval.isNextNode && Array.isArray(preEval.nextValue)) { // prev is a node while next is an array nodes
+						result = preEval.nextValue.filter(node => !_.isEqual(node.value, preEval.prevValue.value));
+
+					} else if (preEval.isPrevNode && Array.isArray(preEval.prevValue) && !preEval.isNextNode) { // prev is an array nodes while next is any other value
+						result = preEval.prevValue.filter(node => !_.isEqual(node.value, preEval.nextValue));
+
+					} else if (!preEval.isPrevNode && preEval.isNextNode && Array.isArray(preEval.nextValue)) {
+						result = preEval.nextValue.filter(node => !_.isEqual(node.value, preEval.prevValue));
+
+					} else if (preEval.isPrevNode && preEval.isNextNode) {
+						result = !_.isEqual(preEval.prevValue, preEval.nextValue);
+
+					} else if (preEval.isPrevNode && !preEval.isNextNode) {
+						result = !_.isEqual(preEval.prevValue.value, preEval.nextValue) ? preEval.prevValue : false;
+
+					} else if (!preEval.isPrevNode && preEval.isNextNode) {
+						result = !_.isEqual(preEval.prevValue,preEval.nextValue.value) ? preEval.nextValue : false;
+					
+					} else if (!preEval.isPrevNode && !preEval.isNextNode) {
+						result = !_.isEqual(preEval.prevValue, preEval.nextValue);
 					}
 
-
-					if (prevValue && prevValue.value){
-						result = !_.isEqual(prevValue.value, nextValue);
-					} else if (nextValue && nextValue.value) {
-						result = !_.isEqual(prevValue, nextValue.value);
-					} else if (Array.isArray(prevValue) && Array.isArray(nextValue)) {
-						result = !_.isEqual(prevValue, nextValue)
-					} else if (Array.isArray(prevValue) && prevValue.length === 1 && prevValue[0].hasOwnProperty('value') && !isNaN(nextValue)) {
-						result = prevValue[0].value !== nextValue;
-					} else if (Array.isArray(nextValue) && nextValue.length === 1 && nextValue[0].hasOwnProperty('value') && !isNaN(prevValue)) {
-						result = prevValue !== nextValue[0].value;
-					} else if (Array.isArray(prevValue)) {
-						result = _.filter(prevValue, function(pv) {
-							return pv.value !== nextValue;
-						});
-					} else if (Array.isArray(nextValue)) {
-						result = _.filter(nextValue, function(nv) {
-							return nv.value !== prevValue;
-						});
-					} else {
-						result = !_.isEqual(prevValue, nextValue);
+					if (Array.isArray(result) && !result.length) {
+						result = false;
 					}
 
 					// istanbul ignore next
-					this._outputDebug("result", "JSXOperatorTokens:≠", prevValue, nextValue, result);
+					this._outputDebug("result", "JSXOperatorTokens:≠", preEval.prevValue, preEval.nextValue, result);
 					return result;
 				}
 			},
@@ -619,16 +608,6 @@ class JSXOperatorTokens {
 					this._outputDebug("init", "JSXOperatorTokens:and", prev, next);
 
 					const preEval = preEvaluate(prev, next, "and");
-					const isDescendant = (primary, seondary) => {
-						const descendants = primary.siblings.reduce((r, sibling) => {
-							r = r.concat(r.descendants);
-							return r;
-						}, primary.descendants);
-						return descendants.includes(secondary);
-					};
-					const isSiblings = (pr, ne) => {
-						return pr.index === ne.index || pr.siblings.includes(ne) && ne.siblings.includes(pr);
-					};
 					const isFromSameBranch = (pr, ne) => {
 						if (pr.depth === ne.depth) {
 							return pr.parent.name === ne.parent.name && isSiblings(pr, ne);
@@ -685,11 +664,42 @@ class JSXOperatorTokens {
 					// istanbul ignore next
 					this._outputDebug("init", "JSXOperatorTokens:or", prev, next);
 
-					let prevValue = Validator.validateBoolean(prev, "or", true);
-					let nextValue = Validator.validateBoolean(next, "or", true);
-					let result = prevValue || nextValue;
+					const preEval = preEvaluate(prev, next, "and");
+					const isFromSameBranch = (pr, ne) => {
+						if (pr.depth === ne.depth) {
+							return pr.parent.name === ne.parent.name && isSiblings(pr, ne);
+						} else {
+							return pr.depth < ne.depth ? isDescendant(pr, ne) : isDescendant(ne, pr);
+						}
+					};
+					let result;
+					console.log('preEval', preEval)
+					if (preEval.isPrevNode && Array.isArray(preEval.prevValue) && preEval.isNextNode && Array.isArray(preEval.nextValue)) { // both node arrays
+						result = preEval.prevValue.filter(pv => !!preEval.nextValue.find(nv => !isFromSameBranch(pv, nv)));
+						result = result.concat(preEval.nextValue);
+
+					} else if (preEval.isPrevNode && Array.isArray(preEval.prevValue) && preEval.isNextNode) { // prev is array nodes while next is node
+						result = preEval.prevValue.filter(node => !isFromSameBranch(node, preEval.nextValue));
+						result = result.concat(preEval.nextValue);
+
+					} else if (preEval.isPrevNode && preEval.isNextNode && Array.isArray(preEval.nextValue)) { // prev is a node while next is an array nodes
+						result = preEval.nextValue.filter(node => !isFromSameBranch(node, preEval.prevValue));
+						result = result.concat(preEval.prevValue);
+
+					} else if (preEval.isPrevNode && preEval.isNextNode) {
+						result = isFromSameBranch(preEval.prevValue, preEval.nextValue) ? preEval.prevValue : [preEval.prevValue, preEval.nextValue];
+
+					} else if (preEval.isPrevNode && !preEval.isNextNode) {
+						result = preEval.prevValue;
+
+					} else if (!preEval.isPrevNode && preEval.isNextNode) {
+						result = preEval.nextValue;
+
+					} else if (!preEval.isPrevNode && !preEval.isNextNode) {
+						result = Boolean(preEval.prevValue) || Boolean(preEval.nextValue);
+					}
 					// istanbul ignore next
-					this._outputDebug("result", "JSXOperatorTokens:or", prevValue, nextValue, result);
+					this._outputDebug("result", "JSXOperatorTokens:or", preEval.prevValue, preEval.nextValue, result);
 					return result;
 				}
 			},
@@ -763,6 +773,10 @@ class JSXOperatorTokens {
 			});
 			return r;
 		}, [])
+	}
+
+	unique(prevNode, nextNode) {
+
 	}
 
 	/**
