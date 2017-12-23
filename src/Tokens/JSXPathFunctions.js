@@ -707,8 +707,15 @@ class JSXPathFunctions {
 			, "position": (args) => {
 				let current = this.context.getLatestItem(); //this.exploded["."];
 				let result = [];
-				if (this.Validator.validateNode(current) && Array.isArray(current)) {
+				if (this.Validator.validateNode(current) && (Array.isArray(current) || current.type === 'nodeList')) {
 					let num = isNaN(args[0]) ? args[2] : args[0];
+					
+					if (!Array.isArray(current)) {
+						current = current.value;
+					} else if (current.length === 1 && current[0].type === 'nodeList') {
+						current = current[0].value;
+					}
+
 					switch(args[1]) {
 						case "=":
 							if (num > 0 && num <= current.length) {
