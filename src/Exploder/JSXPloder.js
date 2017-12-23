@@ -206,7 +206,7 @@ class JSXPloder {
 
 	prune(filteredNodes) {
 		const updateParentValue = (node) => {
-			if (node._keep && node.meta.type === "nodeList") {
+			if (node._keep && node.type === "nodeList") {
 				node._keep.forEach(child => {
 					const childValue = child.composeValue();
 					if (!node._tmp) {

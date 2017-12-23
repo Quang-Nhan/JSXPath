@@ -3,10 +3,7 @@ var moment = require("moment");
 
 class JSXNode {
 	constructor(poArgs) {
-		this.meta = {
-			type: poArgs.type,
-			createdDateTime: moment().format()
-		}
+		this.type = poArgs.type,
 		this.value = poArgs.value;
 		this.parent = poArgs.parent;
 		this.children = poArgs.children || [];
@@ -17,24 +14,6 @@ class JSXNode {
 		this.descendants = poArgs.descendants || [];
 		this.index = poArgs.index || -1;
 		this.exploderId = poArgs.exploderId || -1;
-	}
-
-	update(poArgs) {
-		if (Object.hasOwnProperty('type')) {
-			this.meta.type = poArgs.type;
-		}
-		if (Object.hasOwnProperty('value')) {
-			this.value = poArgs.value;
-		}
-		if (Object.hasOwnProperty('parent')) {
-			this.value = poArgs.parent;
-		}
-		if (Object.hasOwnProperty('children')) {
-			this.value = poArgs.children;
-		}
-		if (Object.hasOwnProperty('name')) {
-			this.value = poArgs.name;
-		}
 	}
 
 	getChildren(paNodeNames) {
