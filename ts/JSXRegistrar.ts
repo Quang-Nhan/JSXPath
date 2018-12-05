@@ -1,5 +1,5 @@
 import { JSXAxes } from "./typeHandlers/JSXAxes";
-import { JSXPathHandler } from "./JSXPathHandler";
+import { JSXPathHandler } from "./pathParser/JSXPathHandler";
 import { JSXFilters } from "./typeHandlers/JSXFilters";
 import { JSXFunctions } from "./typeHandlers/JSXFunctions";
 import { JSXGroupings } from "./typeHandlers/JSXGroupings";
@@ -81,14 +81,13 @@ export class JSXRegistrar {
       this.cache.typeHandlers.FUNCTIONS.getMap()
     ]);
     const extraData = {
-      id: Math.random() % 1000,
       parsedPath,
       currentIndex: 0,
       pathLength: parsedPath.length,
-      variables: data.variables
+      variables: data.variables || {}
     };
     this.cache.stateHandler.init();
-    this.cache.stateHandler.dispatch(this.cache.coreHandlers.actionHandler.create(INPUT_ADDED, {value: Object.assign({}, data, extraData)}))
+    this.cache.stateHandler.dispatch(this.cache.coreHandlers.actionHandler.create(INPUT_ADDED, {id: 0, value: Object.assign({}, data, extraData)}))
     for (let handler in this.cache.typeHandlers) {
       this.cache.typeHandlers[handler].init();
     }
@@ -97,7 +96,7 @@ export class JSXRegistrar {
     }
   }
 
-  get(names: Array<string>):Array<any> {
+  get(names: string[]):any[] {
     const self = this;
     return names.map(name => {
       if (self.cache.hasOwnProperty(name)) {
@@ -111,9 +110,10 @@ export class JSXRegistrar {
       } else if (self.cache.helpers.hasOwnProperty(name)) {
         return self.cache.helpers[name];
       } else {
-        const inputValue = this.cache.stateHandler.getState().inputs;
-        if (inputValue && inputValue.hasOwnProperty(name)) {
-          return inputValue[name];
+        const inputs = this.cache.stateHandler.getState().inputs;
+        const [id, inputValue] = name.split(':');
+        if (inputValue && inputs.hasOwnProperty(id) && inputs[id].hasOwnProperty(inputValue)) {
+          return inputs[id][inputValue];
         } else {
           throw new Error('Handlers does not exists: ' + name);
         }

@@ -1,13 +1,13 @@
-import { ROOT, PARSED_NODES, DISPATCH, ACTION_HANDLER, PATH_HANDLER, GET_STATE } from './../constants';
-import { JSXPathHandler } from "../JSXPathHandler";
-import { Node, Instruction, ImpInstruction, ImpAction, State } from '../JSXInterfaces';
+import { ROOT, PARSED_NODES, DISPATCH, ACTION_HANDLER, PATH_HANDLER, GET_STATE, FILTERED_CONTEXT_NODES } from './../constants';
+import { JSXPathHandler } from "../pathParser/JSXPathHandler";
+import { Node, Instruction, ImpInstruction, ImpAction, State, ActionParams, Action } from '../JSXInterfaces';
 import { NODES } from '../constants';
 import { JSXAction } from '../JSXAction';
 import { JSXRegistrar } from '../JSXRegistrar';
 
 
 export class JSXNodes implements ImpInstruction, ImpAction{
-  static NODE_NAMES: Array<string> = [];
+  static NODE_NAMES: string[] = [];
   private pathHandler: JSXPathHandler;
   private getState: Function;
   private actionHandler: JSXAction;
@@ -22,18 +22,30 @@ export class JSXNodes implements ImpInstruction, ImpAction{
 
   init() {
     let json, dispatch;
-    [this.pathHandler, this.actionHandler, json, this.getState, dispatch] = this.reg.get([PATH_HANDLER, ACTION_HANDLER, 'json', GET_STATE, DISPATCH]);
+    [
+      this.pathHandler, 
+      this.actionHandler, 
+      json, 
+      this.getState, 
+      dispatch
+    ] = this.reg.get([
+      PATH_HANDLER, 
+      ACTION_HANDLER, 
+      '0:json', 
+      GET_STATE, 
+      DISPATCH
+    ]);
     
-    // this.buildAndDispatchNodesMap(ROOT, json);
-    this.setNodes(ROOT, json, this.currentId, Array.isArray(json) ? true : false, ++this.currentGroupId);
-    this.removeDuplicates();
-    this.setSiblings();
-    dispatch(this.actionHandler.create(PARSED_NODES, {value: {
-      nodesByName: {...this.nodesByName},
-      nodesByIds: {...this.nodesByIds},
-      NODE_NAMES: [...JSXNodes.NODE_NAMES]
-    }}));
-    this.resetMap();
+    this.buildAndDispatchNodesMap(ROOT, json);
+    // this.setNodes(ROOT, json, this.currentId, Array.isArray(json) ? true : false, ++this.currentGroupId);
+    // this.removeDuplicates();
+    // this.setSiblings();
+    // dispatch(this.actionHandler.create(PARSED_NODES, {value: {
+    //   nodesByName: {...this.nodesByName},
+    //   nodesByIds: {...this.nodesByIds},
+    //   NODE_NAMES: [...JSXNodes.NODE_NAMES]
+    // }}));
+    // this.resetMap();
   }
 
   buildAndDispatchNodesMap(rootNodeName, value) {
@@ -50,6 +62,92 @@ export class JSXNodes implements ImpInstruction, ImpAction{
     this.resetMap();
   }
 
+  
+
+  resetMap() {
+    this.nodesByIds = {};
+    this.nodesByName = {};
+    JSXNodes.NODE_NAMES = [];
+    this.resetIds();
+  }
+
+  resetIds() {
+    this.currentGroupId = -1;
+    this.currentId = -1;
+  }
+
+  createNode(name: string, value: any, parentId: number, groupId: number): Node {
+    return {
+      id: ++this.currentId,
+      groupId,
+      name,
+      value,
+      parentId,
+      ancestorIds: [],
+      descendantIds: [],
+      childrenIds: [],
+      siblingIds: []
+    }
+  }
+
+  getNodes(props: {name?:string, id?:number, ids?:number[]}):Node[] {
+    const {name, id, ids} = props;
+    const state = this.getState();
+    if (name) {
+      return state.nodes.nodesByName[name];
+    } else if (id) {
+      return [state.nodes.nodesByIds[id]];
+    } else if (ids) {
+      return ids.map(id => state.nodes.nodesByIds[id]);
+    }
+  }
+
+  getInstruction(subPath: string, startIndex: number, instructionHandlerId:number):Instruction {
+    // if (this.currentId !== -1) {
+    //   this.resetIds();
+    // }
+    return {
+      type: NODES,
+      subPath,
+      startIndex,
+      endIndex: this.pathHandler.getCurrentIndex(instructionHandlerId),
+      link: {}
+    }
+  }
+
+  isNode(nodes): boolean {
+    return Array.isArray(nodes) && nodes.every(this.isNodeInstance) || this.isNodeInstance(nodes);
+  }
+  
+  getAction(params: ActionParams): Action {
+    const { instruction } = params;
+    return this.actionHandler.create(
+      NODES, 
+      this.getNodesPayload(instruction)
+    );
+  }
+
+  getFilteredContextAction(params): Action {
+    const { instruction } = params;
+    return this.actionHandler.create(
+      FILTERED_CONTEXT_NODES, 
+      this.getNodesPayload(instruction)
+    );
+  }
+
+  private getNodesPayload(instruction) {
+    return {
+      id: instruction.id,
+      link: instruction.link, 
+      subType: instruction.subType, 
+      value: instruction.subPath 
+    }
+  }
+
+  private isNodeInstance(node): boolean {
+    return node && node.hasOwnProperty('childrenIds') && node.hasOwnProperty('ancestorIds') && node.hasOwnProperty('siblingIds');
+  }
+  
   private setNodes(nodeName: string, value, parentId:number, parentIsArray?:boolean, groupId?: number) {
     let currentNode;
 
@@ -133,72 +231,6 @@ export class JSXNodes implements ImpInstruction, ImpAction{
     node.ancestorIds = this.nodesByIds[node.parentId].ancestorIds.concat([node.parentId]);
   }
 
-  resetMap() {
-    this.nodesByIds = {};
-    this.nodesByName = {};
-    JSXNodes.NODE_NAMES = [];
-  }
-
-  resetIds() {
-    this.currentGroupId = -1;
-    this.currentId = -1;
-  }
-
-  createNode(name: string, value: any, parentId: number, groupId: number): Node {
-    return {
-      id: ++this.currentId,
-      groupId,
-      name,
-      value,
-      parentId,
-      ancestorIds: [],
-      descendantIds: [],
-      childrenIds: [],
-      siblingIds: []
-    }
-  }
-
-  getNodes(props: {name?:string, id?:number, ids?:Array<number>}):Array<Node> {
-    const {name, id, ids} = props;
-    const state = this.getState();
-    if (name) {
-      return state.nodes.nodesByName[name];
-    } else if (id) {
-      return [state.nodes.nodesByIds[id]];
-    } else if (ids) {
-      return ids.map(id => state.nodes.nodesByIds[id]);
-    }
-  }
-
-  getInstruction(subPath: string, startIndex: number):Instruction {
-    if (this.currentId !== -1) {
-      this.resetIds();
-    }
-    return {
-      type: NODES,
-      subPath,
-      startIndex,
-      endIndex: this.pathHandler.getCurrentIndex(),
-      link: {}
-    }
-  }
-
-  getAction(instruction:Instruction, state:State) {
-    return this.actionHandler.create(NODES, { 
-      link: instruction.link, 
-      subType: instruction.subType, 
-      value: instruction.subPath 
-    });
-  }
-
-  isNode(nodes): boolean {
-    return Array.isArray(nodes) && nodes.every(this.isNodeInstance) || this.isNodeInstance(nodes);
-  }
-
-  private isNodeInstance(node): boolean {
-    return node && node.hasOwnProperty('childrenIds') && node.hasOwnProperty('ancestorIds') && node.hasOwnProperty('siblingIds');
-  }
-
   getNodeValues(nodes) {
     return Array.isArray(nodes) ? nodes.map(n => n.value) : [nodes.value];
   }
@@ -212,14 +244,17 @@ export class JSXNodes implements ImpInstruction, ImpAction{
    * 
    * @param nodes 
    */
-  getChildrenIds(nodes): Array<number> {
+  getChildrenIds(nodes): number[] {
     return nodes.reduce((list, node) => {
       list = list.concat(node.childrenIds.filter(childId => !list.includes(childId)));
       return list;
     }, []);
   }
 
-  getChildrenNodes(nodes): Array<Node> {
+  getChildrenNodes(nodes): Node[] {
+    if (!Array.isArray(nodes)) {
+      nodes = [nodes];
+    }
     return this.getNodes({ids: this.getChildrenIds(nodes)});
   }
 
@@ -227,14 +262,14 @@ export class JSXNodes implements ImpInstruction, ImpAction{
 
   }
   
-  getDescendantIds(nodes): Array<number> {
+  getDescendantIds(nodes): number[] {
     return nodes.reduce((list, node:Node) => {
       list = node.descendantIds.filter(descendantId => !list.includes(descendantId));
       return list;
     }, []);
   }
 
-  getDescendantNodes(nodes): Array<Node> {
+  getDescendantNodes(nodes): Node[] {
     return this.getNodes({ids: this.getDescendantIds(nodes)});
   }
 
@@ -242,63 +277,63 @@ export class JSXNodes implements ImpInstruction, ImpAction{
 
   }
 
-  getDescendantOrSelfIds(nodes:Array<Node>): Array<number> {
+  getDescendantOrSelfIds(nodes:Node[]): number[] {
     return nodes.reduce((list, node:Node) => {
       list = node.descendantIds.concat(node.id).filter(id => !list.includes(id));
       return list;
     }, []);
   }
 
-  getDescendantOrSelfNodes(nodes:Array<Node>): Array<Node> {
+  getDescendantOrSelfNodes(nodes:Node[]): Node[] {
     return this.getNodes({ids: this.getDescendantOrSelfIds(nodes)});
   }
 
-  getDescendantOrSelfValues(nodes:Array<Node>) {
+  getDescendantOrSelfValues(nodes:Node[]) {
 
   }
   
-  getParentIds(nodes: Array<Node>): Array<number> {
+  getParentIds(nodes: Node[]): number[] {
     return nodes.reduce((list, node:Node) => {
       list.push(node.parentId);
       return list;
     }, []);
   }
 
-  getParentNodes(nodes: Array<Node>): Array<Node> {
+  getParentNodes(nodes: Node[]): Node[] {
     return this.getNodes({ids: this.getParentIds(nodes)});
   }
 
-  getParentValues(nodes:Array<Node>) {
+  getParentValues(nodes:Node[]) {
 
   }
 
-  getAncestorIds(nodes:Array<Node>): Array<number> {
+  getAncestorIds(nodes:Node[]): number[] {
     return nodes.reduce((list, node:Node) => {
       list = node.ancestorIds.filter(ancestorId => !list.includes(ancestorId));
       return list;
     }, []);
   }
 
-  getAncestorNodes(nodes:Array<Node>): Array<Node> {
+  getAncestorNodes(nodes:Node[]): Node[] {
     return this.getNodes({ids: this.getAncestorIds(nodes)});
   }
 
-  getAncestorValues(nodes:Array<Node>) {
+  getAncestorValues(nodes:Node[]) {
 
   }
 
-  getAncestorOrSelfIds(nodes:Array<Node>): Array<number> {
+  getAncestorOrSelfIds(nodes:Node[]): number[] {
     return nodes.reduce((list, node:Node) => {
       list = node.ancestorIds.concat(node.id).filter(id => !list.includes(id));
       return list;
     }, []);
   }
 
-  getAncestorOrSelfNodes(nodes:Array<Node>) {
+  getAncestorOrSelfNodes(nodes:Node[]) {
     return this.getNodes({ids: this.getAncestorOrSelfIds(nodes)});
   }
 
-  getAncestorOrSelfValues(nodes:Array<Node>) {
+  getAncestorOrSelfValues(nodes:Node[]) {
 
   }
 }

@@ -1,4 +1,4 @@
-import { ImpInstruction, ImpAction, Instruction, Action } from "../JSXInterfaces";
+import { ImpInstruction, ImpAction, Instruction, Action, ActionParams } from "../JSXInterfaces";
 import { JSXRegistrar } from "../JSXRegistrar";
 import { BOOLEAN, ACTION_HANDLER } from "../constants";
 
@@ -21,11 +21,21 @@ export class JSXBoolean implements ImpInstruction, ImpAction {
     }
   }
 
-  getAction(instruction: Instruction): Action {
+  getAction(params: ActionParams): Action {
+    const {instruction} = params;
     return this.actionHandler.create(BOOLEAN, { 
+      id: instruction.id,
       value: instruction.subPath === 'true' ? true : false, 
       link: instruction.link,
       subType: instruction.subType
     });
+  }
+
+  getDefaultAction(params:ActionParams): Action {
+    return null;
+  }
+
+  getFilteredContextAction(params:ActionParams): Action {
+    return null;
   }
 }

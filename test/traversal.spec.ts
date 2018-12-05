@@ -53,20 +53,19 @@ describe('Path traversing json', () => {
     main.flush();
   });
 
-  it('Returns all @k values from branch a', () => {
-    debugger;
-    path = '/a/j/@k';
-    main.process(path, json);
-    expect(main.getResult()).toEqual([
-      'string', false, 12
-    ]);
-  });
+  // it('Returns all @k values from branch a', () => {
+  //   path = '/a/j/@k';
+  //   main.process(path, json);
+  //   expect(main.getResult()).toEqual([
+  //     'string', false, 12
+  //   ]);
+  // });
 
-  it('Returns the k value that has i equal to 2', () => {
-    path = '/a[@i = 2]/j/@k';
-    main.process(path, json);
-    expect(main.getResult()).toEqual([
-      'string'
-    ]);
-  });
+  // it('Returns the k value that has i equal to 2', () => {
+  //   path = '/a[@i = 2]/j/@k';
+  //   main.process(path, json);
+  //   expect(main.getResult()).toEqual([
+  //     'string'
+  //   ]);
+  // });
 });

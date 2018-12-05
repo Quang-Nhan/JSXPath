@@ -1,6 +1,6 @@
 import { Scenario } from './JSXInterfaces';
 import { JSXRegistrar } from './JSXRegistrar';
-import { PARSED_PATH, GET_STATE } from './constants';
+import { PARSED_PATH, GET_STATE, CURRENT_INDEX } from './constants';
 
 import { rootScenarios } from './scenarios/RootScenarios';
 import { axesScenarios } from './Scenarios/AxesScenarios';
@@ -22,7 +22,13 @@ export class JSXPathScenarios {
   constructor(private reg:JSXRegistrar) {}
 
   init() {
-    [this.parsedPath, this.getState] = this.reg.get([PARSED_PATH, GET_STATE]);
+    [
+      this.parsedPath, 
+      this.getState
+    ] = this.reg.get([
+      '0:' + PARSED_PATH, 
+      GET_STATE
+    ]);
     this.scenarios = {
       ROOT: rootScenarios,
       AXES: axesScenarios,
@@ -37,15 +43,16 @@ export class JSXPathScenarios {
       VARIABLES: variableScenarios
     }
   }
-  private validate(subPath: string, scenarios: Array<Scenario>): boolean {
+  private validate(subPath: string, scenarios: Scenario[]): boolean {
     return scenarios.some(scenario => {
       return scenario.hasOwnProperty('testScenario') && scenario.testScenario(subPath);
     });
   }
 
-  test(subPath: string, currentIndex: number): Function {
+  test(subPath: string, inputId:number = 0): Function {
+    const [currentIndex, parsedPath] = this.reg.get([inputId + ':' + CURRENT_INDEX, inputId + ':' + PARSED_PATH]);
     return scenarioType => {
-      return this.scenarios.hasOwnProperty(scenarioType) && this.validate(subPath, this.scenarios[scenarioType](currentIndex, this.parsedPath, this.getState()));
+      return this.scenarios.hasOwnProperty(scenarioType) && this.validate(subPath, this.scenarios[scenarioType](currentIndex, parsedPath, this.getState()));
     }
   }
 }

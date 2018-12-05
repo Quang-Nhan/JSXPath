@@ -1,11 +1,11 @@
-import { ROOT, NODES, AXES, OPERATOR_LHS, OPERATOR_RHS } from "../constants";
+import { ROOT, NODES, AXES, OPERATOR_LHS, OPERATOR_RHS, FILTERED_CONTEXT_NODES } from "../constants";
 import { tokens } from '../tokens/axes.tokens';
 import { Action, State } from "../JSXInterfaces";
 import { JSXNodes } from "../typeHandlers/JSXNodes";
 import { StateUtility } from "./utility";
 
 export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (state: State, action: Action) => {
-  let nodes, currentState;
+  let nodes, currentState, filteredSubState;
   switch (action.type) {
     case AXES:
       if (!state.currentStateId) {
@@ -28,6 +28,7 @@ export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (st
           [currentState.id]: {
             ...state.subStates[currentState.id],
             nodes,
+            value: utils.getNodesValues(nodes)
           }
         },
         history: state.history.concat(utils.createHistory(action))
@@ -38,9 +39,10 @@ export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (st
         subStates: {
           ...state.subStates,
           [currentState.id]: {
+            id: action.payload.id,
             type: action.type,
             nodes,
-            id: action.payload.id
+            value: utils.getNodesValues(nodes),
           }
         },
         history: state.history.concat(utils.createHistory(action))
@@ -48,55 +50,50 @@ export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (st
 
     case NODES:
       currentState = state.subStates[state.currentStateId];
-      const filterState = utils.getFilterNode(currentState.link, state.subStates);
-
-      if (filterState && filterState.nodes) {
-        switch(state.previousActionType) {
-          // TODO when AXES
-          default: 
-            const childrenNodes = nodesHandler.getChildrenNodes(filterState.nodes);
-            nodes = childrenNodes.filter(n => n.name === action.payload.value);
-        }
-
-      } else {
-        nodes = currentState.nodes.filter(node => {
-          return node.name === action.payload.value
-        });
-      }
-
+      
+      nodes = currentState.nodes.filter(node => {
+        return node.name === action.payload.value
+      });
       
       return {
         ...state,
-        previousActionType: action.type,
-        subStates: getSubStates(state.subStates, action, nodes, currentState),
-        history: state.history.concat(utils.createHistory(action))
+        subStates: getSubStates(state.subStates, action, nodes, currentState)
       };
+    case FILTERED_CONTEXT_NODES:
+      currentState = state.subStates[state.currentStateId];
+      filteredSubState = utils.getFilterState(action.payload.link, state.subStates);
+      const childrenNodes = nodesHandler.getChildrenNodes(filteredSubState.context);
+      nodes = childrenNodes.filter(n => n.name === action.payload.value);
+      return {
+        ...state,
+        ...utils.updateCommonStateProperty(state, action),
+        subStates: getSubStates(state.subStates, action, nodes, currentState)
+      }
     case ROOT:
       nodes = nodesHandler.getNodes({name: ROOT});
       return Object.keys(action.payload.link).length ? {
         ...state,
-        previousActionType: action.type, 
+        ...utils.updateCommonStateProperty(state, action),
         subStates: {
           ...state.subStates,
           [state.currentStateId]: {
             ...state.subStates[state.currentStateId],
-            nodes
+            nodes,
+            value: utils.getNodesValues(nodes)
           }
-        },
-        history: state.history.concat(utils.createHistory(action))
+        }
       } : {
         ...state,
-        previousActionType: action.type,
+        ...utils.updateCommonStateProperty(state, action),
         currentStateId: action.payload.id,
         subStates: {
           [action.payload.id]: {
+            id: action.payload.id,
             type: action.type,
             nodes,
-            id: action.payload.id,
-            parentId: null
+            value: utils.getNodesValues(nodes)
           }
-        },
-        history: state.history.concat(utils.createHistory(action))
+        }
       };
     default: return state;
   }

@@ -1,19 +1,32 @@
 import { INCREMENT_CURRENT_INDEX, INPUT_ADDED, UPDATE_CURRENT_INDEX } from "../constants";
+import { StateUtility } from "./utility";
 
-export const InputsReducer = (utils) => (inputState, action) => {
+export const InputsReducer = (utils: StateUtility) => (inputStates, action) => {
   switch (action.type) {
     case INPUT_ADDED:
-      return Object.assign({}, action.payload.value);
+      return {
+        ...inputStates,
+        [action.payload.id]: {
+          id: action.payload.id,
+          ...action.payload.value
+        }
+      }
     case INCREMENT_CURRENT_INDEX:
       return {
-        ...inputState,
-        currentIndex: inputState.currentIndex+1
+        ...inputStates,
+        [action.payload.id]: {
+          ...inputStates[action.payload.id],
+          currentIndex: inputStates[action.payload.id].currentIndex+1
+        }
       };
     case UPDATE_CURRENT_INDEX:
       return {
-        ...inputState,
-        currentIndex: action.payload.value
+        ...inputStates,
+        [action.payload.id]: {
+          ...inputStates[action.payload.id],
+          currentIndex: action.payload.value
+        }
       };
-    default: return inputState;
+    default: return inputStates;
   }
 };

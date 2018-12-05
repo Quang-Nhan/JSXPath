@@ -1,7 +1,7 @@
 import { Scenario } from '../JSXInterfaces';
 import { JSXOperators } from '../typeHandlers/JSXOperators';
 
-export const operatorScenarios = (currentIndex, parsedPath): Array<Scenario> => [
+export const operatorScenarios = (currentIndex, parsedPath): Scenario[] => [
   {
     description: 'Is an operator with 4 characters',
     testScenario: (chars) => {

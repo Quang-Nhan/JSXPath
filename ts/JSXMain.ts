@@ -1,4 +1,4 @@
-import { JSXPathHandler } from './JSXPathHandler';
+import { JSXPathHandler } from './pathParser/JSXPathHandler';
 import { JSXProcessor } from './JSXProcessor';
 import { Instruction } from './JSXInterfaces';
 import { JSXState } from './state/JSXState';
@@ -10,7 +10,7 @@ export default class JSXMain {
   private pathHandler: JSXPathHandler;
   private processor: JSXProcessor;
   private stateHandler: JSXState;
-  private instructions: Array<Instruction>;
+  private instructions: Instruction[];
   private reg: JSXRegistrar;
     
   constructor() {

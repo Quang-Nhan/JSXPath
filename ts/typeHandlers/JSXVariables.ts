@@ -1,6 +1,5 @@
-import { AXES_ENUMS } from '../enums/axes';
-import { Instruction, ImpInstruction, ImpAction, Action } from '../JSXInterfaces';
-import { JSXPathHandler } from '../JSXPathHandler';
+import { Instruction, ImpInstruction, ImpAction, Action, ActionParams } from '../JSXInterfaces';
+import { JSXPathHandler } from '../pathParser/JSXPathHandler';
 import { VARIABLES, PATH_HANDLER, VARS, ACTION_HANDLER, NODES_HANDLER, DISPATCH, PARSED_NODES } from '../constants';
 import { JSXRegistrar } from '../JSXRegistrar';
 import { JSXAction } from '../JSXAction';
@@ -9,7 +8,7 @@ import { JSXNodes } from './JSXNodes';
 export class JSXVariables implements ImpInstruction, ImpAction {
 
   // variables
-  static VARIABLES: Array<string>;
+  static VARIABLES: string[];
   private pathHandler: JSXPathHandler;
   private nodesHandler: JSXNodes;
   private VARIABLE_MAP: object = {};
@@ -48,7 +47,8 @@ export class JSXVariables implements ImpInstruction, ImpAction {
     return this.VARIABLE_MAP;
   }
 
-  getAction(instruction: Instruction): Action {
+  getAction(params: ActionParams): Action {
+    const {instruction} = params;
     return this.actionHandler.create(VARIABLES, {
       id: instruction.id,
       value: this.VARIABLE_MAP[instruction.subPath],
@@ -57,12 +57,20 @@ export class JSXVariables implements ImpInstruction, ImpAction {
     });
   }
 
-  getInstruction(subPath: string, startIndex: number): Instruction {
+  getDefaultAction(params:ActionParams): Action {
+    return null;
+  }
+
+  getFilteredContextAction(params:ActionParams): Action {
+    return null;
+  }
+
+  getInstruction(subPath: string, startIndex: number, instructionHandlerId): Instruction {
     return {
       type: VARIABLES,
       subPath,
       startIndex,
-      endIndex: this.pathHandler.getCurrentIndex(),
+      endIndex: this.pathHandler.getCurrentIndex(instructionHandlerId),
       link: {}
     }
   }

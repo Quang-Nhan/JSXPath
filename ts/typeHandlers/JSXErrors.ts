@@ -1,11 +1,11 @@
 import { JSXRegistrar } from "../JSXRegistrar";
-import { Instruction, Action } from "../JSXInterfaces";
+import { Instruction, Action, ImpAction, ActionParams } from "../JSXInterfaces";
 import { ERROR, PATH_HANDLER, AXES, ACTION_HANDLER } from "../constants";
-import { JSXPathHandler } from "../JSXPathHandler";
+import { JSXPathHandler } from "../pathParser/JSXPathHandler";
 import InstructionMap from '../map/InstructionMap.json';
 import { JSXAction } from "../JSXAction";
 
-export class JSXErrors {
+export class JSXErrors implements ImpAction {
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
   constructor(private reg:JSXRegistrar) {}
@@ -14,7 +14,7 @@ export class JSXErrors {
     [this.pathHandler, this.actionHandler] = this.reg.get([PATH_HANDLER, ACTION_HANDLER]);
   }
 
-  createErrorInstruction(subPath:string, startIndex:number, prevInstruction:Instruction): Instruction {
+  createErrorInstruction(subPath:string, startIndex:number, instructionHandlerId:number, prevInstruction:Instruction): Instruction {
   
     const message = prevInstruction.type && InstructionMap.hasOwnProperty(prevInstruction.type) ?
       'Could not understand the sub path ' + subPath + '. Was expecting ' + InstructionMap[prevInstruction.type]['$next'] :
@@ -25,12 +25,23 @@ export class JSXErrors {
       errorMessage: message,
       subPath,
       startIndex,
-      endIndex: this.pathHandler.getCurrentIndex(),
+      endIndex: this.pathHandler.getCurrentIndex(instructionHandlerId),
       link: {}
     };
   }
 
-  getAction(instruction:Instruction): Action {
-    return this.actionHandler.create(ERROR, {value: instruction.errorMessage});
+  getAction(params: ActionParams): Action {
+    const {instruction} = params;
+    return this.actionHandler.create(ERROR, {
+      value: instruction.errorMessage
+    });
+  }
+
+  getDefaultAction(params:ActionParams): Action {
+    return null;
+  }
+
+  getFilteredContextAction(params:ActionParams): Action {
+    return null;
   }
 }

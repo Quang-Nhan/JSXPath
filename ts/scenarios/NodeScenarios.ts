@@ -2,7 +2,7 @@ import { JSXNodes } from '../typeHandlers/JSXNodes';
 import { JSXOperators } from '../typeHandlers/JSXOperators';
 import { Scenario } from '../JSXInterfaces';
 
-export const nodeScenarios: Function = (currentIndex, parsedPath, state): Array<Scenario> => [
+export const nodeScenarios: Function = (currentIndex, parsedPath, state): Scenario[] => [
   {
     description: 'Is the node and node is end of path?',
     testScenario: (chars):boolean => { 
@@ -22,8 +22,8 @@ export const nodeScenarios: Function = (currentIndex, parsedPath, state): Array<
     testScenario: (chars):boolean => state.nodes.NODE_NAMES.includes(chars) && parsedPath[currentIndex+1] === '['
   },
   {
-    description: 'Is the node followed by ] character?',
-    testScenario: (chars):boolean => state.nodes.NODE_NAMES.includes(chars) && parsedPath[currentIndex+1] === ']'
+    description: 'Is the node followed by ] or ) character?',
+    testScenario: (chars):boolean => state.nodes.NODE_NAMES.includes(chars) && [']', ')'].includes(parsedPath[currentIndex+1])
   },
   {
     description: 'Is the node followed by operator character?',

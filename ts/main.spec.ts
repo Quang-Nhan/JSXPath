@@ -1,6 +1,6 @@
 import Main from './JSXMain';
 
-describe('Main()', () => {
+xdescribe('Main()', () => {
   let main, json, path;
   beforeEach(() => {
     main = new Main();
@@ -10,6 +10,7 @@ describe('Main()', () => {
     
     describe('Root', () => {
       beforeEach(() => {
+        main.flush();
         json = {
           a: 'b',
           c: 'd'
@@ -27,7 +28,7 @@ describe('Main()', () => {
       
       describe('Children()', () => {
         beforeEach(() => {
-          main.flush();
+          // main.flush();
           json = {
             a: {
               b: 1

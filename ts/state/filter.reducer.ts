@@ -1,51 +1,63 @@
 import { Action, State, NodeState, FilterState } from "../JSXInterfaces";
-import { LEFT_FITLER, RIGHT_FILTER, FILTERS } from "../constants";
+import { LEFT_FITLER, RIGHT_FILTER, FILTERS, SET_CONTEXT } from "../constants";
+import { StateUtility } from "./utility";
 
 
-export const FilterReducer = (utils) => (state: State, action: Action) => {
-  
+export const FilterReducer = (utils: StateUtility) => (state: State, action: Action) => {
+  let currentFilterState;
   
   switch(action.type) {
     case LEFT_FITLER:
-      const currentSubState = <NodeState> state.subStates[state.currentStateId]
+      const currentState = state.subStates[state.currentStateId]
       return {
         ...state,
-        previousActionType: action.type,
-        currentStateId: action.payload.id,
+        ...utils.updateCommonStateProperty(state, action),
         subStates: {
           ...state.subStates,
           [action.payload.id]: {
             id: action.payload.id,
             type: FILTERS,
             link: {
-              relatedId: currentSubState.id,
-              relatedType: currentSubState.type
+              relatedId: currentState.id,
+              relatedType: currentState.type
             },
-            nodes: [].concat(currentSubState.nodes)
+            nodes: [].concat(currentState.nodes)
           }
-        },
-        history: state.history.concat(utils.createHistory(action))
+        }
       };
-    case RIGHT_FILTER:
-      const subState = <FilterState> state.subStates[action.payload.id];
-      const parentState = utils.getUpdatedParentState(subState, state.subStates, action);
-      const filteredNodes = subState.nodes.filter(n => {
-        return n.childrenIds.filter(cid => subState.value.map(s => s.id).includes(cid)).length;
-      });
+    case SET_CONTEXT:
+      currentFilterState = state.subStates[action.payload.id];
       return {
         ...state,
-        previousActionType: action.type,
+        ...utils.updateCommonStateProperty(state, action),
+        subStates: {
+          ...state.subStates,
+          [action.payload.id]: {
+            ...currentFilterState,
+            context: currentFilterState.nodes[action.payload.value]
+          }
+        }
+      };    
+    case RIGHT_FILTER:
+      currentFilterState = <FilterState> state.subStates[action.payload.id];
+      const parentState = utils.getUpdatedParentState(currentFilterState, state.subStates);
+      // const filteredNodes = currentFilterState.nodes.filter(n => {
+      //   return n.childrenIds.filter(cid => currentFilterState.filteredNodes.map(s => s.id).includes(cid)).length;
+      // });
+      return {
+        ...state,
+        ...utils.updateCommonStateProperty(state, action),
         currentStateId: parentState ? parentState.id : state.currentStateId,
         subStates: parentState ? {
           ...state.subStates,
           [parentState.id]: {
             ...parentState,
-            value: filteredNodes
+            nodes: currentFilterState.filteredNodes,
+            value: currentFilterState.value
           }
         } : {
           ...state.subStates
-        },
-        history: state.history.concat(utils.createHistory(action))
+        }
       }
       // TODO
     default: return state;

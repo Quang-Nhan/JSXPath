@@ -5,6 +5,7 @@
 README.html
 md/*.html
 node_modules/
+built/
 coverage/
 *.gliffy
 docs/

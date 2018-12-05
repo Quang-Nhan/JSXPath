@@ -1,79 +1,42 @@
 import JSXMain from './JSXMain';
 console.time('DURATION');
 const json = {
-    a: 'abv',
-    c: {
-        a: 'k',
-        f: {
-            a: {
-                k: 100,
-                a: 200
-            }
-        }
+    a: {
+      b: 1
     },
-    m: 1,
-    f: 2,
-    n: [1, 2],
-    d: [
+    c: [
         {
-            a: 1,
-            b: 2
-        },
-        {
-            a: 3,
-            b: 9
-        }
-    ],
-    k: [
-        1,
-        2
+            a: 11,
+            b: -4
+          },
+      {
+        a: 1,
+        b: 2
+      },
+      {
+        a: 3,
+        b: -4
+      }
     ]
-}
+  }
 
-const variables = {
-    $v1: 3
-}
-
-// const json = {
-//     a: [
-//       {
-//         b: 1,
-//         c: 2,
-//         e: {
-//           a: 1
-//         },
-//         f: {
-//           a: 1
-//         }
-//       },
-//       {
-//         b: 'b',
-//         c: 9
-//       },
-//       {
-//         b: 'b',
-//         d: 13
-//       },
-//       {
-//         d: 13,
-//         c: 13
-//       },
-//       {
-//         c: 13,
-//         d: -1
-//       }
-//     ]
-//   }
+// const variables = {
+//     $v1: 3
+// }
 
 
-const path = '/a';
+
+
+// const path = '/c[position() = 1]';
+// const path = '/c[string(@b) = "2"]'
+const path = '/c[@b=-4]/@a'
 const main = new JSXMain();
 
 main.process(path, json);
 console.timeEnd('DURATION');
 console.log('Result: ', main.getResult());
-
-
+console.log('Done')
+debugger
 /* /a/c/f
 {
     ROOT: [

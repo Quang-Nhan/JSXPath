@@ -30,7 +30,8 @@
       "GROUPINGS",
       "NODES",
       "ROOT",
-      "AXES"
+      "AXES",
+      "FUNCTIONS"
     ]
   },
   "STRINGS": {
@@ -55,6 +56,13 @@
   "BOOLEAN": {
     "$next": [
       "OPERATORS"
+    ]
+  },
+  "FILTERS": {
+    "$next": [
+      "AXES",
+      "OPERATORS",
+      "FUNCTIONS"
     ]
   }
 }

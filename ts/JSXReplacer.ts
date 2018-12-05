@@ -3,7 +3,7 @@
  */
 export class JSXReplacer {
 
-  replace(path:string, mapList:Array<object>):string {
+  replace(path:string, mapList:object[]):string {
     let newPath = path;
     mapList.forEach(map => {
       newPath = this.processReplacement(newPath, map);
@@ -20,6 +20,6 @@ export class JSXReplacer {
   }
 
   private findAndReplace(path:string, term:string, value):string {
-    return path.replace(term, value);
+    return path.split(term).join(value);
   }
 }

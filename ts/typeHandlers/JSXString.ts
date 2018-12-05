@@ -1,5 +1,5 @@
-import { JSXPathHandler } from "../JSXPathHandler";
-import { ImpInstruction, ImpAction, Instruction, Action } from "../JSXInterfaces";
+import { JSXPathHandler } from "../pathParser/JSXPathHandler";
+import { ImpInstruction, ImpAction, Instruction, Action, ActionParams } from "../JSXInterfaces";
 import { STRINGS, PATH_HANDLER, ACTION_HANDLER, PARSED_PATH } from '../constants';
 import { JSXAction } from "../JSXAction";
 import { JSXRegistrar } from "../JSXRegistrar";
@@ -13,7 +13,15 @@ export class JSXString implements ImpInstruction, ImpAction {
   constructor(private reg:JSXRegistrar) {}
 
   init(pathHandler:JSXPathHandler, actionHandler:JSXAction, parsedPath:string) {
-    [this.pathHandler, this.actionHandler, this.parsedPath] = this.reg.get([PATH_HANDLER, ACTION_HANDLER, PARSED_PATH]);
+    [
+      this.pathHandler, 
+      this.actionHandler, 
+      this.parsedPath
+    ] = this.reg.get([
+      PATH_HANDLER, 
+      ACTION_HANDLER, 
+      '0:' + PARSED_PATH
+    ]);
   }
   
 
@@ -34,8 +42,8 @@ export class JSXString implements ImpInstruction, ImpAction {
   }
 
   
-  getInstruction(subPath: string, startIndex: number): Instruction {
-    let stringProperties = this.getStringProperties(this.pathHandler.getCurrentIndex());
+  getInstruction(subPath: string, startIndex: number, instructionHandlerId:number): Instruction {
+    let stringProperties = this.getStringProperties(this.pathHandler.getCurrentIndex(instructionHandlerId));
     this.pathHandler.updateCurrentIndex(stringProperties.endIndex);
 
     return {
@@ -47,11 +55,20 @@ export class JSXString implements ImpInstruction, ImpAction {
     }
   }
 
-  getAction(instruction: Instruction): Action {
+  getAction(params: ActionParams): Action {
+    const {instruction} = params;
     return this.actionHandler.create(STRINGS, {
       id: instruction.id,
       value: instruction.subPath.replace(/\'|\"/g, ''), 
       link: instruction.link, 
       subType: instruction.subType});
+  }
+
+  getDefaultAction(params:ActionParams): Action {
+    return null;
+  }
+
+  getFilteredContextAction(params:ActionParams): Action {
+    return null;
   }
 }

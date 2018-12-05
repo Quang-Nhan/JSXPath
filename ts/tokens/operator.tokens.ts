@@ -83,18 +83,20 @@ const helper = {
 
 
 export const tokens = {
-  '+': (lhs, rhs, isFilter) => {
+  '+': (context) => (lhs, rhs, isFilter) => {
     lhs = helper.getSingleValue(lhs);
     rhs = helper.getSingleValue(rhs);
 
     return lhs + rhs;
   },
-  '*': (lhs, rhs, isFilter) => {
+  '*': (context) => (lhs, rhs, isFilter) => {
     lhs = helper.getSingleValue(lhs);
     rhs = helper.getSingleValue(rhs);
     return lhs * rhs;
   },
-  '=': (lhs, rhs, isFilter) => {
+  '=': (context) => (lhs, rhs, isFilter) => {
+    console.log(context)
+    // debugger;
     if (isFilter) {
       let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
       if (lhsType === helper.types.NODE) {
@@ -111,8 +113,8 @@ export const tokens = {
           return rhsNode.siblingIds.includes(lhsNode.id) && helper.isEqual(lhsNode, rhsNode);
         }));
       }
-      if (lhsType === helper.types.ARRAY_NODE) {
-        return helper.filterNodes(lhs, rhs);
+      if (lhsType === helper.types.ARRAY_NODE && helper.filterNodes(lhs, rhs).length) {
+        return context;
       }
       if (rhsType === helper.types.ARRAY_NODE) {
         return helper.filterNodes(rhs, lhs);
@@ -121,10 +123,10 @@ export const tokens = {
       return helper.isEqual(lhs, rhs);
     }
   },
-  'div': (lhs, rhs, isFilter) => {
+  'div': (context) => (lhs, rhs, isFilter) => {
     return lhs/rhs;
   },
-  'or': (lhs, rhs, isFilter) => {
+  'or': (context) => (lhs, rhs, isFilter) => {
     if (isFilter) {
       let finalList = [];
       if (lhs) {
@@ -136,5 +138,8 @@ export const tokens = {
       return finalList.length ? finalList : null;
     }
     return lhs || rhs;
+  },
+  'and': (context) => (lhs, rhs, isFilter) => {
+    return isFilter ? (lhs && (Array.isArray(lhs) ? lhs.length : true) && rhs && (Array.isArray(rhs) ? rhs.length : true)) : lhs && rhs;
   }
 }

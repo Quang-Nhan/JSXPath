@@ -1,8 +1,8 @@
-import { State } from './../JSXInterfaces';
+import { State, ActionParams, Action } from './../JSXInterfaces';
 import { AXES_ENUMS } from '../enums/axes';
 import AXES_TO_NODE_GETTERS from '../map/AxesToNodeGetters.json';
 import { Instruction, ImpInstruction, ImpAction } from '../JSXInterfaces';
-import { JSXPathHandler } from '../JSXPathHandler';
+import { JSXPathHandler } from '../pathParser/JSXPathHandler';
 import { AXES, PATH_HANDLER, ACTION_HANDLER, NODES_HANDLER } from '../constants';
 import { JSXNodes } from './JSXNodes';
 
@@ -12,8 +12,8 @@ import { JSXRegistrar } from '../JSXRegistrar';
 export class JSXAxes implements ImpInstruction, ImpAction {
 
   // variables
-  static JSX_AXES: Array<string>;
-  static AXES: Array<string>;
+  static JSX_AXES: string[];
+  static AXES: string[];
 
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
@@ -52,21 +52,21 @@ export class JSXAxes implements ImpInstruction, ImpAction {
     return newAxesEnums;
   }
 
-  getInstruction(subPath: string, startIndex: number): Instruction {
+  getInstruction(subPath: string, startIndex: number, instructionHandlerId: number): Instruction {
     return {
       type: AXES,
       subPath,
       startIndex,
-      endIndex: this.pathHandler.getCurrentIndex(),
+      endIndex: this.pathHandler.getCurrentIndex(instructionHandlerId),
       link: {}
     }
   }
 
   /**
    * Remove previous '/' instruction if current instruction is other axes tokens
-   * @param instructions {Array<Instruction>}
+   * @param instructions {Instruction[]}
    */
-  cleanUp(instructions: Array<Instruction>): Array<Instruction> {
+  cleanUp(instructions: Instruction[]): Instruction[] {
     return instructions.reduce((r, instruction, index) => {
       if (instruction.type === AXES && ['parent::', 'ancestor::', 'ancestorOrSelf::', 'descendant::', 'descendantOrSelf::'].includes(instruction.subPath) && instructions[index-1].subPath === '/') {
         r.pop();
@@ -76,7 +76,19 @@ export class JSXAxes implements ImpInstruction, ImpAction {
     }, []);
   }
 
-  getAction(instruction:Instruction, state:State) {
-    return this.actionHandler.create(AXES, {subType: instruction.subPath, id: instruction.id});
+  getAction(params: ActionParams): Action {
+    const {instruction} = params;
+    return this.actionHandler.create(AXES, {
+      id: instruction.id,
+      subType: instruction.subPath
+    });
+  }
+
+  getDefaultAction(params:ActionParams): Action {
+    return null;
+  }
+
+  getFilteredContextAction(params:ActionParams): Action {
+    return null;
   }
 }

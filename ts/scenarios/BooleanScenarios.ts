@@ -1,6 +1,6 @@
 import { Scenario } from '../JSXInterfaces';
 
-export const booleanScenarios: Function = (currentIndex, parsedPath): Array<Scenario> => [
+export const booleanScenarios: Function = (currentIndex, parsedPath): Scenario[] => [
   {
     description: 'Is true',
     testScenario: (chars) => chars === 'true'

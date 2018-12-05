@@ -1,31 +1,53 @@
 
-import {
-  State,
-  Action
-} from '../JSXInterfaces';
-import { 
-  ROOT, 
-  AXES,
-  NODES, 
-  NUMBERS, 
-  STRINGS, 
-  OPERATOR_START,
-  OPERATOR_END, 
-  FLUSH, 
-  TYPE_MAPPER, 
-  INPUT_ADDED, 
-  OPERATOR_LHS, 
-  OPERATOR_RHS, EOF, 
-  LEFT_GROUPING, 
-  RIGHT_GROUPING, ERROR, LEFT_FITLER, RIGHT_FILTER, FILTERS, PARSED_NODES, INCREMENT_CURRENT_INDEX, UPDATE_CURRENT_INDEX, BOOLEAN, VARIABLES } from '../constants';
+
 import { StateUtility } from './utility';
 import { JSXTypeMapper } from '../typeHandlers/JSXTypeMapper';
 import { JSXRegistrar } from '../JSXRegistrar';
 import { NodesReducer } from './node.reducer';
 import { InputsReducer } from './inputs.reducer';
 import { GroupReducer } from './group.reducer';
-import { OperatorReducer} from './operator.reducer';
+import { OperatorReducer } from './operator.reducer';
 import { FilterReducer } from './filter.reducer';
+import { PrimitiveReducer } from './primitive.reducer';
+import {
+  State,
+  Action
+} from '../JSXInterfaces';
+import {
+  ARG_END,
+  ARG_START,
+  AXES,
+  BOOLEAN, 
+  EOF, 
+  ERROR, 
+  FILTERS, 
+  FLUSH, 
+  FUNCTION_END,
+  FUNCTION_START, 
+  INCREMENT_CURRENT_INDEX, 
+  INPUT_ADDED, 
+  LEFT_FITLER, 
+  LEFT_GROUPING, 
+  NODES, 
+  NUMBERS, 
+  OPERATOR_END, 
+  OPERATOR_START,
+  PARSED_NODES, 
+  RIGHT_FILTER, 
+  RIGHT_GROUPING, 
+  ROOT, 
+  SET_CONTEXT,
+  STRINGS, 
+  TYPE_MAPPER, 
+  UPDATE_CURRENT_INDEX, 
+  VARIABLES,
+  FILTERED_CONTEXT_OPERATORS_START,
+  FILTERED_CONTEXT_OPERATORS_END,
+  FILTERED_CONTEXT_NODES,
+  FILTERED_CONTEXT_NUMBERS
+} from '../constants';
+import { FunctionReducer } from './function.reducer';
+import { JSXNodes } from '../typeHandlers/JSXNodes';
 
 
 export class JSXState {
@@ -42,7 +64,9 @@ export class JSXState {
   private groupReducer;
   private operatorReducer;
   private filterReducer;
-  private nodeHandler;
+  private nodeHandler: JSXNodes;
+  private functionReducer;
+  private primitiveReducer;
   utils;
 
   constructor(private reg: JSXRegistrar) {}
@@ -55,6 +79,8 @@ export class JSXState {
     this.groupReducer = GroupReducer(this.utils);
     this.operatorReducer = OperatorReducer(this.utils, this.typeMapper);
     this.filterReducer = FilterReducer(this.utils);
+    this.functionReducer = FunctionReducer(this.utils, this.typeMapper);
+    this.primitiveReducer = PrimitiveReducer(this.utils, this.operatorReducer);
   }
 
   private getFinalValues(currentStateId, stateValue, subStates) {
@@ -64,6 +90,8 @@ export class JSXState {
         return currentState.nodes[0].value;
       } else if (this.nodeHandler.isNode(currentState.value)) {
         return this.nodeHandler.getNodeValues(currentState.value);
+      } else if (currentState.filteredNodes) {
+        return this.nodeHandler.getNodeValues(currentState.filteredNodes);
       } else if (currentState.nodes) {
         return this.nodeHandler.getNodeValues(currentState.nodes);
       } else {
@@ -84,7 +112,7 @@ export class JSXState {
   private parseValue(values) {
     if (Array.isArray(values) && this.containsNodes(values)) {
       return values.map(value => {
-        if (this.isNode(value)) {
+        if (this.utils.isNode(value)) {
           return value.value;
         }
         return value;
@@ -96,15 +124,11 @@ export class JSXState {
   private containsNodes(values) {
     // assume values are arrays
     for (let i = 0; i < values.length; ++i) {
-      if (this.isNode(values[i])) {
+      if (this.utils.isNode(values[i])) {
         return true;
       }
     }
     return false;
-  }
-
-  private isNode(value) {
-    return value.hasOwnProperty('name') && value.hasOwnProperty('parentId') && value.hasOwnProperty('value') && value.hasOwnProperty('id');
   }
 
   private reducer(state: State, action:Action): State {
@@ -126,6 +150,7 @@ export class JSXState {
           history: state.history.concat(this.utils.createHistory(action))
         };
       case NODES:
+      case FILTERED_CONTEXT_NODES:
       case AXES:
       case ROOT:
         return this.nodesReducer(state, action);
@@ -133,31 +158,25 @@ export class JSXState {
       case NUMBERS:
       case BOOLEAN:
       case VARIABLES:
-        return action.payload.link && [OPERATOR_LHS, OPERATOR_RHS].includes(action.payload.subType) ? 
-          this.operatorReducer(state, Object.assign({}, action, {type: action.payload.subType})) :
-          {
-            ...state,
-            previousActionType: action.type,
-            currentStateId: action.payload.id,
-            subStates: {
-              [action.payload.id]: {
-                id: action.payload.id,
-                type: action.type,
-                value: action.payload.value,
-                link: action.payload.link
-              }
-            },
-            history: state.history.concat(this.utils.createHistory(action))
-          };
+      case FILTERED_CONTEXT_NUMBERS:
+        return this.primitiveReducer(state, action);
       case OPERATOR_START:
       case OPERATOR_END:
+      case FILTERED_CONTEXT_OPERATORS_START:
+      case FILTERED_CONTEXT_OPERATORS_END:
         return this.operatorReducer(state, action);
       case LEFT_GROUPING:
       case RIGHT_GROUPING:
         return this.groupReducer(state, action);
       case LEFT_FITLER:
+      case SET_CONTEXT:
       case RIGHT_FILTER:
-        return this.filterReducer(state, action); 
+        return this.filterReducer(state, action);
+      case FUNCTION_START:
+      case FUNCTION_END:
+      case ARG_START:
+      case ARG_END:
+        return this.functionReducer(state, action);
       case FLUSH:
         return {
           previousActionType: null,

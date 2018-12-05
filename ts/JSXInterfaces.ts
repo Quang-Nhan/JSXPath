@@ -9,7 +9,7 @@ import { JSXOperators } from "./typeHandlers/JSXOperators";
 import { JSXRoot } from "./typeHandlers/JSXRoot";
 import { JSXString } from "./typeHandlers/JSXString";
 import { JSXVariables } from "./typeHandlers/JSXVariables";
-import { JSXPathHandler } from "./JSXPathHandler";
+import { JSXPathHandler } from "./pathParser/JSXPathHandler";
 import { JSXAction } from "./JSXAction";
 import { JSXProcessor } from "./JSXProcessor";
 import { JSXTypeMapper } from "./typeHandlers/JSXTypeMapper";
@@ -26,9 +26,10 @@ export interface Variable {
 export interface Action {
   type: string,
   payload: {
-    value?: any,
     id?: number,
+    value?: any,
     subType?: string,
+    /** Used by Operators */
     token?: string,
     link?: any
   }
@@ -51,9 +52,9 @@ export interface Instruction {
   subPath: string,
   startIndex: number,
   endIndex: number,
-  // next?: string,
   errorMessage?: string,
-  subInstructions?: Array<Instruction>,
+  subInstructions?: Instruction[],
+  args?: Array<Instruction[]>
   lhs?:Instruction,
   rhs?:Instruction,
   id?: number,
@@ -75,19 +76,26 @@ export interface Node {
   name: string,
   value: any,
   parentId: number,
-  childrenIds: Array<number>,
-  ancestorIds: Array<number>,
-  descendantIds: Array<number>,
-  siblingIds: Array<number>
+  childrenIds: number[],
+  ancestorIds: number[],
+  descendantIds: number[],
+  siblingIds: number[]
 }
 
 export interface ImpInstruction {
-  getInstruction(subPath: string, startIndex: number, prevInstruction?:Instruction): Instruction|Array<Instruction>
-}
+  getInstruction(subPath: string, startIndex: number, handlerId:number, prevInstruction?:Instruction): Instruction|Instruction[]
+};
+
+export interface ActionParams {
+  instruction:Instruction, 
+  processInstruction?:Function, 
+  isFilterContext?:boolean
+};
 
 export interface ImpAction {
-  getAction(instruction:Instruction, state?:State, processInstruction?:Function): Action
-}
+  getAction(params: ActionParams): Action,
+  getFilteredContextAction(params: ActionParams): Action
+};
 
 export interface RegistrarCache {
   typeHandlers: {
@@ -113,32 +121,34 @@ export interface RegistrarCache {
     typeMapper: JSXTypeMapper,
     pathScenarios: JSXPathScenarios
   },
-  helpers: {
-    dispatch: Function,
-    generateId: Function,
-    createLink: Function,
-    getState: Function
-  }
+  helpers: CacheHelpers,
   enums: object
 }
+
+export interface CacheHelpers {
+  dispatch: Function,
+  generateId: Function,
+  createLink: Function,
+  getState: Function
+};
 
 // State interface
 
 export interface State {
   previousActionType: string,
-  values: Array<any>,
+  values: any[],
   status: string,
   message?: string,
   currentStateId?,
   subStates: {
-    [key: number]: OperatorState|NodeState|FilterState|BaseState
+    [key: number]: OperatorState|NodeState|FilterState
   },
-  history: Array<ActionHistory>,
-  inputs?: Input, //TODO: update to allow multiple inputs, or update path
+  history: ActionHistory[],
+  inputs?: Inputs, //TODO: update to allow multiple inputs, or update path
   nodes?: {
     nodesByName: object,
     nodesByIds: object,
-    NODE_NAMES: Array<string>
+    NODE_NAMES: string[]
   }
 }
 
@@ -148,13 +158,14 @@ interface BaseState {
   link: {
     relatedId: number,
     relatedType: string
-  }
+  },
+  value: any,
+  nodes: Node[]
 }
 
 export interface NodeState extends BaseState {
-  nodes: Array<Node>|Function,
-  childrenIds?: Array<number>,
-  descendantIds?: Array<number>
+  childrenIds?: number[],
+  descendantIds?: number[]
 }
 
 export interface OperatorState extends BaseState {
@@ -162,13 +173,22 @@ export interface OperatorState extends BaseState {
   operatorType: string,
   lhs?: number,
   rhs?: number,
-  value: any,
   operate: Function
 }
 
 export interface FilterState extends BaseState {
-  value: any,
-  nodes: Array<Node>
+  filteredNodes: Node[],
+  context: any
+}
+
+export interface FunctionState extends BaseState {
+  functionName: string,
+  arguments: any[],
+  execute: Function
+}
+
+export interface Inputs {
+  [id: number]: Input
 }
 
 export interface Input {
