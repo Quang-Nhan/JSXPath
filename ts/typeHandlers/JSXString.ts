@@ -6,6 +6,7 @@ import { JSXRegistrar } from "../JSXRegistrar";
 
 
 export class JSXString implements ImpInstruction, ImpAction {
+  public name = STRINGS;
   private parsedPath: string;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
@@ -64,11 +65,8 @@ export class JSXString implements ImpInstruction, ImpAction {
       subType: instruction.subType});
   }
 
-  getDefaultAction(params:ActionParams): Action {
-    return null;
-  }
 
   getFilteredContextAction(params:ActionParams): Action {
-    return null;
+    return this.getAction(params);
   }
 }

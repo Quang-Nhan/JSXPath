@@ -44,7 +44,9 @@ import {
   FILTERED_CONTEXT_OPERATORS_START,
   FILTERED_CONTEXT_OPERATORS_END,
   FILTERED_CONTEXT_NODES,
-  FILTERED_CONTEXT_NUMBERS
+  FILTERED_CONTEXT_NUMBERS,
+  FILTERED_CONTEXT_FUNCTION_START,
+  FILTERED_CONTEXT_FUNCTION_END
 } from '../constants';
 import { FunctionReducer } from './function.reducer';
 import { JSXNodes } from '../typeHandlers/JSXNodes';
@@ -79,7 +81,7 @@ export class JSXState {
     this.groupReducer = GroupReducer(this.utils);
     this.operatorReducer = OperatorReducer(this.utils, this.typeMapper);
     this.filterReducer = FilterReducer(this.utils);
-    this.functionReducer = FunctionReducer(this.utils, this.typeMapper);
+    this.functionReducer = FunctionReducer(this.utils, this.typeMapper, this.nodeHandler);
     this.primitiveReducer = PrimitiveReducer(this.utils, this.operatorReducer);
   }
 
@@ -87,7 +89,8 @@ export class JSXState {
     if (currentStateId && subStates.hasOwnProperty(currentStateId)) {
       const currentState = subStates[currentStateId];
       if (currentState.nodes && Array.isArray(currentState.nodes) && currentState.nodes.length === 1) {
-        return currentState.nodes[0].value;
+        // return currentState.nodes[0].value; // TODO decide if we want to return single value for an array with 1 value?
+        return this.nodeHandler.getNodeValues(currentState.nodes);
       } else if (this.nodeHandler.isNode(currentState.value)) {
         return this.nodeHandler.getNodeValues(currentState.value);
       } else if (currentState.filteredNodes) {
@@ -176,6 +179,8 @@ export class JSXState {
       case FUNCTION_END:
       case ARG_START:
       case ARG_END:
+      case FILTERED_CONTEXT_FUNCTION_START:
+      case FILTERED_CONTEXT_FUNCTION_END:
         return this.functionReducer(state, action);
       case FLUSH:
         return {

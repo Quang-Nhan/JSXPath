@@ -7,6 +7,7 @@ import { JSXAction } from '../JSXAction';
 import { JSXRegistrar } from '../JSXRegistrar';
 
 export class JSXRoot implements ImpInstruction, ImpAction {
+  public name = ROOT;
   private pathHandlder: JSXPathHandler;
   private nodesHandler: JSXNodes;
   private actionHandler: JSXAction;

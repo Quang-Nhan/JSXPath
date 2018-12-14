@@ -14,6 +14,7 @@ import {
   UPDATE_CURRENT_INDEX,
   ACTION_HANDLER,
   FUNCTIONS,
+  FILTERS,
 } from '../constants';
 
 
@@ -72,8 +73,18 @@ export class JSXPathHandler {
   }
 
   sortInstructions(instructions: Instruction[], inputId) {
-    // Turn this into chain
-    const [operatorHandler, axesHandler, functionHandler] = this.reg.get([OPERATORS, AXES, FUNCTIONS]);
+    const [
+      operatorHandler, 
+      axesHandler, 
+      functionHandler,
+      filterHandler
+    ] = this.reg.get([
+      OPERATORS, 
+      AXES, 
+      FUNCTIONS,
+      FILTERS
+    ]);
+    
     let chain = {
       instructions: [],
       axesCleanUp: (unsortedInstructions) => {
@@ -88,12 +99,20 @@ export class JSXPathHandler {
         chain.instructions = operatorHandler.sortInstructions(chain.instructions, inputId);
         return chain;
       },
+      sortFilters: () => {
+        chain.instructions = filterHandler.sortInstructions(chain.instructions, inputId);
+        return chain;
+      },
       value: () => {
         return chain.instructions;
       }
     }
 
-    const test =  chain.axesCleanUp(instructions).sortFunction().sortOperator().value();
+    const test =  chain.axesCleanUp(instructions)
+    .sortFunction()
+    .sortOperator()
+    .sortFilters()
+      .value();
     return test;
   }
 

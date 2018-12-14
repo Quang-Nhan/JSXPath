@@ -1,7 +1,7 @@
 import { FUNCTION_ENUMS } from '../enums/functions';
 import { JSXPathHandler } from '../pathParser/JSXPathHandler';
 import { Instruction, ImpInstruction, ImpAction, Action, CacheHelpers, State, ActionParams } from '../JSXInterfaces';
-import { FUNCTIONS, PATH_HANDLER, ACTION_HANDLER, LEFT_GROUPING, RIGHT_GROUPING, PARSED_PATH, EOF, HELPERS, FUNCTION_START, FUNCTION_ARGUMENT, FUNCTION_END, ARG_START, GENERATE_ID, ARG_END, OPERATORS, STRINGS } from '../constants';
+import { FUNCTIONS, PATH_HANDLER, ACTION_HANDLER, LEFT_GROUPING, RIGHT_GROUPING, PARSED_PATH, EOF, HELPERS, FUNCTION_START, FUNCTION_ARGUMENT, FUNCTION_END, ARG_START, GENERATE_ID, ARG_END, OPERATORS, STRINGS, FILTERED_CONTEXT_FUNCTION_START, FILTERED_CONTEXT_FUNCTION_END } from '../constants';
 import { JSXAction } from '../JSXAction';
 import { JSXRegistrar } from '../JSXRegistrar';
 import { findMatchingCharacterIndex } from './helper';
@@ -12,6 +12,7 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
   static JSX_FUNCTIONS: string[];
   static FUNCTIONS: string[];
 
+  public name = FUNCTIONS;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
   private parsedPath: string;
@@ -52,8 +53,8 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
       if (skipInstructionCheck > 0) {
         --skipInstructionCheck;
       } else {
-        if (!this.isPositionInstruction) {
-        } else if (instructions[i-1] && this.isOperatorInstruction(instructions[i-1])) {
+        if (!this.isPositionInstruction(instruction)) {
+        } else if (instructions[i-1] && this.isOperatorInstruction(instructions[i-1])) { //position is on the rhs
           const convertedOperator:Instruction[] = [Object.assign({}, sortedInstructions.pop(), {
             type: STRINGS
           })];
@@ -67,7 +68,7 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
           }]]);
         } else if (instructions[i+1] && this.isOperatorInstruction(instructions[i+1])) {
           skipInstructionCheck = 2;
-          const convertedOperator:Instruction[] = [Object.assign({}, instructions[i+1], {
+          const convertedOperator:Instruction[] = [Object.assign({}, instructions[i+1], { // position is on the rhs
             type: STRINGS
           })];
           instruction.args = instruction.args.concat([convertedOperator]);
@@ -83,11 +84,16 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
       }
     });
 
+
     return sortedInstructions;
   }
 
   private isPositionInstruction(instruction:Instruction) {
     return instruction.type === FUNCTIONS && instruction.subPath === '#position('
+  }
+
+  private handlePositionFunction() {
+
   }
 
   private isOperatorInstruction(instruction:Instruction) {
@@ -168,7 +174,7 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
   }
 
   getAction(params:ActionParams): Action {
-    const {instruction, processInstruction, isFilterContext} = params;
+    const {instruction} = params;
     const { id, subType, subPath, link, args } = instruction;
 
     this.helper.dispatch(this.actionHandler.create(FUNCTION_START, {
@@ -178,6 +184,35 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
       token: subPath.replace(/\#|\(/g, '')
     }));
 
+    this.dispatchArguments(args, params);
+
+    return this.actionHandler.create(FUNCTION_END, {
+      id,
+      link
+    });
+  }
+
+
+  getFilteredContextAction(params: ActionParams): Action {
+    const {instruction} = params;
+    const { id, subType, subPath, link, args } = instruction;
+
+    this.helper.dispatch(this.actionHandler.create(FILTERED_CONTEXT_FUNCTION_START, {
+      id,
+      subType,
+      link,
+      token:  subPath.replace(/\#|\(/g, '')
+    }));
+    this.dispatchArguments(args, params);
+
+    return this.actionHandler.create(FILTERED_CONTEXT_FUNCTION_END, {
+      id,
+      link
+    })
+  }
+
+
+  private dispatchArguments(args, {instruction, processInstruction, isFilterContext}: ActionParams) {
     args.forEach(subs => {
       const link = this.helper.createLink(instruction);
       const id = this.helper.generateId();
@@ -197,19 +232,6 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
         link
       }));
     });
-
-    return this.actionHandler.create(FUNCTION_END, {
-      id,
-      link
-    });
-  }
-
-  getDefaultAction(params:ActionParams): Action {
-    return null;
-  }
-
-  getFilteredContextAction(params:ActionParams): Action {
-    return null;
   }
 
   run(context) {

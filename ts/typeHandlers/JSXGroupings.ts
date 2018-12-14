@@ -9,6 +9,7 @@ import { JSXAction } from "../JSXAction";
 
 
 export class JSXGroupings implements ImpInstruction, ImpAction {
+  public name = GROUPINGS;
   private pathHandler: JSXPathHandler;
   private parsedPath: string;
   private actionHandler: JSXAction;
@@ -113,11 +114,8 @@ export class JSXGroupings implements ImpInstruction, ImpAction {
     return endAction;
   }
 
-  getDefaultAction(params: ActionParams): Action {
-    return null;
-  }
 
   getFilteredContextAction(params: ActionParams): Action {
-    return null;
+    return this.getAction(params);
   }
 }

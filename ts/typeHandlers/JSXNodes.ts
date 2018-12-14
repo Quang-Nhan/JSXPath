@@ -7,6 +7,7 @@ import { JSXRegistrar } from '../JSXRegistrar';
 
 
 export class JSXNodes implements ImpInstruction, ImpAction{
+  public name = NODES;
   static NODE_NAMES: string[] = [];
   private pathHandler: JSXPathHandler;
   private getState: Function;
@@ -51,7 +52,13 @@ export class JSXNodes implements ImpInstruction, ImpAction{
   buildAndDispatchNodesMap(rootNodeName, value) {
     const [dispatch, actionHandler] = this.reg.get([DISPATCH, ACTION_HANDLER]);
 
-    this.setNodes(rootNodeName, value, this.currentId, Array.isArray(value) ? true : false, ++this.currentGroupId);
+    this.setNodes({
+      nodeName: rootNodeName, 
+      value, 
+      parentId: this.currentId, 
+      parentIsArray: Array.isArray(value) ? true : false, 
+      groupId: ++this.currentGroupId
+    });
     this.removeDuplicates();
     this.setSiblings();
     dispatch(actionHandler.create(PARSED_NODES, {value: {
@@ -76,7 +83,7 @@ export class JSXNodes implements ImpInstruction, ImpAction{
     this.currentId = -1;
   }
 
-  createNode(name: string, value: any, parentId: number, groupId: number): Node {
+  createNode(name: string, value: any, parentId: number, groupId: number, position?: number): Node {
     return {
       id: ++this.currentId,
       groupId,
@@ -86,7 +93,8 @@ export class JSXNodes implements ImpInstruction, ImpAction{
       ancestorIds: [],
       descendantIds: [],
       childrenIds: [],
-      siblingIds: []
+      siblingIds: [],
+      position
     }
   }
 
@@ -148,24 +156,25 @@ export class JSXNodes implements ImpInstruction, ImpAction{
     return node && node.hasOwnProperty('childrenIds') && node.hasOwnProperty('ancestorIds') && node.hasOwnProperty('siblingIds');
   }
   
-  private setNodes(nodeName: string, value, parentId:number, parentIsArray?:boolean, groupId?: number) {
+  private setNodes(params: {nodeName: string, value, parentId:number, parentIsArray?:boolean, groupId?: number, position?: number}) {
+    let {nodeName, value, parentId, parentIsArray, groupId, position} = params;
     let currentNode;
 
     if (Array.isArray(value)) {
-      value.forEach(nodeValue => this.setNodes(nodeName, nodeValue, parentId, true, groupId));
+      value.forEach((nodeValue, position) => this.setNodes({nodeName, value: nodeValue, parentId, parentIsArray:true, groupId, position}));
     } else {
       if (typeof value !== 'object' && !parentIsArray) {
         nodeName = '@' + nodeName;
       }
       JSXNodes.NODE_NAMES.push(nodeName);
-      currentNode = this.createNode(nodeName, value, parentId, groupId);
+      currentNode = this.createNode(nodeName, value, parentId, groupId, position);
       this.addNode(currentNode);
     }
 
     if (typeof value === 'object' && !Array.isArray(value)) {
       const keyNames = Object.keys(value);
       const groupId = ++this.currentGroupId;
-      keyNames.forEach(name => this.setNodes(name, value[name], currentNode.id, undefined, groupId));
+      keyNames.forEach(name => this.setNodes({nodeName: name, value: value[name], parentId: currentNode.id, groupId}));
     }
   }
 

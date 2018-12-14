@@ -3,7 +3,7 @@ import { JSXRegistrar } from "../JSXRegistrar";
 import { BOOLEAN, ACTION_HANDLER } from "../constants";
 
 export class JSXBoolean implements ImpInstruction, ImpAction {
-
+  public name = BOOLEAN;
   private actionHandler;
   constructor(private reg:JSXRegistrar) {}
 

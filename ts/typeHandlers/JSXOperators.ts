@@ -22,13 +22,12 @@ import { JSXGroupings } from "./JSXGroupings";
     GROUPINGS,
     PATH_LENGTH,
     FILTERED_CONTEXT_OPERATORS_START,
-    FILTERED_CONTEXT_OPERATOR_LHS,
-    FILTERED_CONTEXT_OPERATOR_RHS,
     FILTERED_CONTEXT_OPERATORS_END
   } from "../constants";
 
 
-export class JSXOperators implements ImpInstruction, ImpAction{
+export class JSXOperators implements ImpInstruction, ImpAction {
+  public name = OPERATORS;
   static OPERATORS: string[];
   static SORTED_OPERATORS_BY_LENGTH: object = {}; // dynamically created {1: [], 2: [], ...}
   private pathHandler: JSXPathHandler;

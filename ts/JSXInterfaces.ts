@@ -79,7 +79,8 @@ export interface Node {
   childrenIds: number[],
   ancestorIds: number[],
   descendantIds: number[],
-  siblingIds: number[]
+  siblingIds: number[],
+  position?: number
 }
 
 export interface ImpInstruction {

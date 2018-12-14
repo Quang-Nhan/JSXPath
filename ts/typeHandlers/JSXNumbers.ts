@@ -5,6 +5,7 @@ import { JSXAction } from "../JSXAction";
 import { JSXRegistrar } from "../JSXRegistrar";
 
 export class JSXNumbers implements ImpInstruction, ImpAction{
+  public name = NUMBERS;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
   private parsedPath: string;

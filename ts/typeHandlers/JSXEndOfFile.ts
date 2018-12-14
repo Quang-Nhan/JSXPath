@@ -5,6 +5,7 @@ import { JSXPathHandler } from "../pathParser/JSXPathHandler";
 import { JSXAction } from "../JSXAction";
 
 export class JSXEndOfFile implements ImpInstruction, ImpAction {
+  public name = EOF;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
 

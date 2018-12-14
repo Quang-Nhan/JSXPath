@@ -9,6 +9,7 @@ import { JSXState } from "../state/JSXState";
 
 
 export class JSXFilters implements ImpInstruction, ImpAction {
+  public name = FILTERS;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
   private helper;
@@ -59,9 +60,33 @@ export class JSXFilters implements ImpInstruction, ImpAction {
     }
   }
 
+  sortInstructions(instructions: Instruction[], inputId) {
+    let sortedInstructions:Instruction[] = [];
+    instructions.forEach(instruction => {
+      if (instruction.type === FILTERS) {
+        instruction.subInstructions = instruction.subInstructions.reduce((r, ins) => {
+          if ([LEFT_FITLER, RIGHT_FILTER].includes(ins.type)) {
+            r.push(ins)
+          } else {
+            if (!r[1]) {
+              r[1] = [];
+            }
+            r[1].push(ins)
+          }
+          return r;
+        }, [])
+      } else if (instruction.args && instruction.args.length) {
+        instruction.args = instruction.args.map((args) => this.sortInstructions(args, inputId));
+      } else if (instruction.subInstructions) {
+        instruction.subInstructions = this.sortInstructions(instruction.subInstructions, inputId);
+      }
+      sortedInstructions.push(instruction);
+    });
+    return sortedInstructions;
+  }
+
   getInstruction(subPath, startIndex, inputId:number, prevInstruction): Instruction {
     let subInstructions = [], filterProperties;
-
     if (subPath === filters[LEFT_FITLER]) {
       filterProperties = this.getFilterProperties(this.pathHandler.getCurrentIndex(inputId), inputId);
       const leftFilterInstruction = this.getLeftFilterInstruction(subPath, startIndex, inputId);
@@ -81,9 +106,24 @@ export class JSXFilters implements ImpInstruction, ImpAction {
     }
   }
 
+  private processFilterArgs(parentInstruction, instruction, processInstruction) {
+    return (context) => {
+      this.helper.dispatch(this.actionHandler.create(SET_CONTEXT, {
+        id: parentInstruction.id,
+        value: context
+      }));
+      const link = this.helper.createLink(parentInstruction);
+      instruction.forEach(s => {
+        s.link = link;
+        processInstruction(true)(s);
+      });
+    }
+  }
+
   getAction(params: ActionParams): Action {
     const {instruction, processInstruction} = params;
     let endAction: Action, context, state;
+
     instruction.subInstructions.forEach(sub => {
       if (sub.type === LEFT_FITLER) {
         sub.id = instruction.id;
@@ -96,27 +136,17 @@ export class JSXFilters implements ImpInstruction, ImpAction {
       } else if (sub.type === RIGHT_FILTER) {
         sub.id = instruction.id;
         endAction = this.actionHandler.create(RIGHT_FILTER, {id: sub.id});
+      } else if (Array.isArray(sub)) {
+        context.forEach(this.processFilterArgs(instruction, sub, processInstruction));
       } else {
-        context.forEach((node, index) => {
-          this.helper.dispatch(this.actionHandler.create(SET_CONTEXT, {
-            id: instruction.id,
-            value: index
-          }));
-
-          sub.link = this.helper.createLink(instruction);
-          processInstruction(true)(sub);
-        });
+        this.processFilterArgs(instruction, sub, processInstruction)(context);
       }
     });
     
     return endAction;
   }
 
-  getDefaultAction(params: ActionParams): Action {
-    return null
-  }
-
   getFilteredContextAction(params:ActionParams): Action {
-    return null;
+    return this.getAction(params);
   }
 }

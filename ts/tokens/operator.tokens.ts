@@ -94,9 +94,21 @@ export const tokens = {
     rhs = helper.getSingleValue(rhs);
     return lhs * rhs;
   },
+  "<": (context) => (lhs,rhs, isFilter) => {
+    let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
+    if (isFilter) {
+      if (lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value < rhs[0].value || 
+        (lhsType === helper.types.ARRAY_NODE && lhs[0].value < rhs || rhsType === helper.types.ARRAY_NODE && lhs < rhs[0].value)
+      ) {
+          return context;
+      }
+      return;
+    }
+    return lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value < rhs[0].value ||
+      (lhsType === helper.types.ARRAY_NODE && lhs[0].value < rhs || rhsType === helper.types.ARRAY_NODE && lhs < rhs[0].value) ||
+      lhs < rhs;
+  },
   '=': (context) => (lhs, rhs, isFilter) => {
-    console.log(context)
-    // debugger;
     if (isFilter) {
       let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
       if (lhsType === helper.types.NODE) {
@@ -113,17 +125,26 @@ export const tokens = {
           return rhsNode.siblingIds.includes(lhsNode.id) && helper.isEqual(lhsNode, rhsNode);
         }));
       }
-      if (lhsType === helper.types.ARRAY_NODE && helper.filterNodes(lhs, rhs).length) {
+      if (
+        lhsType === helper.types.ARRAY_NODE && helper.filterNodes(lhs, rhs).length || 
+        rhsType === helper.types.ARRAY_NODE && helper.filterNodes(rhs, lhs).length
+      ) {
         return context;
-      }
-      if (rhsType === helper.types.ARRAY_NODE) {
-        return helper.filterNodes(rhs, lhs);
       }
     } else {
       return helper.isEqual(lhs, rhs);
     }
   },
   'div': (context) => (lhs, rhs, isFilter) => {
+    const lhsType = helper.parseType(lhs);
+    const rhsType = helper.parseType(rhs);
+    if (lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1) {
+      return lhs[0].value / rhs[0].value;
+    } else if (lhsType === helper.types.ARRAY_NODE) {
+      return lhs[0].value / rhs;
+    } else if (rhsType === helper.types.ARRAY_NODE) {
+      return lhs / rhs[0].value;
+    }
     return lhs/rhs;
   },
   'or': (context) => (lhs, rhs, isFilter) => {

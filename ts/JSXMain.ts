@@ -21,6 +21,7 @@ export default class JSXMain {
   process(path, json, variables = {}) {
     this.reg.setInputData({json, path, variables});
     this.instructions = this.pathHandler.getInstructionSet();
+    // debugger;
     this.processor.process(this.instructions);
   }
 

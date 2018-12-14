@@ -63,13 +63,34 @@ export class StateUtility {
       }
 
       if (parentState.type === FILTERS) {
-        parentState.filteredNodes = parentState.filteredNodes  && currentState.nodes ? 
-          parentState.filteredNodes.concat(currentState.nodes) :
-          parentState.filteredNodes || currentState.nodes;
+        parentState = this.updateFilterParentState(parentState, currentState, subStates)
       } else {
-        parentState.nodes = currentState.nodes
+        parentState.nodes = currentState.type === FILTERS ? currentState.filteredNodes : currentState.nodes;
       }
       return parentState;
+    }
+  }
+
+  private updateFilterParentState(parentState, currentState, subStates) {
+    if (currentState.type === FILTERS) {
+      let filteredNodes = parentState.filteredNodes || [] ;
+      if (currentState.filteredNodes && currentState.filteredNodes.length) {
+        filteredNodes.push(parentState.context);
+      }
+      return {
+        ...parentState,
+        filteredNodes
+      }
+    } else if (parentState.filteredNodes && currentState.nodes) {
+      return {
+        ...parentState,
+        filteredNodes: (Array.isArray(parentState.filteredNodes) ? parentState.filteredNodes : [parentState.filteredNodes]).concat(currentState.nodes)
+      }
+    } else { 
+      return {
+        ...parentState,
+        filteredNodes: parentState.filteredNodes || currentState.nodes
+      }
     }
   }
 

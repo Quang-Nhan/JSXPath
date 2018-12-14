@@ -6,7 +6,7 @@ import { JSXAction } from '../JSXAction';
 import { JSXNodes } from './JSXNodes';
 
 export class JSXVariables implements ImpInstruction, ImpAction {
-
+  public name = VARIABLES;
   // variables
   static VARIABLES: string[];
   private pathHandler: JSXPathHandler;

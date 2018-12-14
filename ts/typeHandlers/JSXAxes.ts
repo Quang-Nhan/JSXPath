@@ -15,6 +15,7 @@ export class JSXAxes implements ImpInstruction, ImpAction {
   static JSX_AXES: string[];
   static AXES: string[];
 
+  public name = AXES;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
   private nodesHandler: JSXNodes;

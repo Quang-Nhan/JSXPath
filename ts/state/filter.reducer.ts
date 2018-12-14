@@ -1,4 +1,4 @@
-import { Action, State, NodeState, FilterState } from "../JSXInterfaces";
+import { Action, State, FilterState } from "../JSXInterfaces";
 import { LEFT_FITLER, RIGHT_FILTER, FILTERS, SET_CONTEXT } from "../constants";
 import { StateUtility } from "./utility";
 
@@ -12,6 +12,7 @@ export const FilterReducer = (utils: StateUtility) => (state: State, action: Act
       return {
         ...state,
         ...utils.updateCommonStateProperty(state, action),
+        currentStateId: action.payload.id,
         subStates: {
           ...state.subStates,
           [action.payload.id]: {
@@ -34,16 +35,13 @@ export const FilterReducer = (utils: StateUtility) => (state: State, action: Act
           ...state.subStates,
           [action.payload.id]: {
             ...currentFilterState,
-            context: currentFilterState.nodes[action.payload.value]
+            context: action.payload.value
           }
         }
       };    
     case RIGHT_FILTER:
       currentFilterState = <FilterState> state.subStates[action.payload.id];
       const parentState = utils.getUpdatedParentState(currentFilterState, state.subStates);
-      // const filteredNodes = currentFilterState.nodes.filter(n => {
-      //   return n.childrenIds.filter(cid => currentFilterState.filteredNodes.map(s => s.id).includes(cid)).length;
-      // });
       return {
         ...state,
         ...utils.updateCommonStateProperty(state, action),

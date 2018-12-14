@@ -62,7 +62,8 @@
     "$next": [
       "AXES",
       "OPERATORS",
-      "FUNCTIONS"
+      "FUNCTIONS",
+      "FILTERS"
     ]
   }
 }

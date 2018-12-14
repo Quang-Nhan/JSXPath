@@ -6,6 +6,7 @@ import InstructionMap from '../map/InstructionMap.json';
 import { JSXAction } from "../JSXAction";
 
 export class JSXErrors implements ImpAction {
+  public name = ERROR;
   private pathHandler: JSXPathHandler;
   private actionHandler: JSXAction;
   constructor(private reg:JSXRegistrar) {}
