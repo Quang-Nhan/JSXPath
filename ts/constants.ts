@@ -1,10 +1,12 @@
 export const ROOT = 'ROOT';
-export const AXES = 'AXES';
 export const VARIABLES = 'VARIABLES';
 export const STRINGS = 'STRINGS';
 export const NUMBERS ='NUMBERS';
 export const BOOLEAN = 'BOOLEAN';
 export const NODES = 'NODES';
+
+export const AXES = 'AXES';
+export const FILTERED_CONTEXT_AXES = 'FILTERED_CONTEXT_AXES';
 
 export const FUNCTIONS = 'FUNCTIONS';
 export const FUNCTION_START = 'FUNCTION_START';

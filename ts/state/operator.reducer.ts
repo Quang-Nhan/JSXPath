@@ -4,134 +4,148 @@ import { StateUtility } from "./utility";
 import { JSXTypeMapper } from "../typeHandlers/JSXTypeMapper";
 
 
-export const OperatorReducer = (utils: StateUtility, typeMapper: JSXTypeMapper) => (state:State, action:Action) => {
-  let filteredSubState, currentState, operatedResult, parentState;
-  switch(action.type) {
-    case OPERATOR_START:
-      return {
-        ...state,
-        ...utils.updateCommonStateProperty(state, action),
-        currentStateId: action.payload.id,
-        subStates: {
-          ...state.subStates,
-          [action.payload.id]: {
-            ...getStartProperties(action),
-            operate: typeMapper.getTypeHandler({type: OPERATORS}).run()
+
+export const OperatorReducer = (utils: StateUtility, typeMapper: JSXTypeMapper) => {
+  const startOperator = new StartOperator(utils, typeMapper);
+  return (state:State, action:Action) => {
+    let filteredSubState, currentState, operatedResult, parentState;
+    switch(action.type) {
+      case OPERATOR_START:
+        return startOperator.get(state, action);
+      case FILTERED_CONTEXT_OPERATORS_START:
+        filteredSubState = utils.getFilterState(action.payload.link, state.subStates);
+        return {
+          ...state,
+          ...utils.updateCommonStateProperty(state, action),
+          currentStateId: action.payload.id,
+          subStates: {
+            ...state.subStates,
+            [action.payload.id]: {
+              ...getStartProperties(action),
+              operate: typeMapper.getTypeHandler({type: OPERATORS}).run(filteredSubState.context)
+            }
           }
+        };
+  
+      case OPERATOR_LHS:
+        return {
+          ...state,
+          previousActionType: action.type,
+          subStates: {
+            ...state.subStates,
+            [action.payload.link.relatedId]: {
+              ...state.subStates[action.payload.link.relatedId],
+              lhs:  action.payload.value
+            }
+          },
+          history: state.history.concat(utils.createHistory(action))
         }
-      };
-    case FILTERED_CONTEXT_OPERATORS_START:
-      filteredSubState = utils.getFilterState(action.payload.link, state.subStates);
-      return {
-        ...state,
-        ...utils.updateCommonStateProperty(state, action),
-        currentStateId: action.payload.id,
-        subStates: {
-          ...state.subStates,
-          [action.payload.id]: {
-            ...getStartProperties(action),
-            operate: typeMapper.getTypeHandler({type: OPERATORS}).run(filteredSubState.context)
-          }
+  
+      case OPERATOR_RHS: 
+        return {
+          ...state,
+          previousActionType: action.type,
+          subStates: {
+            ...state.subStates,
+            [action.payload.link.relatedId]: {
+              ...state.subStates[action.payload.link.relatedId],
+              rhs: action.payload.value
+            }
+          },
+          history: state.history.concat(utils.createHistory(action))
         }
-      };
-
-
-    case OPERATOR_LHS:
-      return {
-        ...state,
-        previousActionType: action.type,
-        subStates: {
-          ...state.subStates,
-          [action.payload.link.relatedId]: {
-            ...state.subStates[action.payload.link.relatedId],
-            lhs:  action.payload.value
-          }
-        },
-        history: state.history.concat(utils.createHistory(action))
-      }
-
-    case OPERATOR_RHS: 
-      return {
-        ...state,
-        previousActionType: action.type,
-        subStates: {
-          ...state.subStates,
-          [action.payload.link.relatedId]: {
-            ...state.subStates[action.payload.link.relatedId],
-            rhs: action.payload.value
-          }
-        },
-        history: state.history.concat(utils.createHistory(action))
-      }
-    case OPERATOR_END:
-      currentState = <OperatorState>state.subStates[action.payload.id];
-      
-      operatedResult = currentState.operate({
-        lhs: currentState.lhs, 
-        rhs: currentState.rhs, 
-        operation: currentState.operatorType, 
-        isFilter: utils.isFilterMode(currentState.link, state.subStates)// subState.link && subState.link.relatedType === FILTERS
-      });
-      
-      if (Array.isArray(operatedResult) && utils.isNode(operatedResult[0]) || utils.isNode(operatedResult)) {
-        currentState.nodes = operatedResult;
-        currentState.value = utils.getNodesValues(operatedResult);
-      } else {
-        currentState.value = operatedResult;
-      }
-
-      parentState = utils.getUpdatedParentState(currentState, state.subStates);
-
-      return {
-        ...state,
-        previousActionType: action.type,
-        currentStateId: parentState ? parentState.id : state.currentStateId,
-        subStates: parentState ? {
-          ...state.subStates,
-          [parentState.id]: {
-            ...parentState
-          }
-        } : Object.assign({}, state.subStates),
-        history: state.history.concat(utils.createHistory(action))
-      }
-    case FILTERED_CONTEXT_OPERATORS_END:
-      currentState= <OperatorState>state.subStates[action.payload.id];
+      case OPERATOR_END:
+        currentState = <OperatorState>state.subStates[action.payload.id];
         
-      operatedResult = currentState.operate({
-        lhs: currentState.lhs, 
-        rhs: currentState.rhs, 
-        operation: currentState.operatorType, 
-        isFilter: utils.isFilterMode(currentState.link, state.subStates)// subState.link && subState.link.relatedType === FILTERS
-      });
-      
-      if (!Array.isArray(operatedResult) && utils.isNode(operatedResult)) {
-        operatedResult = [operatedResult];
+        operatedResult = currentState.operate({
+          lhs: currentState.lhs, 
+          rhs: currentState.rhs, 
+          operation: currentState.operatorType, 
+          isFilter: utils.isFilterMode(currentState.link, state.subStates)// subState.link && subState.link.relatedType === FILTERS
+        });
+        
+        if (Array.isArray(operatedResult) && utils.isNode(operatedResult[0]) || utils.isNode(operatedResult)) {
+          currentState.nodes = operatedResult;
+          currentState.value = utils.getNodesValues(operatedResult);
+        } else {
+          currentState.value = operatedResult;
+        }
+  
+        parentState = utils.getUpdatedParentState(currentState, state.subStates);
+  
+        return {
+          ...state,
+          previousActionType: action.type,
+          currentStateId: parentState ? parentState.id : state.currentStateId,
+          subStates: parentState ? {
+            ...state.subStates,
+            [parentState.id]: {
+              ...parentState
+            }
+          } : Object.assign({}, state.subStates),
+          history: state.history.concat(utils.createHistory(action))
+        }
+      case FILTERED_CONTEXT_OPERATORS_END:
+        currentState= <OperatorState>state.subStates[action.payload.id];
+          
+        operatedResult = currentState.operate({
+          lhs: currentState.lhs, 
+          rhs: currentState.rhs, 
+          operation: currentState.operatorType, 
+          isFilter: utils.isFilterMode(currentState.link, state.subStates)// subState.link && subState.link.relatedType === FILTERS
+        });
+        
+        if (!Array.isArray(operatedResult) && utils.isNode(operatedResult)) {
+          operatedResult = [operatedResult];
+        }
+  
+        if (Array.isArray(operatedResult) && utils.isNode(operatedResult[0])) {
+          currentState.nodes = operatedResult;
+          currentState.value = utils.getNodesValues(operatedResult);
+        } else {
+          currentState.value = operatedResult;
+        }
+  
+        parentState = utils.getUpdatedParentState(currentState, state.subStates);
+  
+        return {
+          ...state,
+          previousActionType: action.type,
+          currentStateId: parentState ? parentState.id : state.currentStateId,
+          subStates: parentState ? {
+            ...state.subStates,
+            [parentState.id]: {
+              ...parentState
+            }
+          } : Object.assign({}, state.subStates),
+          history: state.history.concat(utils.createHistory(action))
+        }
+      default:
+        return state
       }
+  }
+}
 
-      if (Array.isArray(operatedResult) && utils.isNode(operatedResult[0])) {
-        currentState.nodes = operatedResult;
-        currentState.value = utils.getNodesValues(operatedResult);
-      } else {
-        currentState.value = operatedResult;
-      }
 
-      parentState = utils.getUpdatedParentState(currentState, state.subStates);
-
+class StartOperator {
+  type:string = OPERATOR_START;
+  constructor(private utils, private typeMapper) {};
+  get(state, action): State {
+    if (action.type === this.type) {
       return {
         ...state,
-        previousActionType: action.type,
-        currentStateId: parentState ? parentState.id : state.currentStateId,
-        subStates: parentState ? {
+        ...this.utils.updateCommonStateProperty(state, action),
+        currentStateId: action.payload.id,
+        subStates: {
           ...state.subStates,
-          [parentState.id]: {
-            ...parentState
+          [action.payload.id]: {
+            ...getStartProperties(action),
+            operate: this.typeMapper.getTypeHandler({type: OPERATORS}).run()
           }
-        } : Object.assign({}, state.subStates),
-        history: state.history.concat(utils.createHistory(action))
+        }
       }
-    default:
-      return state
     }
+  }
 }
 
 const getStartProperties = (action) => {

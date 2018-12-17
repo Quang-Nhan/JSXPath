@@ -155,5 +155,13 @@ describe('filtering []', () => {
         }
       ]);
     });
+
+    it('Multi children filter test', () => {
+      path = '/a/f[@l = 9]/@m[. >= 80]';
+      main.process(path, json);
+      expect(main.getResult()).toEqual([
+        90
+      ]);
+    });
   });
 });

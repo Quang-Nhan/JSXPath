@@ -40,14 +40,7 @@ export class JSXOperators implements ImpInstruction, ImpAction {
 
   
   init() {
-    // populate sortedOperatorByLength
-    JSXOperators.OPERATORS = Object.values(operators);
-    JSXOperators.OPERATORS.forEach(operator => {
-      if (!JSXOperators.SORTED_OPERATORS_BY_LENGTH[operator.length]) {
-        JSXOperators.SORTED_OPERATORS_BY_LENGTH[operator.length] = [];
-      }
-      JSXOperators.SORTED_OPERATORS_BY_LENGTH[operator.length].push(operator);
-    });
+    this.initStaticValues();
     [
       this.pathHandler, 
       this.actionHandler, 
@@ -60,6 +53,17 @@ export class JSXOperators implements ImpInstruction, ImpAction {
       DISPATCH
     ]);
     this.precendence = precendence;
+  }
+
+  initStaticValues() {
+    // populate sortedOperatorByLength
+    JSXOperators.OPERATORS = Object.values(operators);
+    JSXOperators.OPERATORS.forEach(operator => {
+      if (!JSXOperators.SORTED_OPERATORS_BY_LENGTH[operator.length]) {
+        JSXOperators.SORTED_OPERATORS_BY_LENGTH[operator.length] = [];
+      }
+      JSXOperators.SORTED_OPERATORS_BY_LENGTH[operator.length].push(operator);
+    });
   }
   
   private createLink(instruction): {relatedId:number, relatedType:string} {

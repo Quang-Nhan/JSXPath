@@ -98,7 +98,10 @@ export const tokens = {
     let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
     if (isFilter) {
       if (lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value < rhs[0].value || 
-        (lhsType === helper.types.ARRAY_NODE && lhs[0].value < rhs || rhsType === helper.types.ARRAY_NODE && lhs < rhs[0].value)
+        (lhsType === helper.types.ARRAY_NODE && lhs[0].value < rhs || rhsType === helper.types.ARRAY_NODE && lhs < rhs[0].value) ||
+        (lhsType === helper.types.NODE && lhs.value < rhs) ||
+        (rhsType === helper.types.NODE && lhs < rhs.value) ||
+        lhs < rhs
       ) {
           return context;
       }
@@ -106,7 +109,67 @@ export const tokens = {
     }
     return lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value < rhs[0].value ||
       (lhsType === helper.types.ARRAY_NODE && lhs[0].value < rhs || rhsType === helper.types.ARRAY_NODE && lhs < rhs[0].value) ||
+      (lhsType === helper.types.NODE && lhs.value < rhs) ||
+      (rhsType === helper.types.NODE && lhs < rhs.value) ||
       lhs < rhs;
+  },
+  "<=": (context) => (lhs,rhs, isFilter) => {
+    let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
+    if (isFilter) {
+      if (lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value < rhs[0].value || 
+        (lhsType === helper.types.ARRAY_NODE && lhs[0].value <= rhs || rhsType === helper.types.ARRAY_NODE && lhs <= rhs[0].value) ||
+        (lhsType === helper.types.NODE && lhs.value <= rhs) ||
+        (rhsType === helper.types.NODE && lhs <= rhs.value) ||
+        lhs <= rhs
+      ) {
+          return context;
+      }
+      return;
+    }
+    return lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value <= rhs[0].value ||
+      (lhsType === helper.types.ARRAY_NODE && lhs[0].value <= rhs || rhsType === helper.types.ARRAY_NODE && lhs <= rhs[0].value) ||
+      (lhsType === helper.types.NODE && lhs.value <= rhs) ||
+      (rhsType === helper.types.NODE && lhs <= rhs.value) ||
+      lhs <= rhs;
+  },
+  '>': (context) => (lhs, rhs, isFilter) => {
+    let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
+    if (isFilter) {
+      if (lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value > rhs[0].value || 
+        (lhsType === helper.types.ARRAY_NODE && lhs[0].value > rhs || rhsType === helper.types.ARRAY_NODE && lhs > rhs[0].value) ||
+        (lhsType === helper.types.NODE && rhsType === helper.types.NODE && lhs.value > rhs.value) ||
+        (lhsType === helper.types.NODE && lhs.value > rhs) ||
+        (rhsType === helper.types.NODE && lhs > rhs.value) ||
+        lhs > rhs
+      ) {
+          return context;
+      }
+      return;
+    }
+    return lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value > rhs[0].value ||
+      (lhsType === helper.types.ARRAY_NODE && lhs[0].value > rhs || rhsType === helper.types.ARRAY_NODE && lhs > rhs[0].value) ||
+      (lhsType === helper.types.NODE && lhs.value > rhs) ||
+      (rhsType === helper.types.NODE && lhs > rhs.value) ||
+      lhs > rhs;
+  },
+  '>=': (context) => (lhs, rhs, isFilter) => {
+    let lhsType = helper.parseType(lhs), rhsType = helper.parseType(rhs);
+    if (isFilter) {
+      if (lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value > rhs[0].value || 
+        (lhsType === helper.types.ARRAY_NODE && lhs[0].value >= rhs || rhsType === helper.types.ARRAY_NODE && lhs >= rhs[0].value) ||
+        (lhsType === helper.types.NODE && lhs.value >= rhs) ||
+        (rhsType === helper.types.NODE && lhs >= rhs.value) ||
+        lhs >= rhs
+      ) {
+          return context;
+      }
+      return;
+    }
+    return lhsType === helper.types.ARRAY_NODE && lhs.length === 1 && rhsType === helper.types.ARRAY_NODE && rhs.length === 1 && lhs[0].value >= rhs[0].value ||
+      (lhsType === helper.types.ARRAY_NODE && lhs[0].value >= rhs || rhsType === helper.types.ARRAY_NODE && lhs >= rhs[0].value) ||
+      (lhsType === helper.types.NODE && lhs.value >= rhs) ||
+      (rhsType === helper.types.NODE && lhs >= rhs.value) ||
+      lhs >= rhs;
   },
   '=': (context) => (lhs, rhs, isFilter) => {
     if (isFilter) {

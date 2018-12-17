@@ -21,12 +21,7 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
   constructor(private reg:JSXRegistrar) {}
 
   init() {
-    if (!JSXFunctions.JSX_FUNCTIONS) {
-      JSXFunctions.JSX_FUNCTIONS = Object.values(FUNCTION_ENUMS);
-    }
-    if (!JSXFunctions.FUNCTIONS) {
-      JSXFunctions.FUNCTIONS = Object.keys(FUNCTION_ENUMS);
-    }
+    this.initStaticValues();
     [
       this.pathHandler, 
       this.actionHandler,
@@ -36,6 +31,15 @@ export class JSXFunctions implements ImpInstruction, ImpAction{
       ACTION_HANDLER,
       HELPERS
     ]);
+  }
+
+  initStaticValues() {
+    if (!JSXFunctions.JSX_FUNCTIONS) {
+      JSXFunctions.JSX_FUNCTIONS = Object.values(FUNCTION_ENUMS);
+    }
+    if (!JSXFunctions.FUNCTIONS) {
+      JSXFunctions.FUNCTIONS = Object.keys(FUNCTION_ENUMS);
+    }
   }
 
   getMap(): object {

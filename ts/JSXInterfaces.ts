@@ -36,7 +36,7 @@ export interface Action {
 };
 
 export interface ActionHistory {
-  dateTime: string,
+  dateTime: number,
   action: Action
 };
 
@@ -66,7 +66,19 @@ export interface Instruction {
 
 export interface Scenario {
   description: string,
-  testScenario: Function
+  testScenario: Function,
+  testCases: testCase[]
+}
+
+export interface testCase {
+  description: string,
+  inputs: {
+    currentIndex: number,
+    parsedPath: string,
+    state?: object,
+    chars: string
+  },
+  expectedResult: any
 }
 
 

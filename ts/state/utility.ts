@@ -29,7 +29,7 @@ export class StateUtility {
 
   createHistory(action: Action): ActionHistory {
     return {
-      dateTime: new Date().toDateString(),
+      dateTime: new Date().getTime(),
       action
     }
   }
@@ -106,7 +106,7 @@ export class StateUtility {
     return {
       ...state,
       previousActionType: action.type,
-      history: state.history.concat(this.createHistory(action))
+      history: [this.createHistory(action)].concat(state.history)
     }
   }
 }

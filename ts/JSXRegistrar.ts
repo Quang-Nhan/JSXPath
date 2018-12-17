@@ -88,6 +88,11 @@ export class JSXRegistrar {
     };
     this.cache.stateHandler.init();
     this.cache.stateHandler.dispatch(this.cache.coreHandlers.actionHandler.create(INPUT_ADDED, {id: 0, value: Object.assign({}, data, extraData)}))
+    this.initCache();
+  }
+
+  // Used for testing
+  initCache() {
     for (let handler in this.cache.typeHandlers) {
       this.cache.typeHandlers[handler].init();
     }

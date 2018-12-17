@@ -32,14 +32,19 @@ export class JSXVariables implements ImpInstruction, ImpAction {
       DISPATCH
     ]);
     
-    if (!JSXVariables.VARIABLES) {
-      JSXVariables.VARIABLES = Object.keys(this.VARIABLE_MAP);
-    }
+    this.initStaticValues();
+    
     for (let varName in this.VARIABLE_MAP) {
       if (typeof this.VARIABLE_MAP[varName] === 'object') {
         // merges variables to nodes map
         // this.nodesHandler.buildAndDispatchNodesMap(varName, this.VARIABLE_MAP[varName]);
       }
+    }
+  }
+
+  initStaticValues() {
+    if (!JSXVariables.VARIABLES) {
+      JSXVariables.VARIABLES = Object.keys(this.VARIABLE_MAP);
     }
   }
 
@@ -57,12 +62,8 @@ export class JSXVariables implements ImpInstruction, ImpAction {
     });
   }
 
-  getDefaultAction(params:ActionParams): Action {
-    return null;
-  }
-
   getFilteredContextAction(params:ActionParams): Action {
-    return null;
+    return this.getAction(params);
   }
 
   getInstruction(subPath: string, startIndex: number, instructionHandlerId): Instruction {

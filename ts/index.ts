@@ -25,7 +25,7 @@ const json = {
         f: [
           {
             l: 1,
-            m: -12,
+            m: -18,
             n: -100
           },
           {
@@ -41,9 +41,9 @@ const json = {
 // const variables = {
 //     $v1: 3
 // }
+    
 
-
-const path = '/a/f[@l=1][@m=90][@n<-50]' 
+const path = '/a/f[@l=9]/@m[. < 0]' 
 
 const main = new JSXMain();
 
@@ -51,4 +51,4 @@ main.process(path, json);
 console.timeEnd('DURATION');
 console.log('Result: ', main.getResult());
 console.log('Done')
-// debugger
+debugger

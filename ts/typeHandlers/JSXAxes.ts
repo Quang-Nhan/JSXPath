@@ -1,9 +1,9 @@
-import { State, ActionParams, Action } from './../JSXInterfaces';
+import {  ActionParams, Action } from './../JSXInterfaces';
 import { AXES_ENUMS } from '../enums/axes';
 import AXES_TO_NODE_GETTERS from '../map/AxesToNodeGetters.json';
 import { Instruction, ImpInstruction, ImpAction } from '../JSXInterfaces';
 import { JSXPathHandler } from '../pathParser/JSXPathHandler';
-import { AXES, PATH_HANDLER, ACTION_HANDLER, NODES_HANDLER } from '../constants';
+import { AXES, PATH_HANDLER, ACTION_HANDLER, NODES_HANDLER, FILTERED_CONTEXT_AXES } from '../constants';
 import { JSXNodes } from './JSXNodes';
 
 import { JSXAction } from '../JSXAction';
@@ -23,23 +23,25 @@ export class JSXAxes implements ImpInstruction, ImpAction {
   constructor(private reg:JSXRegistrar) {}
 
   init() {
+    this.initStaticValues();
+    [
+      this.pathHandler, 
+      this.actionHandler, 
+      this.nodesHandler
+    ] = this.reg.get([
+      PATH_HANDLER, 
+      ACTION_HANDLER, 
+      NODES_HANDLER
+    ]);
+  }
+
+  initStaticValues() {
     if (!JSXAxes.JSX_AXES) {
       JSXAxes.JSX_AXES = Object.values(AXES_ENUMS);
     }
     if (!JSXAxes.AXES) {
       JSXAxes.AXES = Object.keys(AXES_ENUMS);
     }
-
-    [
-      this.pathHandler, 
-      this.actionHandler, 
-      this.nodesHandler
-    ] 
-    = this.reg.get([
-      PATH_HANDLER, 
-      ACTION_HANDLER, 
-      NODES_HANDLER
-    ]);
   }
 
   getMap():object {
@@ -78,18 +80,16 @@ export class JSXAxes implements ImpInstruction, ImpAction {
   }
 
   getAction(params: ActionParams): Action {
-    const {instruction} = params;
     return this.actionHandler.create(AXES, {
-      id: instruction.id,
-      subType: instruction.subPath
+      id: params.instruction.id,
+      subType: params.instruction.subPath
     });
   }
 
-  getDefaultAction(params:ActionParams): Action {
-    return null;
-  }
-
   getFilteredContextAction(params:ActionParams): Action {
-    return null;
+    return this.actionHandler.create(FILTERED_CONTEXT_AXES, {
+      id: params.instruction.id,
+      subType: params.instruction.subPath
+    });
   }
 }

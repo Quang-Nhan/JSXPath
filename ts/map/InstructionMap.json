@@ -61,6 +61,7 @@
   "FILTERS": {
     "$next": [
       "AXES",
+      "NODES",
       "OPERATORS",
       "FUNCTIONS",
       "FILTERS"

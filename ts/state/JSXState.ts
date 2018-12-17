@@ -1,14 +1,16 @@
 
 
-import { StateUtility } from './utility';
-import { JSXTypeMapper } from '../typeHandlers/JSXTypeMapper';
 import { JSXRegistrar } from '../JSXRegistrar';
+import { JSXTypeMapper } from '../typeHandlers/JSXTypeMapper';
+import { JSXNodes } from '../typeHandlers/JSXNodes';
+import { StateUtility } from './utility';
 import { NodesReducer } from './node.reducer';
 import { InputsReducer } from './inputs.reducer';
 import { GroupReducer } from './group.reducer';
 import { OperatorReducer } from './operator.reducer';
 import { FilterReducer } from './filter.reducer';
 import { PrimitiveReducer } from './primitive.reducer';
+import { FunctionReducer } from './function.reducer';
 import {
   State,
   Action
@@ -20,6 +22,12 @@ import {
   BOOLEAN, 
   EOF, 
   ERROR, 
+  FILTERED_CONTEXT_FUNCTION_END,
+  FILTERED_CONTEXT_FUNCTION_START,
+  FILTERED_CONTEXT_NODES,
+  FILTERED_CONTEXT_NUMBERS,
+  FILTERED_CONTEXT_OPERATORS_END,
+  FILTERED_CONTEXT_OPERATORS_START,
   FILTERS, 
   FLUSH, 
   FUNCTION_END,
@@ -41,15 +49,8 @@ import {
   TYPE_MAPPER, 
   UPDATE_CURRENT_INDEX, 
   VARIABLES,
-  FILTERED_CONTEXT_OPERATORS_START,
-  FILTERED_CONTEXT_OPERATORS_END,
-  FILTERED_CONTEXT_NODES,
-  FILTERED_CONTEXT_NUMBERS,
-  FILTERED_CONTEXT_FUNCTION_START,
-  FILTERED_CONTEXT_FUNCTION_END
+  FILTERED_CONTEXT_AXES
 } from '../constants';
-import { FunctionReducer } from './function.reducer';
-import { JSXNodes } from '../typeHandlers/JSXNodes';
 
 
 export class JSXState {
@@ -155,6 +156,7 @@ export class JSXState {
       case NODES:
       case FILTERED_CONTEXT_NODES:
       case AXES:
+      case FILTERED_CONTEXT_AXES:
       case ROOT:
         return this.nodesReducer(state, action);
       case STRINGS:

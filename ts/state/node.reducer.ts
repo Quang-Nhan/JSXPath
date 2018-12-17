@@ -1,4 +1,4 @@
-import { ROOT, NODES, AXES, OPERATOR_LHS, OPERATOR_RHS, FILTERED_CONTEXT_NODES } from "../constants";
+import { ROOT, NODES, AXES, OPERATOR_LHS, OPERATOR_RHS, FILTERED_CONTEXT_NODES, FILTERED_CONTEXT_AXES } from "../constants";
 import { tokens } from '../tokens/axes.tokens';
 import { Action, State } from "../JSXInterfaces";
 import { JSXNodes } from "../typeHandlers/JSXNodes";
@@ -8,6 +8,7 @@ export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (st
   let nodes, currentState, filteredSubState;
   switch (action.type) {
     case AXES:
+    case FILTERED_CONTEXT_AXES:
       if (!state.currentStateId) {
         // get root node
         currentState = {
@@ -48,6 +49,17 @@ export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (st
         history: state.history.concat(utils.createHistory(action))
       };
 
+      // debugger;
+      // currentState = state.subStates[state.currentStateId];
+      // filteredSubState = utils.getFilterState(currentState.link, state.subStates);
+      // nodes = tokens[action.payload.subType](nodesHandler, filteredSubState.context);
+
+      // return {
+      //   ...state,
+      //   ...utils.updateCommonStateProperty(state, action),
+      //   currentStateId: action.payload.id,
+      //   subStates: getSubStates(state.subStates, action, nodes, currentState)
+      // };
     case NODES:
       currentState = state.subStates[state.currentStateId];
       
@@ -62,8 +74,12 @@ export const NodesReducer = (utils: StateUtility, nodesHandler: JSXNodes) => (st
     case FILTERED_CONTEXT_NODES:
       currentState = state.subStates[state.currentStateId];
       filteredSubState = utils.getFilterState(action.payload.link, state.subStates);
-      const childrenNodes = nodesHandler.getChildrenNodes(filteredSubState.context);
-      nodes = childrenNodes.filter(n => n.name === action.payload.value);
+      if (action.payload.value === '.') {
+        nodes = filteredSubState.context;
+      } else {
+        const childrenNodes = nodesHandler.getChildrenNodes(filteredSubState.context);
+        nodes = childrenNodes.filter(n => n.name === action.payload.value);
+      }
       return {
         ...state,
         ...utils.updateCommonStateProperty(state, action),

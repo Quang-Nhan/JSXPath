@@ -2,6 +2,9 @@ import { JSXNodes } from "../typeHandlers/JSXNodes";
 
 
 export const tokens = {
+  '.': ({}, nodes) => {
+    return nodes;
+  },
   '/': (nodeHandler:JSXNodes, nodes) => {
     return nodeHandler.getChildrenNodes(nodes);
   },
