@@ -1,15 +1,12 @@
 {
     "compilerOptions": {
-        "outDir": "./built",
-        "moduleResolution": "node",
-        "allowJs": true,
-        "target": "es5",
-        "lib": ["es2015", "es2017", "dom"],
-        "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "sourceMap": true
-    },
-    "include": [
-        "./ts/**/*"
-    ]
+        "target": "ES2017",
+        "module": "commonjs",
+        "outDir": "dist",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "declarationMap": true,
+        "importHelpers": true
+    }
 }

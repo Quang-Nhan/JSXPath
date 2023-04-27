@@ -3,14 +3,12 @@
 *.DS_Store
 
 README.html
-md/*.html
 node_modules/
-built/
+dist/
+md/
 coverage/
 *.gliffy
-docs/
 src/*.sublime*
-test.html
 npm-debug.log
 *.sublime-project
 *.sublime-workspace
