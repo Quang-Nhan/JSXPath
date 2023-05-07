@@ -430,6 +430,112 @@ describe('Class Postfix', () => {
       ];
       expect(postfixInstance.toPostfix(path)).toEqual(expected);
     });
+
+    it('path is /*[name()="a" or name()="b"]', () => {
+      const path = '/*[name()="a" or name()="b"]';
+      expected = [
+        {
+          type: TYPES.rootPath,
+          value: "/*",
+          callerId: 'main'
+        },
+        [
+          {
+            type: TYPES.arguments,
+            value: []
+          },
+          {
+            type: TYPES.function,
+            value: 'name',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.string,
+            value: 'a'
+          },
+          {
+            type: TYPES.operator,
+            value: '=',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.arguments,
+            value: []
+          },
+          {
+            type: TYPES.function,
+            value: 'name',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.string,
+            value: 'b'
+          },
+          {
+            type: TYPES.operator,
+            value: '=',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.operator,
+            value: 'or',
+            callerId: 'main'
+          }
+        ]
+      ];
+      expect(postfixInstance.toPostfix(path)).toEqual(expected);
+    });
+
+    it('path is //*[local-name()="a" and sibling::b="c"]', () => {
+      const path = '//*[local-name()="a" and sibling::b="c"]';
+      expected = [
+        {
+          type: TYPES.rootPath,
+          value: "//*",
+          callerId: 'main'
+        },
+        [
+          {
+            type: TYPES.arguments,
+            value: []
+          },
+          {
+            type: TYPES.function,
+            value: 'local-name',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.string,
+            value: 'a'
+          },
+          {
+            type: TYPES.operator,
+            value: '=',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.path,
+            value: './sibling::b',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.string,
+            value: 'c'
+          },
+          {
+            type: TYPES.operator,
+            value: '=',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.operator,
+            value: 'and',
+            callerId: 'main'
+          }
+        ]
+      ];
+      expect(postfixInstance.toPostfix(path)).toEqual(expected);
+    });
   });
 
   describe('Variables', () => {
