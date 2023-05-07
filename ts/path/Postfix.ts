@@ -309,6 +309,10 @@ export class Postfix {
           }
           this.stacks.operators.push(subPath);
           subPath = '';
+        } else if (this.tests.isStringValue(subPath)) {
+          this.stacks.output.push(this.setType(subPath));
+          subPath = '';
+        
         } else if (subPath.length && (
           !this.tests.isFunctionName(subPath+this.props.trimmedInput[this.props.pathIndex+1]) && 
           !this.tests.isPosition(subPath+this.props.trimmedInput[this.props.pathIndex+1]) &&
