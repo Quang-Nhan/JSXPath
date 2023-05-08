@@ -1,12 +1,12 @@
 import { TYPES } from "./consts";
-import { tNode, tStack } from "./types";
+import { tNode, tNodesState, tStack } from "./types";
 import { NodesState } from "./nodes/State";
 import { KEYS, SYMBOLS } from "./nodes/consts";
 import { Json } from "./nodes/Json";
 
 const nsInstance = NodesState.getInstance();
 
-const nodesOps = {
+export const nodesOps = {
   tests: {
     exists: (id: number) => {
       return !!nsInstance.getNodeById(id);
@@ -117,6 +117,9 @@ const nodesOps = {
       return current
         ? nodesOps.get.byName([nsInstance.getNodeById(current[KEYS.links].parentId)], nodeName)
         : [];
+    },
+    nodeList: (byId: boolean):  tNodesState['nodes']['byId'] | tNodesState['nodes']['byCaller'] => {
+      return nsInstance.getNodeList(byId);
     }
   },
   reconstruct: (nodes: tNode[]) => {
@@ -125,7 +128,7 @@ const nodesOps = {
   }
 };
 
-const opFunc = {
+export const opFunc = {
   /**
    * 
    * @param context the caller name
@@ -231,17 +234,6 @@ const opFunc = {
   }
 };
 
-const throwError  = (context, msg) => {
+export const throwError  = (context, msg) => {
   throw new Error(`Error thrown in ${context}: ${msg}`);
 };
-
-/**
- * Convenient utility function
- */
-const util = {
-  nodesOps: nodesOps,
-  opFunc,
-  throwError
-};
-
-export = util;

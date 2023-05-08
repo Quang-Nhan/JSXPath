@@ -256,7 +256,7 @@ describe('README.md', () => {
         runPath({
           path: 'abs($tuitionAmount) > abs(/expenses/*[display="gardening"]/value)',
           description: 'Is tuition fee cost less than the the amount spent on gardening?',
-          then: ({value}) => {
+          then: ({value, error}) => {
             const message = value === true ?
               'Tuition is overly expensive. We should spend our time on gardening':
               'Tuition is still dirt cheap.'
