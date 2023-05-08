@@ -7,7 +7,7 @@ If you are already familiar with the construct of XPath, using this should be a 
 
 # version
 
-> Latest version: 1.0.0 <br/>
+> Latest version: 1.0.1 <br/>
 > Note that this version is not commpatible with previous alpha versions.
 
 <br/>
@@ -700,7 +700,7 @@ Helper functions are provided that can be used in custom functions
   nodesOps.get.siblings(currentNode: tNode, nodeName?: string): tNode[];
 
   // convert the node into its' JSON value
-  nodesOps.reconstruct(nodes: tNode[]): (JSONValue|JSONObject)[];
+  nodesOps.reconstruct(nodes: tNode[]): (iJSONArray|tJSONObject)[];
 
   // test to see if two nodes are equal (deep)
   nodesOps.test.isEqual(node1: tNode, node2: tNode): boolean;
