@@ -7,8 +7,7 @@ If you are already familiar with the construct of XPath, using this should be a 
 
 # version
 
-> Latest version: 1.0.1 <br/>
-> Note that this version is not commpatible with previous alpha versions.
+> Latest version: v1.1.0 <br/>
 
 <br/>
 
@@ -217,6 +216,8 @@ type tRunPathsInput {
   - **json**: the json object to interrogate
   - **functions**?: see [custom functions](#custom-functions)
   - **variables**?: see [variables](#variables)
+  - **outputOptions**?: flags to determine extra optionally return values
+
 
   ```ts
   type tRunPathsInput {
@@ -226,6 +227,9 @@ type tRunPathsInput {
     },
     variables?: {
       [variableName: string]: any
+    },
+    outputOptions?: {
+      nodes?: boolean
     }
   };
   ```
@@ -264,6 +268,7 @@ type tRunPathsInput {
   - **json**: the json object to interrogate
   - **functions**?: see [custom functions](#custom-functions)
   - **variables**?: see [variables](#variables)
+  - **outputOptions**?: flags to determine extra optionally return values
 
   ```ts
   type tRunPathsInput {
@@ -273,6 +278,9 @@ type tRunPathsInput {
     },
     variables?: {
       [variableName: string]: any
+    },
+    outputOptions?: {
+      nodes?: boolean
     }
   };
   ```

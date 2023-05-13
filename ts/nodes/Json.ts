@@ -1,13 +1,12 @@
 import { tJSON, tNode } from "../types";
 import { KEYS, SYMBOLS } from "./consts";
-import { nodesOps as utilNodes} from '../Util';
+import { nodesOps } from "../Util";
 
 export class Json {
   constructor() {}
-
   public reconstruct = (nodes: tNode[]): tJSON => {
     return nodes.map((node) => {
-      if (!utilNodes.tests.exists(node[KEYS.id])) {
+      if (!nodesOps.tests.exists(node[KEYS.id])) {
         return;
       } else if (node[KEYS.value] === SYMBOLS.array) {
         return this.build.array(node);
@@ -21,7 +20,7 @@ export class Json {
 
   private build = {
     array: (node: tNode) => {
-      const childrenNodes = utilNodes.get.children(node);
+      const childrenNodes = nodesOps.get.children(node);
       if (!childrenNodes.length) {
         return [];
       }
@@ -48,7 +47,7 @@ export class Json {
       return result;
     },
     object: (node: tNode) => {
-      const childrenNodes = utilNodes.get.children(node);
+      const childrenNodes = nodesOps.get.children(node);
       if (!childrenNodes.length) {
         return {};
       }

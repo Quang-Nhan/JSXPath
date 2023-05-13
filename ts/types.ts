@@ -25,14 +25,21 @@ export type tJSON = tJSONObject | iJSONArray;
 export type tRunPathsInput = {
   json: tJSON,
   functions?: tFunctions,
-  variables?: tVariables
+  variables?: tVariables,
+  // return optional nodes and nodesValue in callback mode
+  outputOptions?: {
+    nodes?: boolean
+  }
 };
 
 export type tRunPathResult = {
   path: string,
   description?: string,
   value: any,
-  error?: string
+  error?: string,
+  // set when outputOptions.nodes is true
+  nodes?: tNodesState['nodes']['byId'],
+  nodesValue?: tNode[]
 };
 
 export type tPathWithCallBack = {

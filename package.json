@@ -1,11 +1,12 @@
 {
   "name": "jsxpath",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "XPath like notation to query a JSON object",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage && open -a \"Safari\" ./coverage/lcov-report/index.html",
     "build": "tsc"
   },
   "keywords": [
