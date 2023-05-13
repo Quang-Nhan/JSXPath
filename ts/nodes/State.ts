@@ -71,6 +71,10 @@ class State implements iState {
     return this.state.id;
   };
 
+  public getNodeList(byId: boolean) {
+    return byId ?  this.state.nodes.byId : this.state.nodes.byCaller;
+  }
+
   public reset() {
     this.caller = null;
     this.state = {
