@@ -59,14 +59,14 @@ describe('RunPath', () => {
           then: ({value, nodes, nodesValue}) => {
             expect(value).toEqual([12]);
             expect(nodesValue).toEqual([
-              [4, 3, 3, '_', 'c', 12, 'number', {parentId: 3, childrenIds: [], descendantIds: [], ancestorIds: [1, 2, 3], siblings: []}]
+              [4, 3, 3, '_', 'c', 12, 'number', {parentId: 3, childrenIds: [], descendantIds: [], ancestorIds: [3, 2, 1], siblings: []}]
             ]);
             expect(nodes).toEqual({
-              "1": [ 1, 0, "_", "_", "{$r}", "{$o}", "object", { parentId: null, childrenIds: [ 2 ], descendantIds: [ 2, 3, 5, 4 ], siblings: [ ], } ],
-              "2": [ 2, 1, 1, "_", "a", "{$o}", "object", { parentId: 1, childrenIds: [ 3, 5 ], descendantIds: [ 3, 5, 4 ], ancestorIds: [ 1 ], siblings: [ ], } ],
-              "3": [ 3, 2, 2, "_", "b", "{$o}", "object", { parentId: 2, childrenIds: [ 4 ], descendantIds: [ 4 ], ancestorIds: [ 1, 2 ], siblings: [ 5 ], } ],
-              "4": [ 4, 3, 3, "_", "c", 12, "number", { parentId: 3, childrenIds: [ ], descendantIds: [ ], ancestorIds: [ 1, 2, 3 ], siblings: [ ], } ],
-              "5": [ 5, 2, 2, "_", "d", "string", "string", { parentId: 2, childrenIds: [ ], descendantIds: [ ], ancestorIds: [ 1, 2 ], siblings: [ 3 ], } ],
+              "1": [ 1, 0, "_", "_", "{$r}", "{$o}", "object", { parentId: null, childrenIds: [ 2 ], descendantIds: [ 2, 3, 4, 5 ], ancestorIds: [], siblings: [ ], } ],
+              "2": [ 2, 1, 1, "_", "a", "{$o}", "object", { parentId: 1, childrenIds: [ 3, 5 ], descendantIds: [ 3, 4, 5 ], ancestorIds: [ 1 ], siblings: [ ], } ],
+              "3": [ 3, 2, 2, "_", "b", "{$o}", "object", { parentId: 2, childrenIds: [ 4 ], descendantIds: [ 4 ], ancestorIds: [ 2, 1 ], siblings: [ 5 ], } ],
+              "4": [ 4, 3, 3, "_", "c", 12, "number", { parentId: 3, childrenIds: [ ], descendantIds: [ ], ancestorIds: [ 3, 2, 1 ], siblings: [ ], } ],
+              "5": [ 5, 2, 2, "_", "d", "string", "string", { parentId: 2, childrenIds: [ ], descendantIds: [ ], ancestorIds: [ 2 ,1 ], siblings: [ 3 ], } ],
             });
           }
         });
