@@ -53,7 +53,7 @@ export class RunPath {
         nodesValue = item.value;
       }
     } catch(e) {
-      error = `${e.message}${description ? ` for the scenario:"${description}"`: ` for path "${path}"`}`
+      error = `${e.message}${description ? ` for the scenario:"${description}"`: ` for path "${path}"`}`;
     }
     
     then({

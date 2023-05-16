@@ -53,7 +53,7 @@ describe('Class Variables', () => {
 
     it('When the given variable name is valid, it should return the root node', () => {
       expect(variablesInstance.getVariableRootNode('variableName')).toEqual([
-        [1, 0, "_", "_", "{$r}", "{$o}", "object", { childrenIds: [ 2 ], descendantIds: [ 2, 3 ], parentId: null, siblings: [] }]
+        [1, 0, "_", "_", "{$r}", "{$o}", "object", { childrenIds: [ 2 ], descendantIds: [ 2, 3 ], parentId: null, ancestorIds: [], siblings: [] }]
       ]);
     });
   });

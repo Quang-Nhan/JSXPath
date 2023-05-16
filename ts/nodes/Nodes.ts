@@ -23,50 +23,41 @@ export class Nodes {
     },
     node: (id: tNode[0], group: tNode[2], key: tNode[4], value: tNode[5], parent?: tNode, position?: tNode[3]) => {
       const depth = (parent ? parent[KEYS.depth] : -1) + 1;
-      const node: tNode = [id, depth, group, (position || position === 0 ? position : SYMBOLS.na), key, value, this.determineValueType(value), {
-        parentId: parent && parent[KEYS.id]
-      }];
+      const node: tNode = [id, depth, group, (position || position === 0 ? position : SYMBOLS.na), key, value, this.determineValueType(value), {}];
 
+      this.add.links(parent, node);
       this.nodeState.addNode(node);
       this.nodeState.incrementId();
       return node;
     },
-    links: () => {
-      this.nodeState.getNodes().forEach((node) => {
-        this.add.descendants(node, this.add.children(node));
-      });
-      this.nodeState.getNodes().forEach((node) => {
-        this.add.ancestors(node);
-        this.add.siblings(node, this.nodeState.getNodes());
-      });
-    },
-    ancestors: (node:tNode) => {
-      node[KEYS.links].descendantIds.forEach((dId) => {
-        const descendantNode = this.nodeState.getNodeById(dId);
-        if (!descendantNode[KEYS.links].ancestorIds) {
-          descendantNode[KEYS.links].ancestorIds = [];
+    // Add parent/ancestor/children/descendant links
+    links: (ancestorNode: tNode, currentNode: tNode) => {
+      if (currentNode[KEYS.links].parentId === undefined) {
+        currentNode[KEYS.links] = {
+          ancestorIds: [],
+          parentId: ancestorNode ? ancestorNode[KEYS.id] : null,
+          descendantIds: [],
+          siblings: [],
+          childrenIds: []
+        };
+      }
+      if (ancestorNode) {
+        if (currentNode[KEYS.links].parentId === ancestorNode[KEYS.id]) {
+          ancestorNode[KEYS.links].childrenIds.push(currentNode[KEYS.id]);
         }
-        descendantNode[KEYS.links].ancestorIds.push(node[KEYS.id]);
+        ancestorNode[KEYS.links].descendantIds.push(currentNode[KEYS.id]);
+        currentNode[KEYS.links].ancestorIds.push(ancestorNode[KEYS.id]);
+        this.add.links(this.nodeState.getNodeById(ancestorNode[KEYS.links].parentId), currentNode);
+      }
+    },
+    siblings: (nodes: tNode[]) => {
+      nodes.forEach(node => {
+        nodes.forEach(linkedNode => {
+          if (node[KEYS.id] !== linkedNode[KEYS.id]) {
+            node[KEYS.links].siblings.push(linkedNode[KEYS.id]);
+          }
+        });
       });
-    },
-    descendants: (node: tNode, children: tNode[0][]) => {
-      node[KEYS.links].descendantIds = children;
-      children.forEach(cId => {
-        const childNode = this.nodeState.getNodeById(cId)
-        node[KEYS.links].descendantIds = [...node[KEYS.links].descendantIds, ...this.add.descendants(childNode, this.add.children(childNode))];
-      });
-      return node[KEYS.links].descendantIds;
-    },
-    children: (node: tNode) => {
-      node[KEYS.links].childrenIds = this.nodeState.getNodes().filter(
-        c => c[KEYS.links].parentId && c[KEYS.links].parentId === node[KEYS.id]
-      ).map(c => c[KEYS.id]);
-
-      return node[KEYS.links].childrenIds;
-    },
-    siblings: (node: tNode, nodes: tNode[]) => {
-      node[KEYS.links].siblings = nodes.filter(n => n[KEYS.group] === node[KEYS.group] && n[KEYS.group] !== SYMBOLS.na && n[KEYS.id] !== node[KEYS.id])
-        .map(n => n[KEYS.id]);
     }
   };
 
@@ -90,6 +81,7 @@ export class Nodes {
     },
     object: (data: tJSON, parent: tNode, pos?) => {
       const group = this.nodeState.incrementGroup();
+      const siblings = [];
       for (let key in data) {
         const currentId = this.nodeState.getId();
         const value = this.deconstruct.getValue(data[key]);
@@ -101,7 +93,9 @@ export class Nodes {
         } else {
           // this.add(b.id, currentId, group, symbols.value, data[key], pos);
         }
+        siblings.push(node);
       }
+      this.add.siblings(siblings);
     },
     getValue: (value) => {
       if (Array.isArray(value)) {
@@ -140,7 +134,6 @@ export class Nodes {
     } else if (value === SYMBOLS.object) {
       this.deconstruct.object(data, root);
     }
-    this.add.links();
     return this.nodeState.getNodes();
   };
 }
