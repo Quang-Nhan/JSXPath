@@ -7,7 +7,7 @@ If you are already familiar with the construct of XPath, using this should be a 
 
 # version
 
-> Latest version: v1.1.0 <br/>
+> Latest version: v1.1.1 <br/>
 
 <br/>
 
