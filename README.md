@@ -7,7 +7,7 @@ If you are already familiar with the construct of XPath, using this should be a 
 
 # version
 
-> Latest version: v1.1.1 <br/>
+> Latest version: v1.1.2 <br/>
 
 <br/>
 
@@ -704,7 +704,7 @@ Helper functions are provided that can be used in custom functions
   nodesOps.get.ancestors(currentNode: tNode, nodeName?: string): tNode[];
   nodesOps.get.children(currentNode: tNode, nodeName?: string): tNode[];
   nodesOps.get.descendants(currentNode: tNode, nodeName?: string): tNode[];
-  nodesOps.get.parent(currentNode: tNode, nodeName?: string): tNode[];
+  nodesOps.get.parent(currentNode: tNode, nodeName?: string): tNode;
   nodesOps.get.siblings(currentNode: tNode, nodeName?: string): tNode[];
 
   // convert the node into its' JSON value

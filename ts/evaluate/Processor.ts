@@ -70,8 +70,8 @@ export class Processor {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
           const parent = nodesOps.get.parent(v);
-          if (!r.some((rr) => rr[KEYS.id] === parent[0][KEYS.id])) {
-            r = [...r, ...parent];
+          if (parent && !r.some((rr) => rr[KEYS.id] === parent[KEYS.id])) {
+            r.push(parent);
           }
           return r;
         }, []);
@@ -81,7 +81,7 @@ export class Processor {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
           const parent = nodesOps.get.parent(v, this.pathStringSteps.nodeName);
-          if (!r.some(node => node[KEYS.id] === parent[KEYS.id])) {
+          if (parent && !r.some(node => node[KEYS.id] === parent[KEYS.id])) {
             r.push(parent);
           }
           return r;
@@ -173,7 +173,8 @@ export class Processor {
 
     for (let i = 0; i < pathString.length; i++) {
       subPath += pathString[i];
-      if (subPath.includes('::') && steps[steps.length-1] === '/') {
+      if ((subPath.includes('::') || subPath === '..') && steps[steps.length-1] === '/') {
+        // skip processing '/' step (children)
         steps.pop();
       }
 
