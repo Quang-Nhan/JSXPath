@@ -114,9 +114,12 @@ export const nodesOps = {
         : [];
     },
     parent: (current: tNode, nodeName?: string): tNode[] => {
-      return current
-        ? nodesOps.get.byName([nsInstance.getNodeById(current[KEYS.links].parentId)], nodeName)
-        : [];
+      if (!current) return [];
+      let parent = nsInstance.getNodeById(current[KEYS.links].parentId);
+      if (parent[KEYS.name] === SYMBOLS.ao) {
+        parent = nsInstance.getNodeById(parent[KEYS.links].parentId);
+      }
+      return parent && ((!nodeName || nodeName === '*') || nodeName === parent[KEYS.name]) ? parent : undefined;
     },
     nodeList: (byId: boolean):  tNodesState['nodes']['byId'] | tNodesState['nodes']['byCaller'] => {
       return nsInstance.getNodeList(byId);

@@ -36,6 +36,31 @@ describe('RunPath', () => {
           }
         });
       });
+
+      it('should return sibling d via parent notation', () => {
+        runPathInstance = new RunPath(input);
+        runPathInstance.callbackMode({
+          path: '//b/../d',
+          then: ({value}) => {
+            expect(value).toEqual(['string']);
+          }
+        });
+      });
+
+      it('should return ancestor value of a', () => {
+        runPathInstance = new RunPath(input);
+        runPathInstance.callbackMode({
+          path: '//c/ancestor::a',
+          then: ({value}) => {
+            expect(value).toEqual([{
+              b: {
+                c: 12
+              },
+              d: 'string'
+            }]);
+          }
+        });
+      });
     });
 
     describe('outputOptions', () => {
