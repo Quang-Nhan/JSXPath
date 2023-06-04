@@ -15,11 +15,13 @@ describe('Class Nodes', () => {
   
       it('Simple object', () => {
         const json = {
-          a: "a"
+          a: "a",
+          b: true
         };
         expect(nodesInstance.jsonToNodes(json, callerId)).toEqual([
-          [1, 0, "_", "_", "{$r}", "{$o}", "object", {childrenIds: [2], descendantIds: [2], parentId: null, ancestorIds: [], siblings:[]}],
-          [2, 1, 1, "_", "a", "a", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1], parentId: 1, siblings:[]}]
+          [1, 0, "_", "_", "{$r}", "{$o}", "object", {childrenIds: [2, 3], descendantIds: [2, 3], parentId: null, ancestorIds: [], siblings:[]}],
+          [2, 1, 1, "_", "a", "a", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1], parentId: 1, siblings:[3]}],
+          [3, 1, 1, "_", "b", true, "boolean", {childrenIds: [], descendantIds: [], ancestorIds: [1], parentId: 1, siblings:[2]}]
         ]);
       });
   
