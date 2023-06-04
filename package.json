@@ -1,6 +1,6 @@
 {
   "name": "jsxpath",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "XPath like notation to query a JSON object",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
