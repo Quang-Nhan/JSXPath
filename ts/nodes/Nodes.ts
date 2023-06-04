@@ -118,10 +118,10 @@ export class Nodes {
       return 'undefined';
     } else if (typeof value === TYPES.string) {
       return TYPES.string;
+    }  else if (typeof value === TYPES.boolean) {
+      return TYPES.boolean;
     } else if (!Number.isNaN(Number(value))) {
       return 'number'
-    } else if (typeof value === TYPES.boolean) {
-      return TYPES.boolean;
     }
   };
 
