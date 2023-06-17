@@ -536,6 +536,28 @@ describe('Class Postfix', () => {
       ];
       expect(postfixInstance.toPostfix(path)).toEqual(expected);
     });
+
+    it('path is count(//*)', () => {
+      const path = 'count(//*)';
+      expected = [
+        {
+          type: TYPES.arguments,
+          value: [
+            {
+              callerId: 'main',
+              type: 'rootPath',
+              value: '//*'
+            }
+          ]
+        },
+        {
+          callerId: 'main',
+          type: TYPES.function,
+          value: 'count'
+        }
+      ];
+      expect(postfixInstance.toPostfix(path)).toEqual(expected)
+    });
   });
 
   describe('Variables', () => {
