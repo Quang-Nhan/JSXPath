@@ -141,7 +141,9 @@ export class Postfix {
     isDescendantFromRoot: (chars) => chars[0] === '/' && chars[1] === '/' && !this.tests.isWithinFilter() && (
       chars.length-1 === this.props.pathIndex || 
       // previous character before the start of chars input
-      ([' ', ...OPERATORS.byLength['1']].includes(this.props.trimmedInput[this.props.pathIndex-chars.length]))
+      ([' ', ...OPERATORS.byLength['1']].includes(this.props.trimmedInput[this.props.pathIndex-chars.length])) ||
+      // is an argument of a function
+      Object.keys(this.stacks.arguments).length
     ),
     isWithinFilter: () => {
       const prePath = this.props.trimmedInput.substring(0, this.props.pathIndex);
