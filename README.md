@@ -7,7 +7,7 @@ If you are already familiar with the construct of XPath, using this should be a 
 
 # version
 
-> Latest version: v1.1.4 <br/>
+> Latest version: v1.1.5 <br/>
 
 <br/>
 
@@ -718,7 +718,6 @@ Helper functions are provided that can be used in custom functions
 
 # ROADMAP
 - better error handling overall
-- achieve 100% code coverage if possible
 - introduce date functions
 
 

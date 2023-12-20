@@ -37,9 +37,9 @@ export class Processor {
     resetNodeName: () => {
       this.pathStringSteps.nodeName = null;
     },
-    setNodeName: (step: string, subPath: string) => {
+    setNodeName: (step: string) => {
       if (step.includes('::')) {
-        const axisNode = subPath.split("::");
+        const axisNode = step.split("::");
         step = axisNode[0];
         this.pathStringSteps.nodeName = axisNode[1];
       }
@@ -123,6 +123,7 @@ export class Processor {
               r.push(a);
             }
           });
+          return r;
         }, [item.value]);
         this.pathStringSteps.resetNodeName();
       },
@@ -195,7 +196,7 @@ export class Processor {
     this.pathStringSteps.init(this.output.pop());
     while (steps.length) {
       let step = steps.shift();
-      step = this.pathStringSteps.setNodeName(step, subPath);
+      step = this.pathStringSteps.setNodeName(step);
       
       if (step.length && typeof this.pathStringSteps.axis[step] === 'function') {
         this.pathStringSteps.axis[step]();
