@@ -47,12 +47,18 @@ export class Functions {
       };
     },
     contains: (search: tStack, searchFor: tStack) => {
-      const searchString = opFunc.getValueByType(this.getContext('substring-before'), ['string'], search);
-      const searchForString = opFunc.getValueByType(this.getContext('substring-before'), ['string'], searchFor);
+      let value = true;
+      try {
+        const searchString = opFunc.getValueByType(this.getContext('contains'), ['string'], search);
+        const searchForString = opFunc.getValueByType(this.getContext('contains'), ['string'], searchFor);
+        value = searchString.includes(searchForString);
+      } catch(e) {
+        value = false;
+      }
 
       return {
         type: TYPES.boolean,
-        value: searchString.includes(searchForString)
+        value
       }
     },
     count: (item: tStack) => {
