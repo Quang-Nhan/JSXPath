@@ -360,6 +360,21 @@ describe("Functions", () => {
         value: true
       });
     });
+
+    it('When the search string arg is an empty node, it should return false', () => {
+      args.push({
+        type: TYPES.nodes,
+        value: []
+      });
+      args.push({
+        type: TYPES.string,
+        value: 'false result'
+      });
+      expect(functionInstance.run('contains', args)).toEqual({
+        type: TYPES.boolean,
+        value: false
+      });
+    });
   });
 
   describe('count()', () => {
