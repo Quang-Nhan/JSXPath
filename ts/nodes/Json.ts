@@ -1,12 +1,12 @@
 import { tJSON, tNode } from "../types";
 import { KEYS, SYMBOLS } from "./consts";
-import { nodesOps } from "../Util";
+import { NodesOps } from "../Util";
 
 export class Json {
-  constructor() {}
+  constructor(private nodesOps: NodesOps) { }
   public reconstruct = (nodes: tNode[]): tJSON => {
     return nodes.map((node) => {
-      if (!nodesOps.tests.exists(node[KEYS.id])) {
+      if (!this.nodesOps.tests.exists(node[KEYS.id])) {
         return;
       } else if (node[KEYS.value] === SYMBOLS.array) {
         return this.build.array(node);
@@ -20,24 +20,24 @@ export class Json {
 
   private build = {
     array: (node: tNode) => {
-      const childrenNodes = nodesOps.get.children(node);
+      const childrenNodes = this.nodesOps.get.children(node);
       if (!childrenNodes.length) {
         return [];
       }
       const result = [];
-      
+
       childrenNodes.forEach((c) => {
         if (c[KEYS.group] !== SYMBOLS.na && result[c[KEYS.arrayPosition]] === undefined) {
           result[c[KEYS.arrayPosition]] = {};
         }
-        
+
         let value = c[KEYS.value];
         if (value === SYMBOLS.array) {
           value = this.build.array(c);
         } else if (value === SYMBOLS.object) {
           value = this.build.object(c)
         }
-  
+
         if (this.isValidKey(c[KEYS.name])) {
           result[c[KEYS.arrayPosition]][c[KEYS.name]] = value;
         } else {
@@ -47,7 +47,7 @@ export class Json {
       return result;
     },
     object: (node: tNode) => {
-      const childrenNodes = nodesOps.get.children(node);
+      const childrenNodes = this.nodesOps.get.children(node);
       if (!childrenNodes.length) {
         return {};
       }

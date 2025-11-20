@@ -14,3 +14,5 @@ npm-debug.log
 *.sublime-workspace
 
 .vscode/launch.json
+
+samples

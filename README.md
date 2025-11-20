@@ -1,30 +1,45 @@
-JSXPath
-=======
+# JSXPath
 
-JSXPath is an adaptation of XPath, a querying language for XML documents, to query JSON object.
+[![npm version](https://img.shields.io/npm/v/jsxpath.svg)](https://www.npmjs.com/package/jsxpath)
+[![License](https://img.shields.io/npm/l/jsxpath.svg)](LICENSE)
 
-If you are already familiar with the construct of XPath, using this should be a breeze.
+An XPath-inspired query language for JSON objects.
 
-# version
+If you're already familiar with XPath, using JSXPath will be intuitive and straightforward.
 
-> Latest version: v1.1.5 <br/>
+## Table of Contents
 
-<br/>
+- [Why JSXPath?](#why-jsxpath)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [API Reference](#api-reference)
+- [Features](#features)
+  - [Operators](#operators)
+  - [Axes](#axes)
+  - [Functions](#functions)
+  - [Variables](#variables)
+  - [Complex Predicates](#complex-predicates)
+- [Error Handling](#error-handling)
+- [TypeScript Support](#typescript-support)
+- [Differences from XPath](#differences-from-xpath)
+- [Advanced Topics](#advanced-topics)
+- [Roadmap](#roadmap)
 
-# Why JSXPath?
-1. Powerful, yet simple to use to perform complex query on JSON data with just a string expression. 
-2. Packed full of features out of the box.
+## Why JSXPath?
 
+- **Powerful & Simple**: Query complex JSON with string expressions
+- **Feature-Rich**: Built-in functions, variables, custom functions, and more
+- **Familiar Syntax**: XPath users will feel right at home
 
-```js
-  const json = { "a": 1, "b": 2, "c": "pass"}
+```ts
+  const json = { 'a': 1, 'b': 2, 'c': 'pass' };
 
   /*----------
   without JSXPath
   ----------*/
   function sum(pa, pb) {
-    if (!isNumber(pa) || isNumber(pb)) {
-      throw new Error("an argument is not a number");
+    if (!isNumber(pa) || !isNumber(pb)) {
+      throw new Error('an argument is not a number');
     }
     return pa + pb;
   }
@@ -33,7 +48,7 @@ If you are already familiar with the construct of XPath, using this should be a 
     return !isNaN(num) && isFinite(num);
   }
 
-  const result = sum(js.a, js.b) === 3 ? js.c : null;
+  const result = sum(json.a, json.b) === 3 ? json.c : null;
   // result => 'pass'
 
 
@@ -46,257 +61,288 @@ If you are already familiar with the construct of XPath, using this should be a 
   // result => ['pass']
 ```
 
-# INSTALL
-```cmd
+## Installation
+
+```bash
 npm install jsxpath
 ```
-# USE
+
+## Quick Start
+
+### Simple Query
+
 ```ts
-  const json = {
-    a: {
-        links: [
-          { id: 3, type: 'b' },
-          { id: 1, type: 'c' }
-        ],
-        value: 'master'
-    },
-    b: [
-      { id: 1, value: 'one' },
-      { id: 2, value: 'two' },
-      { id: 3, value: 'three' }
-    ]
-  };
+import { runPath } from 'jsxpath';
+
+const json = { user: { name: 'John', age: 30 } };
+
+const result = runPath('/user/name', { json });
+// result => ['John']
 ```
 
+> **Note**: Results are always returned as arrays.
+
+### Filtering with Predicates
+
 ```ts
-  import { runPath } from 'jsxpath';
+const json = { 
+  users: [
+    { name: 'John', age: 30 }, 
+    { name: 'Jane', age: 25 }
+  ] 
+};
 
-  // Get the value of "b" that is linked back to "a" by "id"
-  const path = '/b/*[id = /a/links/*[type="b"]/id]/value';
-
-  const result = runPath(path, {json}); // ["three"]
-
-
-  // callback version
-  //-------------------------
-  runPath({
-    path: path,
-    then: ({ path, error, value }) => {
-      // value => ['three'];
-
-      // run your custom code
-    } 
-  }, {json});
-
-
-  // path looks complicated? 
-  // use variables.
-  //-------------------------
-  const result = runPath( '/b/*[id = $aLinkToB_id]/value', 
-    { 
-      json, variables: { aLinkToB_id: '$root/a/links/*[type="b"]/id' } 
-    }
-  ); // ["three"]
-
+const result = runPath('/users/*[age > 26]/name', { json });
+// result => ['John']
 ```
 
-Evaluating multiple paths within one run
+### Complex Queries
+
+Get values from one part of JSON based on conditions in another:
 
 ```ts
-
-  const json = {
-    c: [
-      { id: 1, type: 'TypeA', value: 'car'},
-      { id: 2, type: 'TypeB', value: 'house'},
-      { id: 3, type: 'TypeA', value: 'boat'}
-    ]
-  }
-```
-
-```ts
-  import { runPaths } from 'jsxpath';
-
-  const pathsResult = {
-    entities: null,
-    typeAs: null
-  };
-
-  const pathsAndCallbacks: tPathWithCallBack[] = [
-    { 
-      path: '/c/*/value',
-      then: (result) => {
-        // custom code
-        if (result.value.length) {
-          pathsResult.entities = result.value;
-        }
-      }
-    },
-    {
-      path: '/c/*[type="TypeA"]',
-      description: 'type "A" objects in "c"',
-      then: ({value, error}) => {
-        // custom code
-        if (!error) {
-          pathsResult.typeAs = value;
-        }
-      }
-    }
-  ];
-
-  runPaths( pathsAndCallbacks, { json });
-
-  /*
-  * pathsResult => {
-  *   entities: ['car', 'house', 'boat'],
-  *   typeAs: [
-  *     { id: 1, type: 'TypeA', value: 'car'},
-  *     { id: 3, type: 'TypeA', value: 'boat'}
-  *   ]
-  * }
-  */
-```
-
-
-# API
-These are the 3 methods to run the path expression
-```ts
-  runPath( path: string, inputProps: tRunPathsInput )
-```
-
-<details>
-<summary>args</summary>
-
-1. **path**: path expression
-2. **inputProps**: tRunPathsInput
-- **json**: the json object to interrogate
-- **functions**?: see [custom functions](#custom-functions)
-- **variables**?: see [variables](#variables)
-
-```ts
-type tRunPathsInput {
-  json: object,
-  functions?: {
-    [functionName: string]: (...args: tStack[]) => tStack
+const json = {
+  a: {
+    links: [
+      { id: 3, type: 'b' },
+      { id: 1, type: 'c' }
+    ],
+    value: 'master'
   },
-  variables?: {
-    [variableName: string]: any
-  }
+  b: [
+    { id: 1, value: 'one' },
+    { id: 2, value: 'two' },
+    { id: 3, value: 'three' }
+  ]
 };
 ```
-</details>
-<br/>
 
 ```ts
-  runPath( pathProp: tPathWithCallBack, inputProps: tRunPathsInput )
+import { runPath } from 'jsxpath';
+
+// Get the value of 'b' that is linked back to 'a' by 'id'
+const path = '/b/*[id = /a/links/*[type="b"]/id]/value';
+
+const result = runPath(path, { json }); 
+// result => ['three']
 ```
-<details>
-<summary>args</summary>
 
-  1. **pathProp**: tPathWithCallBack
-  - **path**: path expression
-  - **description**?: describe what this path expression is about
-  - **then**: a callback function that accepts the result of executing the path expression.
-  ```ts
-  type tPathWithCallBack = {
-    path: string,
-    description?: string,
-    active?: boolean,
-    then(result: tRunPathResult),
-    [key: string]: any
-  };
-
-  type tRunPathResult = {
-    path: string,
-    value: any,
-    error?: string
-  };
-  ```
-
-  2. **inputProps**: tRunPathsInput
-  - **json**: the json object to interrogate
-  - **functions**?: see [custom functions](#custom-functions)
-  - **variables**?: see [variables](#variables)
-  - **outputOptions**?: flags to determine extra optionally return values
-
-
-  ```ts
-  type tRunPathsInput {
-    json: object,
-    functions?: {
-      [functionName: string]: (...args: tStack[]) => tStack
-    },
-    variables?: {
-      [variableName: string]: any
-    },
-    outputOptions?: {
-      nodes?: boolean
-    }
-  };
-  ```
-
-</details>
-<br/>
+### Using Callbacks
 
 ```ts
-  runPaths( pathProp: tPathWithCallBack[], inputProps: tRunPathsInput )
+import { runPath } from 'jsxpath';
+
+runPath({
+  path: '/b/*[id = /a/links/*[type="b"]/id]/value',
+  then: ({ path, error, value }) => {
+    // value => ['three']
+    // Run your custom code here
+  } 
+}, { json });
 ```
 
-<details>
-<summary>args</summary>
+### Simplifying with Variables
 
-  1. **pathProp**: tPathWithCallBack[]
-  - **path**: path expression
-  - **description**?: describe what this path expression is about
-  - **then**: a callback function that accepts the result of executing the path expression.
-  ```ts
-  type tPathWithCallBack = {
-    path: string,
-    description?: string,
-    active?: boolean,
-    then(result: tRunPathResult),
-    [key: string]: any
-  };
+Path expressions can get complex. Use variables to make them more readable:
 
-  type tRunPathResult = {
-    path: string,
-    value: any,
-    error?: string
-  };
-  ```
+```ts
+const result = runPath('/b/*[id = $aLinkToB_id]/value', 
+  { 
+    json, 
+    variables: { 
+      aLinkToB_id: '$root/a/links/*[type="b"]/id' 
+    } 
+  }
+);
+// result => ['three']
+```
 
-  2. **inputProps**: tRunPathsInput
-  - **json**: the json object to interrogate
-  - **functions**?: see [custom functions](#custom-functions)
-  - **variables**?: see [variables](#variables)
-  - **outputOptions**?: flags to determine extra optionally return values
+> **Tip**: The JSON input is automatically available as `$root` in all path and variable expressions.
 
-  ```ts
-  type tRunPathsInput {
-    json: object,
-    functions?: {
-      [functionName: string]: (...args: tStack[]) => tStack
-    },
-    variables?: {
-      [variableName: string]: any
-    },
-    outputOptions?: {
-      nodes?: boolean
+### Multiple Paths
+
+Execute multiple queries in a single call:
+
+```ts
+import { runPaths } from 'jsxpath';
+
+const json = {
+  c: [
+    { id: 1, type: 'TypeA', value: 'car' },
+    { id: 2, type: 'TypeB', value: 'house' },
+    { id: 3, type: 'TypeA', value: 'boat' }
+  ]
+};
+
+const pathsResult = {
+  entities: null,
+  typeAs: null
+};
+
+const pathsAndCallbacks = [
+  { 
+    path: '/c/*/value',
+    then: (result) => {
+      if (result.value.length) {
+        pathsResult.entities = result.value;
+      }
     }
+  },
+  {
+    path: '/c/*[type="TypeA"]',
+    description: 'type "A" objects in "c"',
+    then: ({ value, error }) => {
+      if (!error) {
+        pathsResult.typeAs = value;
+      }
+    }
+  }
+];
+
+runPaths(pathsAndCallbacks, { json });
+
+/*
+ * pathsResult => {
+ *   entities: ['car', 'house', 'boat'],
+ *   typeAs: [
+ *     { id: 1, type: 'TypeA', value: 'car' },
+ *     { id: 3, type: 'TypeA', value: 'boat' }
+ *   ]
+ * }
+ */
+
+
+## API Reference
+
+JSXPath provides three main methods for executing path expressions.
+
+### Types
+
+```ts
+type tRunPathsInput = {
+  json: object;
+  functions?: {
+    [functionName: string]: (...args: tStack[]) => tStack
   };
-  ```
+  variables?: {
+    [variableName: string]: any
+  };
+  outputOptions?: {
+    nodes?: boolean
+  };
+};
 
-</details>
-<br/>
+type tPathWithCallBack = {
+  path: string;
+  description?: string;
+  active?: boolean;
+  then: (result: tRunPathResult) => void;
+  [key: string]: any;
+};
 
+type tRunPathResult = {
+  path: string;
+  value: any;
+  error?: string;
+};
+```
 
-# Differences & Limitations
-There are some notable differences and limiations between xml and json that the query langauge do not support.
-- The '@' symbol is not used in JSXPath expression since JSON only consists of key value pair. '@' in XML denotes an attribute.
-- The axis 'preceding', 'preceding-sibling', 'following', and 'following-sibling' is not supported. JSON is a hash map, the keys are not always returned in a particular order. Instead JSXPath supports 'sibling' that looks for key value within the same object.
-- The operator token keywords are reserved. This means that the keys in the json cannot contain the following symbols (|,/,+, -, %, *, =, >, <) and spaces
+### Methods
 
+#### `runPath(path: string, input: tRunPathsInput): any[]`
 
-# FEATURES
+Executes a single path expression and returns the result as an array.
+
+**Parameters:**
+- `path`: The path expression string
+- `input`: Configuration object containing:
+  - `json`: The JSON object to query
+  - `functions?`: Custom functions (see [Custom Functions](#custom-functions))
+  - `variables?`: Variables for use in expressions (see [Variables](#variables))
+
+**Returns:** Array of matched values
+
+**Example:**
+```ts
+const result = runPath('/users/*[age > 25]/name', { json });
+```
+
+---
+
+#### `runPath(pathProp: tPathWithCallBack, input: tRunPathsInput): void`
+
+Executes a path expression with a callback function.
+
+**Parameters:**
+- `pathProp`: Object containing:
+  - `path`: The path expression string
+  - `description?`: Optional description of what the path does
+  - `then`: Callback function that receives `{ path, value, error }`
+  - `active?`: Set to `false` to skip execution (default: `true`)
+- `input`: Same as above, with optional `outputOptions.nodes` for internal node details
+
+**Example:**
+```ts
+runPath({
+  path: '/users/*[age > 25]',
+  description: 'Users older than 25',
+  then: ({ value, error }) => {
+    if (!error) console.log(value);
+  }
+}, { json });
+```
+
+---
+
+#### `runPaths(paths: tPathWithCallBack[], input: tRunPathsInput): void`
+
+Executes multiple path expressions with callbacks in a single call.
+
+**Parameters:**
+- `paths`: Array of path configuration objects (same structure as `tPathWithCallBack`)
+- `input`: Same as above
+
+**Example:**
+```ts
+runPaths([
+  {
+    path: '/users/*/name',
+    then: (result) => { /* handle names */ }
+  },
+  {
+    path: '/users/*[age > 25]',
+    then: (result) => { /* handle filtered users */ }
+  }
+], { json });
+```
+
+## Differences from XPath
+
+JSXPath adapts XPath for JSON with the following key differences:
+
+| XPath Feature | JSXPath Equivalent | Reason |
+|--------------|-------------------|--------|
+| `@attribute` | Not supported | JSON uses key-value pairs, no attributes |
+| `preceding::`, `following::` | Not supported | JSON keys have no guaranteed order |
+| `preceding-sibling::`, `following-sibling::` | `sibling::` | Finds keys within the same object |
+
+### Reserved Tokens
+
+Keys cannot contain these symbols: `|`, `/`, `+`, `-`, `%`, `*`, `=`, `>`, `<`, or spaces
+
+### Operator Precedence
+
+Operators follow standard precedence rules. Notably, `and` has higher precedence than `or`:
+
+```ts
+// The expression: [A and B or C] 
+// Is evaluated as: [(A and B) or C]
+const json = { items: [{ a: 1, b: 2, c: 5 }] };
+runPath('/items/*[a=1 and b=2 or c>10]', { json });
+// Matches items where (a=1 AND b=2) OR (c>10)
+```
+
+## Features
 
 ## Operators
 | Operators | |
@@ -317,20 +363,80 @@ There are some notable differences and limiations between xml and json that the 
 | mod | Modulus |
 
 ## Axes
-| Select | |
-|---|---|
-| . | Current |
-| .. | Parent from Current |
-| / | Root or Child from Current |
-| // | Descendants from Current |
-| * | Any child nodes from Current | 
-| parent | Parent from Current |
-| ancestor::(node-name) | Ancestors from Current |
-| ancestor-or-self::(node-name) | Ancestors + Current from Current |
-| child::(node-name) | Child from Current |
-| descendant::(node-name) | Descendants from Current |
-| descendant-or-self::(node-name) | Descendants + Current from Current |
-| sibling::(node-name) | Sibling of Current (key name within the same object)|
+
+| Axis | Example | Description |
+|------|---------|-------------|
+| `.` | `./name` | Current node |
+| `..` | `../name` | Parent node |
+| `/` | `/root` | Root or child |
+| `//` | `//name` | Descendants |
+| `*` | `/users/*` | All children |
+| `self::` | `self::node()` | Current node |
+| `parent::` | `parent::user` | Parent node |
+| `child::` | `child::name` | Direct children |
+| `ancestor::` | `ancestor::root` | All ancestors |
+| `ancestor-or-self::` | `ancestor-or-self::user` | Ancestors + self |
+| `descendant::` | `descendant::id` | All descendants |
+| `descendant-or-self::` | `descendant-or-self::user` | Descendants + self |
+| `sibling::` | `sibling::name` | Keys in same object |
+
+## Complex Predicates
+
+JSXPath supports complex filtering with nested predicates and multiple conditions.
+
+### Operator Precedence in Predicates
+
+Operators are evaluated with standard precedence. The `and` operator has higher precedence than `or`:
+
+```ts
+const json = {
+  items: [
+    { id: 1, b: { c: 1 }, d: 'test', e: 10 },
+    { id: 2, b: { c: 2 }, d: 'test', e: 3 },
+    { id: 3, b: { c: 1 }, d: 'other', e: 8 }
+  ]
+};
+
+// Expression: [b/c=1 and d="test" or e > 5]
+// Evaluated as: [(b/c=1 AND d="test") OR (e > 5)]
+const result = runPath('/items/*[b/c=1 and d="test" or e > 5]', { json });
+// Returns items 1 and 3
+```
+
+### Nested Predicates
+
+Filter by nested conditions within arrays or objects:
+
+```ts
+const json = {
+  data: [
+    { id: 1, tags: [{ name: 'urgent', value: 1 }] },
+    { id: 2, tags: [{ name: 'normal', value: 2 }] }
+  ]
+};
+
+// Find items with nested tag matching criteria
+const result = runPath('/data/*[tags/*[name="urgent"]]', { json });
+// Returns item 1
+```
+
+### Complex Sibling Lookups
+
+Use the `sibling::` axis to check properties of sibling keys within the same object:
+
+```ts
+const json = {
+  records: [
+    { id: 1, type: 'user', status: 'active' },
+    { id: 2, type: 'admin', status: 'active' },
+    { id: 3, type: 'user', status: 'inactive' }
+  ]
+};
+
+// Find all 'id' nodes where the sibling 'type' equals 'user'
+const result = runPath('//*[local-name()="id"][sibling::type="user"]', { json });
+// Returns [1, 3]
+```
 
 ## Functions
 ### Built in functions
@@ -354,8 +460,8 @@ There are some notable differences and limiations between xml and json that the 
 | number | path = 'number(/a)' | return the number value of the first node of a | if it's a string or boolean type, it will try to convert it to a number value, otherwise return NAN. Throws an error if the passed in type is not a string, number, or boolean.
 | round | path = 'round(4.4)', 'round(4.5)' | 4 , 5 | round the number to the nearest integer value
 | string | path = 'string(1.1)' | '1.1' | convert and return a string value. Throws an error if the passed in type is not a string, number, or boolean. |
-| substring-after | path = 'string-after("haystack", "st") | "ack" | | 
-| substring-before | path = 'string-before("haystack", "st") | "hay" | | 
+| substring-after | path = 'substring-after("haystack", "st")' | "ack" | | 
+| substring-before | path = 'substring-before("haystack", "st")' | "hay" | | 
 | sum | path = 'sum(/a/*/b)' | sum all value of b | Throws an error if the value is not node and is of number type |
 | true | path = 'true = true()' | true | |
 
@@ -564,10 +670,6 @@ Consider the budget example set up in the [functions](#functions) section above.
   // totalIncomePerMonth = 1600.5
 ```
 
-> Note that on initialization, the passed in json is stored as a variable with the name $root. $root can be referenced in both the main path or variable path expression
-
-<br/>
-
 Example below shows additional ways of using variables
 - tuitionType is a literal object value
 - tuitionAmount is a path expression referencing $tuitionType
@@ -595,43 +697,112 @@ Example below shows additional ways of using variables
   // console.log => 'Tuition is overly expensive. We should spend our time on gardening'
 ```
 
+## Error Handling
 
-# About JSXPath nodes
-
-In JSXPath, we natively deconstruct the passed in JSON object into a series of nodes in order to make it easier to traverse and perform a deep comparisons without relying on third party libraries. Before returning the result, JSXPath will reconstruct the filtered down node(s) as an array of JSON object.
-
-Node have the following shape
+When using the callback version of `runPath` or `runPaths`, errors are captured and passed to your callback:
 
 ```ts
-  type tNode = [
-    id: number,
-    depth: number,
-    group: number|string,
-    arrayPosition: number|string,
-    key: string,
-    value: any,
-    valueType: string,
-    links: {
-      parentId?: number,
-      childrenIds?: number[],
-      descendantIds?: number[],
-      ancestorIds?: number[],
-      siblings?: number[]
+runPath({
+  path: '/items/*[id > 0]',
+  then: ({ value, error }) => {
+    if (error) {
+      console.error('Query failed:', error);
+      return;
     }
-  ];
+    // Process value
+    console.log('Results:', value);
+  }
+}, { json });
 ```
-Given the passed in JSON is
+
+Common error scenarios:
+- Invalid path syntax
+- Type mismatches in operations (e.g., comparing number with string)
+- Undefined variables or functions
+- Invalid function arguments
+
+## TypeScript Support
+
+JSXPath is written in TypeScript and includes full type definitions:
 
 ```ts
-  {
-    a: [
-      0,
-      {b: 'c', d: 1},
-      'efg'
-    ]
+import { runPath, runPaths, KEYS, NodesOps } from 'jsxpath';
+import type { 
+  tRunPathsInput, 
+  tPathWithCallBack, 
+  tRunPathResult,
+  tStack,
+  tNode 
+} from 'jsxpath';
+
+// Type-safe path execution
+const json = { users: [{ name: 'John', age: 30 }] };
+
+const result: any[] = runPath('/users/*/name', { json });
+
+// Type-safe callback
+const pathConfig: tPathWithCallBack = {
+  path: '/users/*[age > 25]',
+  then: (result: tRunPathResult) => {
+    console.log(result.value);
   }
+};
+
+runPath(pathConfig, { json });
 ```
-it is deconstructed into a list of array nodes and linked together as shown below diagramatically.
+
+### Exported Types
+
+- `tRunPathsInput` - Configuration for path execution
+- `tPathWithCallBack` - Path configuration with callback
+- `tRunPathResult` - Result object passed to callbacks
+- `tStack` - Internal stack type for custom functions
+- `tNode` - JSXPath node structure
+- `eStackTypesObject` - Stack type constants
+- `tNodesState` - Node state type
+
+
+### About JSXPath Nodes
+
+> **Note**: This section is primarily for users who want to write custom functions or understand JSXPath's internal architecture.
+
+JSXPath internally converts JSON objects into a graph of nodes to enable efficient traversal and deep comparisons without relying on third-party libraries. Before returning results, JSXPath reconstructs the filtered nodes back into JSON arrays.
+
+#### Node Structure
+
+Nodes have the following shape:
+
+```ts
+type tNode = [
+  id: number,
+  depth: number,
+  group: number | string,
+  arrayPosition: number | string,
+  key: string,
+  value: any,
+  valueType: string,
+  links: {
+    parentId?: number,
+    childrenIds?: number[]
+  }
+];
+```
+
+#### Example: JSON to Node Conversion
+
+Given this JSON:
+
+```ts
+{
+  a: [
+    0,
+    { b: 'c', d: 1 },
+    'efg'
+  ]
+}
+```
+
+It is deconstructed into linked nodes as shown below:
 
 ```mermaid
 classDiagram
@@ -688,36 +859,31 @@ class efg {
   + valueType: string
 }
 ```
-> apart from child/parent/sibling relationship, each node have links to ancestors and descendants
 
+> **Note**: Each node maintains links to child and parent relationships. The `descendants`, `ancestors`, and `siblings` relationships are computed on-demand (lazy evaluation), which significantly improves performance for large JSON structures.
 
-Helper functions are provided that can be used in custom functions
+#### Helper Functions for Custom Functions
+
+When writing custom functions, you can use these helper utilities:
+
 ```ts
-  import { KEYS, nodesOps } from 'jsxpath';
+import { KEYS, NodesOps } from 'jsxpath';
 
-  // Actual node properties can be accessed via the KEYS object
-  nodeA[KEYS.valueType] //object, array, string,...
-  nodeA[KEYS.value]
-  nodeA[KEYS.links].childrenIds // [1, 4, ...]
+// Access node properties via the KEYS object
+nodeA[KEYS.valueType]  // 'object', 'array', 'string', 'number', etc.
+nodeA[KEYS.value]
+nodeA[KEYS.links].childrenIds  // [1, 4, ...]
 
-  // Get the linked nodes
-  nodesOps.get.ancestors(currentNode: tNode, nodeName?: string): tNode[];
-  nodesOps.get.children(currentNode: tNode, nodeName?: string): tNode[];
-  nodesOps.get.descendants(currentNode: tNode, nodeName?: string): tNode[];
-  nodesOps.get.parent(currentNode: tNode, nodeName?: string): tNode;
-  nodesOps.get.siblings(currentNode: tNode, nodeName?: string): tNode[];
+// Get linked nodes (available on NodesOps instance)
+nodesOps.get.ancestors(currentNode: tNode, nodeName?: string): tNode[];
+nodesOps.get.children(currentNode: tNode, nodeName?: string): tNode[];
+nodesOps.get.descendants(currentNode: tNode, nodeName?: string): tNode[];
+nodesOps.get.parent(currentNode: tNode, nodeName?: string): tNode;
+nodesOps.get.siblings(currentNode: tNode, nodeName?: string): tNode[];
 
-  // convert the node into its' JSON value
-  nodesOps.reconstruct(nodes: tNode[]): (iJSONArray|tJSONObject)[];
+// Convert nodes back to JSON values
+nodesOps.reconstruct(nodes: tNode[]): any[];
 
-  // test to see if two nodes are equal (deep)
-  nodesOps.test.isEqual(node1: tNode, node2: tNode): boolean;
-
+// Test node equality (deep comparison)
+nodesOps.tests.isEqual(node1: tNode, node2: tNode): boolean;
 ```
-
-
-# ROADMAP
-- better error handling overall
-- introduce date functions
-
-

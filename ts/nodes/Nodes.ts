@@ -10,11 +10,9 @@ type tAnyArray = Array<any>;
 type tJSON = tAnyObject | tAnyArray;
 
 export class Nodes {
-  private nodeState: iState;
-  
-  constructor() {
-    // singleton nodeState shared across main and variables
-    this.nodeState = NodesState.getInstance();
+
+
+  constructor(private nodeState: NodesState) {
   }
 
   private add = {
@@ -34,30 +32,16 @@ export class Nodes {
     links: (ancestorNode: tNode, currentNode: tNode) => {
       if (currentNode[KEYS.links].parentId === undefined) {
         currentNode[KEYS.links] = {
-          ancestorIds: [],
           parentId: ancestorNode ? ancestorNode[KEYS.id] : null,
-          descendantIds: [],
-          siblings: [],
           childrenIds: []
+          // descendants and ancestors will be computed lazily
         };
       }
-      if (ancestorNode) {
-        if (currentNode[KEYS.links].parentId === ancestorNode[KEYS.id]) {
-          ancestorNode[KEYS.links].childrenIds.push(currentNode[KEYS.id]);
-        }
-        ancestorNode[KEYS.links].descendantIds.push(currentNode[KEYS.id]);
-        currentNode[KEYS.links].ancestorIds.push(ancestorNode[KEYS.id]);
-        this.add.links(this.nodeState.getNodeById(ancestorNode[KEYS.links].parentId), currentNode);
+
+      // Only store immediate parent-child relationship
+      if (ancestorNode && currentNode[KEYS.links].parentId === ancestorNode[KEYS.id]) {
+        ancestorNode[KEYS.links].childrenIds.push(currentNode[KEYS.id]);
       }
-    },
-    siblings: (nodes: tNode[]) => {
-      nodes.forEach(node => {
-        nodes.forEach(linkedNode => {
-          if (node[KEYS.id] !== linkedNode[KEYS.id]) {
-            node[KEYS.links].siblings.push(linkedNode[KEYS.id]);
-          }
-        });
-      });
     }
   };
 
@@ -81,7 +65,6 @@ export class Nodes {
     },
     object: (data: tJSON, parent: tNode, pos?) => {
       const group = this.nodeState.incrementGroup();
-      const siblings = [];
       for (let key in data) {
         const currentId = this.nodeState.getId();
         const value = this.deconstruct.getValue(data[key]);
@@ -93,9 +76,7 @@ export class Nodes {
         } else {
           // this.add(b.id, currentId, group, symbols.value, data[key], pos);
         }
-        siblings.push(node);
       }
-      this.add.siblings(siblings);
     },
     getValue: (value) => {
       if (Array.isArray(value)) {
@@ -118,7 +99,7 @@ export class Nodes {
       return 'undefined';
     } else if (typeof value === TYPES.string) {
       return TYPES.string;
-    }  else if (typeof value === TYPES.boolean) {
+    } else if (typeof value === TYPES.boolean) {
       return TYPES.boolean;
     } else if (!Number.isNaN(Number(value))) {
       return 'number'

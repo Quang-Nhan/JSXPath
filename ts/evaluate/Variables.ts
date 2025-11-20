@@ -1,7 +1,8 @@
 import { OPERATORS, TYPES } from "../consts";
 import { Json } from "../nodes/Json";
 import { Nodes } from "../nodes/Nodes";
-import { nodesOps } from "../Util";
+import { NodesState } from "../nodes/State";
+import { NodesOps } from "../Util";
 import { Postfix } from "../path/Postfix";
 import { tNode, tVariables } from "../types";
 import { Processor } from "./Processor";
@@ -15,7 +16,7 @@ type tVariableCache = {
   }
 };
 
-type tRoot = {root: object, nodes: tNode[]};
+type tRoot = { root: object, nodes: tNode[] };
 
 export class Variables {
   private cache: tVariableCache;
@@ -23,13 +24,13 @@ export class Variables {
   private postfixInstance: Postfix;
   private processorInstance: Processor;
   private toJsonInstance: Json;
-  constructor(rootProps: tRoot, private variables?: tVariables) {
-    this.NodesClass = new Nodes();
+  constructor(rootProps: tRoot, private nodesState: NodesState, private nodesOps: NodesOps, private variables?: tVariables) {
+    this.NodesClass = new Nodes(this.nodesState);
     this.variables = variables || {};
     this.cacheVariables(rootProps);
   }
 
-  private cacheVariables({root, nodes}: tRoot) {
+  private cacheVariables({ root, nodes }: tRoot) {
     this.cache = {
       root: {
         name: 'root',
@@ -38,7 +39,7 @@ export class Variables {
         isPath: false
       }
     };
-    for(let key in this.variables) {
+    for (let key in this.variables) {
       this.cache[key] = {
         name: key,
         value: this.variables[key],
@@ -57,11 +58,11 @@ export class Variables {
   private getVariableEndIndex(path, startIndex) {
     const stopChars = [' ', '[', ']', '/', ...OPERATORS.byLength['1']];
     for (
-      let i = startIndex; 
+      let i = startIndex;
       i < path.length;
       i++
     ) {
-      if(stopChars.includes(path[i])) {
+      if (stopChars.includes(path[i])) {
         return i;
       }
     }
@@ -71,14 +72,14 @@ export class Variables {
   private getReferenceVariableInPath(variableValue: string) {
     const startOfDollarSign = variableValue.indexOf('$');
     const endOfVariableName = this.getVariableEndIndex(variableValue, startOfDollarSign);
-    return variableValue.substring(startOfDollarSign+1, endOfVariableName);
+    return variableValue.substring(startOfDollarSign + 1, endOfVariableName);
   };
 
   private getVariablePathResult(path) {
     const postfixPath = this.postfixInstance.toPostfix(path);
     this.processorInstance.processPostfixPath(postfixPath);
     const item = this.processorInstance.output.pop();
-    
+
     let value;
     if (item.type === TYPES.nodes) {
       value = this.toJsonInstance.reconstruct(item.value);
@@ -100,7 +101,7 @@ export class Variables {
     if (this.cache[variableReferenceName].isPath) {
       this.updateVariablePathValue(this.cache[variableReferenceName]);
     }
-    
+
     if (!this.cache[variableReferenceName].nodes) {
       const referenceValue = this.cache[variableReferenceName].value;
       this.cache[variableReferenceName].nodes = this.NodesClass.jsonToNodes(referenceValue, this.cache[variableReferenceName].name);
@@ -111,7 +112,7 @@ export class Variables {
   };
 
   // This should be called early
-  public setInstances({postfixInstance, processorInstance, toJsonInstance}) {
+  public setInstances({ postfixInstance, processorInstance, toJsonInstance }) {
     this.postfixInstance = postfixInstance
     this.processorInstance = processorInstance;
     this.toJsonInstance = toJsonInstance;
@@ -128,13 +129,13 @@ export class Variables {
 
     if (this.cache[variable].isPath) {
       this.updateVariablePathValue(this.cache[variable]);
-    } 
-    
+    }
+
     if (!this.cache[variable].nodes) {
       this.cache[variable].nodes = this.NodesClass.jsonToNodes(this.cache[variable].value, variable);
     }
 
-    return nodesOps.get.root(this.cache[variable].nodes);
+    return this.nodesOps.get.root(this.cache[variable].nodes);
   };
 
   public reset() {

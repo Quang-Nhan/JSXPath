@@ -3,7 +3,7 @@ import { Variables } from "./Variables";
 import { NodesState } from "../nodes/State";
 import { Functions } from './Functions';
 import { Operations } from './Operations';
-import { nodesOps } from '../Util';
+import { NodesOps } from '../Util';
 import { KEYS } from "../nodes/consts";
 import { TYPES } from "../consts";
 import { iState, tFilterModeOptions, tStack } from "../types";
@@ -17,15 +17,14 @@ export class Processor {
   private variablesInstance: Variables
   private operationsInstance: Operations;
   private functionsInstance: Functions;
-  private nodesState: iState;
+
   public output: tStack[] = [];
-  
-  constructor(Nodes: Nodes, variables: Variables, functions: Functions) {
-    this.operationsInstance = new Operations();
+
+  constructor(Nodes: Nodes, variables: Variables, functions: Functions, private nodesState: NodesState, private nodesOps: NodesOps) {
+    this.operationsInstance = new Operations(this.nodesOps);
     this.mainNodes = Nodes;
     this.variablesInstance = variables;
     this.functionsInstance = functions;
-    this.nodesState = NodesState.getInstance();
   };
 
   private pathStringSteps = {
@@ -50,37 +49,39 @@ export class Processor {
     axis: {
       '/': () => {
         const item = this.pathStringSteps.item;
-        item.value = item.value.reduce((r, v) => {
-          const children = nodesOps.get.children(v);
-          r = [...r, ...children];
-          return r;
-        }, []);
+        const result = [];
+        for (const v of item.value) {
+          const children = this.nodesOps.get.children(v);
+          result.push(...children);
+        }
+        item.value = result;
       },
       '//': () => {
         const item = this.pathStringSteps.item;
-        item.value = item.value.reduce((r, v) => {
-          const descendants = nodesOps.get.descendants(v);
-          r = [...r, ...descendants];
-          return r;
-        }, []);
+        const result = [];
+        for (const v of item.value) {
+          const descendants = this.nodesOps.get.descendants(v);
+          result.push(...descendants);
+        }
+        item.value = result;
       },
       '.': () => {
       },
       '..': () => {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
-          const parent = nodesOps.get.parent(v);
+          const parent = this.nodesOps.get.parent(v);
           if (parent && !r.some((rr) => rr[KEYS.id] === parent[KEYS.id])) {
             r.push(parent);
           }
           return r;
         }, []);
       },
-      '*': () => {},
+      '*': () => { },
       parent: () => {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
-          const parent = nodesOps.get.parent(v, this.pathStringSteps.nodeName);
+          const parent = this.nodesOps.get.parent(v, this.pathStringSteps.nodeName);
           if (parent && !r.some(node => node[KEYS.id] === parent[KEYS.id])) {
             r.push(parent);
           }
@@ -91,7 +92,7 @@ export class Processor {
       child: () => {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
-          const children = nodesOps.get.children(v, this.pathStringSteps.nodeName);
+          const children = this.nodesOps.get.children(v, this.pathStringSteps.nodeName);
           children.forEach(a => {
             if (!r.some(node => node[KEYS.id] === a[KEYS.id])) {
               r.push(a);
@@ -104,7 +105,7 @@ export class Processor {
       ancestor: () => {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
-          const ancestors = nodesOps.get.ancestors(v, this.pathStringSteps.nodeName);
+          const ancestors = this.nodesOps.get.ancestors(v, this.pathStringSteps.nodeName);
           ancestors.forEach(a => {
             if (!r.some(node => node[KEYS.id] === a[KEYS.id])) {
               r.push(a);
@@ -117,7 +118,7 @@ export class Processor {
       'ancestor-or-self': () => {
         const item = this.pathStringSteps.item;
         item.value = item.value.reduce((r, v) => {
-          const ancestors = nodesOps.get.ancestors(v, this.pathStringSteps.nodeName);
+          const ancestors = this.nodesOps.get.ancestors(v, this.pathStringSteps.nodeName);
           ancestors.forEach(a => {
             if (!r.some(node => node[KEYS.id] === a[KEYS.id])) {
               r.push(a);
@@ -129,41 +130,45 @@ export class Processor {
       },
       descendant: () => {
         const item = this.pathStringSteps.item;
-        item.value = item.value.reduce((r, v) => {
-          const descendants = nodesOps.get.descendants(v, this.pathStringSteps.nodeName);
-          r = [...r, ...descendants];
-          return r;
-        }, []);
+        const result = [];
+        for (const v of item.value) {
+          const descendants = this.nodesOps.get.descendants(v, this.pathStringSteps.nodeName);
+          result.push(...descendants);
+        }
+        item.value = result;
         this.pathStringSteps.resetNodeName();
       },
       'descendant-or-self': () => {
         const item = this.pathStringSteps.item;
-        item.value = item.value.reduce((r, v) => {
-          const descendants = nodesOps.get.descendants(v, this.pathStringSteps.nodeName);
-          r = [...r, ...descendants];
-          return r;
-        }, [item.value]);
+        const result = [...item.value];
+        for (const v of item.value) {
+          const descendants = this.nodesOps.get.descendants(v, this.pathStringSteps.nodeName);
+          result.push(...descendants);
+        }
+        item.value = result;
         this.pathStringSteps.resetNodeName();
       },
       self: () => {
         const item = this.pathStringSteps.item;
         const from = item.value;
-        item.value = nodesOps.get.byName(item.value, this.pathStringSteps.nodeName);
+        item.value = this.nodesOps.get.byName(item.value, this.pathStringSteps.nodeName);
         this.pathStringSteps.resetNodeName();
       },
       sibling: () => {
         const item = this.pathStringSteps.item;
-        item.value = item.value.reduce((r, v) => {
-          const siblings = nodesOps.get.siblings(v, this.pathStringSteps.nodeName);
-          r = [...r, ...siblings];
-          return r;
-        }, []);
+        const result = [];
+        for (const v of item.value) {
+          const siblings = this.nodesOps.get.siblings(v);
+          const filtered = this.nodesOps.get.byName(siblings, this.pathStringSteps.nodeName);
+          result.push(...filtered);
+        }
+        item.value = result;
         this.pathStringSteps.resetNodeName();
       },
       default: (value) => {
         const item = this.pathStringSteps.item;
         const initialList = item.value;
-        item.value = nodesOps.get.byName(initialList, value);
+        item.value = this.nodesOps.get.byName(initialList, value);
       }
     }
   };
@@ -174,7 +179,7 @@ export class Processor {
 
     for (let i = 0; i < pathString.length; i++) {
       subPath += pathString[i];
-      if ((subPath.includes('::') || subPath === '..') && steps[steps.length-1] === '/') {
+      if ((subPath.includes('::') || subPath === '..') && steps[steps.length - 1] === '/') {
         // skip processing '/' step (children)
         steps.pop();
       }
@@ -197,7 +202,7 @@ export class Processor {
     while (steps.length) {
       let step = steps.shift();
       step = this.pathStringSteps.setNodeName(step);
-      
+
       if (step.length && typeof this.pathStringSteps.axis[step] === 'function') {
         this.pathStringSteps.axis[step]();
       } else {
@@ -215,7 +220,7 @@ export class Processor {
         let value = path.value;
         return {
           type: path.type,
-          value: Array.isArray(value) ? path.value.map(v =>  Array.isArray(v) ? [...v] : v ) : value
+          value: Array.isArray(value) ? path.value.map(v => Array.isArray(v) ? [...v] : v) : value
         }
       }
     });
@@ -235,7 +240,7 @@ export class Processor {
     },
     isPositionCheck: (paths: tStack[]) => {
       return Array.isArray(paths) && (
-        (paths.length === 1 && paths[0].type === TYPES.number) || 
+        (paths.length === 1 && paths[0].type === TYPES.number) ||
         (paths.length === 2 && paths[1].type === TYPES.function && ['last', 'first'].includes(paths[1].value))
       )
     }
@@ -245,7 +250,7 @@ export class Processor {
     rootPath: (path: tStack, { isFilterMode }: tFilterModeOptions) => {
       this.output.push({
         type: TYPES.nodes,
-        value: nodesOps.get.root(this.nodesState.getNodes(path.callerId)),
+        value: this.nodesOps.get.root(this.nodesState.getNodes(path.callerId)),
         startedFromRoot: !!isFilterMode
       });
       this.processPathString(path.value);
@@ -270,19 +275,19 @@ export class Processor {
       this.output.push(path);
     },
     variablePath: (path: tStack) => {
-        const variableName = path.value.substring(0, path.value.indexOf('/'));
-        this.output.push({
-          type: TYPES.nodes,
-          value: this.variablesInstance.getVariableRootNode(variableName)
-        });
-        this.processPathString(path.value.replace(variableName, ''));
+      const variableName = path.value.substring(0, path.value.indexOf('/'));
+      this.output.push({
+        type: TYPES.nodes,
+        value: this.variablesInstance.getVariableRootNode(variableName)
+      });
+      this.processPathString(path.value.replace(variableName, ''));
     },
     variable: (path: tStack) => {
-        this.output.push({
-          type: TYPES.nodes,
-          value: this.variablesInstance.getVariableRootNode(path.value)
-        });
-        this.processPathString('.');
+      this.output.push({
+        type: TYPES.nodes,
+        value: this.variablesInstance.getVariableRootNode(path.value)
+      });
+      this.processPathString('.');
     },
     position: (path: tStack, { index }: tFilterModeOptions) => {
       this.output.push({
@@ -313,7 +318,7 @@ export class Processor {
       this.output.push(result);
     }
   };
-  
+
   public processPostfixPath(paths: tStackCombo, filterProps?: tFilterModeOptions) {
     let path: tStack | tStack[];
     while (paths.length) {
@@ -338,7 +343,7 @@ export class Processor {
           const localFilterProps = {
             isFilterMode: true,
             current: nodes,
-            index: index+1,
+            index: index + 1,
             firstIndex: 1,
             lastIndex: context.value.length
           };
@@ -352,7 +357,7 @@ export class Processor {
           value: updatedNodes
         });
       } else {
-        this.postFixPathTypes[path.type](path, {...filterProps});
+        this.postFixPathTypes[path.type](path, { ...filterProps });
       }
     }
   };

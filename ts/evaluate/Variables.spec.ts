@@ -1,10 +1,14 @@
+import { NodesState } from "../nodes/State";
+import { NodesOps } from "../Util";
 import { Variables } from "./Variables";
 
 describe('Class Variables', () => {
-  let variablesInstance, variables, rootProps;
+  let variablesInstance, variables, rootProps, nodesState, nodesOps;
   beforeEach(() => {
+    nodesState = new NodesState();
+    nodesOps = new NodesOps(nodesState);
     variables = {
-      variableName: {a: { b: 'c' }}
+      variableName: { a: { b: 'c' } }
     };
     rootProps = {
       root: [1, 2],
@@ -17,12 +21,12 @@ describe('Class Variables', () => {
 
   describe('constructor()', () => {
     it('When no argument is passed in, it should set variables to an empty object', () => {
-      variablesInstance = new Variables(rootProps);
+      variablesInstance = new Variables(rootProps, nodesState, nodesOps);
       expect(variablesInstance.variables).toEqual({});
     });
 
     it('When argument is passed in, it should set variables and cache the passed in value', () => {
-      variablesInstance = new Variables(rootProps, variables);
+      variablesInstance = new Variables(rootProps, nodesState, nodesOps, variables);
       expect(variablesInstance.variables).toEqual(variables);
       expect(variablesInstance.cache).toEqual({
         root: {
@@ -34,7 +38,7 @@ describe('Class Variables', () => {
         variableName: {
           isPath: false,
           name: 'variableName',
-          value: {a: { b: 'c' }},
+          value: { a: { b: 'c' } },
           nodes: null
         }
       });
@@ -43,7 +47,7 @@ describe('Class Variables', () => {
 
   describe('getVariableRootNode()', () => {
     beforeEach(() => {
-      variablesInstance = new Variables(rootProps, variables);
+      variablesInstance = new Variables(rootProps, nodesState, nodesOps, variables);
     });
 
     it('When the given variable name does not eixsts, it should throw an error', () => {
@@ -53,7 +57,7 @@ describe('Class Variables', () => {
 
     it('When the given variable name is valid, it should return the root node', () => {
       expect(variablesInstance.getVariableRootNode('variableName')).toEqual([
-        [1, 0, "_", "_", "{$r}", "{$o}", "object", { childrenIds: [ 2 ], descendantIds: [ 2, 3 ], parentId: null, ancestorIds: [], siblings: [] }]
+        [1, 0, "_", "_", "{$r}", "{$o}", "object", { childrenIds: [2], parentId: null }]
       ]);
     });
   });

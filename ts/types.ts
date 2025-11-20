@@ -17,9 +17,9 @@ type tJSONValue =
   | tJSONObject
   | iJSONArray;
 type tJSONObject = {
-  [x: string]: tJSONValue|null;
+  [x: string]: tJSONValue | null;
 };
-interface iJSONArray extends Array<tJSONValue|null> { };
+interface iJSONArray extends Array<tJSONValue | null> { };
 export type tJSON = tJSONObject | iJSONArray;
 
 export type tRunPathsInput = {
@@ -49,7 +49,7 @@ export type tPathWithCallBack = {
   [key: string]: any
 };
 
-export enum eStackTypesObject  {
+export enum eStackTypesObject {
   number = 'number',
   boolean = 'boolean',
   string = 'string',
@@ -72,7 +72,7 @@ export type tConsts = {
   AXES: string[],
   OPERATORS: {
     byName: { [key: string]: string },
-    byLength: { [key: number ]: string[] }
+    byLength: { [key: number]: string[] }
     values: string[],
   },
   OPERATOR_PRECEDENCE: Array<string[]>,
@@ -91,16 +91,13 @@ export type tGuid = string;
 
 export type tNodeLinks = {
   parentId?: number,
-  childrenIds?: number[],
-  descendantIds?: number[],
-  ancestorIds?: number[],
-  siblings?: number[]
+  childrenIds?: number[]
 };
 export type tNode = [
   id: number,
   depth: number,
-  group: number|string,
-  arrayPosition: number|string,
+  group: number | string,
+  arrayPosition: number | string,
   key: string,
   value: any,
   valueType: string,
@@ -113,7 +110,7 @@ export type tNodesState = {
       [caller: string]: tNode[]
     },
     byId: {
-      [key:number]: tNode
+      [key: number]: tNode
     }
   },
   // id and group to be incremented globally
@@ -139,7 +136,7 @@ export type tStack = {
   callerId?: string,  // used when type is TYPES.nodes /paths/rootPaths/variables
   startedFromRoot?: boolean | undefined // used for nodes in filter mode and the path starts at root
 };
-export type tStackMix = tStack|tStack[]
+export type tStackMix = tStack | tStack[]
 export type tStackParent = {
   [id: string]: tStackMix[]
 };

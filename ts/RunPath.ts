@@ -1,4 +1,5 @@
-import { nodesOps } from "./Util"
+import { NodesOps } from "./Util"
+import { NodesState } from "./nodes/State";
 import { TYPES } from "./consts"
 import { Functions } from "./evaluate/Functions"
 import { Processor } from "./evaluate/Processor"
@@ -19,24 +20,29 @@ export class RunPath {
   private caller;
   private options: tRunPathsInput['outputOptions'] = {};
 
-  constructor({json, functions, variables, outputOptions}: tRunPathsInput) {
+  private nodesState: NodesState;
+  private nodesOps: NodesOps;
+
+  constructor({ json, functions, variables, outputOptions }: tRunPathsInput) {
     this.caller = 'main'
-    this.nodesInstance = new Nodes();
+    this.nodesState = new NodesState();
+    this.nodesOps = new NodesOps(this.nodesState);
+    this.nodesInstance = new Nodes(this.nodesState);
     this.functionInstance = new Functions(functions);
     this.postfixInstance = new Postfix(this.caller, this.functionInstance);
     this.nodes = this.nodesInstance.jsonToNodes(json, this.caller);
-    this.variablesInstance = new Variables({root: json, nodes: this.nodes}, variables);
-    this.processorInstance = new Processor(this.nodesInstance, this.variablesInstance, this.functionInstance);
-    this.toJsonInstance = new Json();
-    this.variablesInstance.setInstances({ 
-      postfixInstance: this.postfixInstance, 
-      processorInstance: this.processorInstance, 
-      toJsonInstance: this.toJsonInstance 
+    this.variablesInstance = new Variables({ root: json, nodes: this.nodes }, this.nodesState, this.nodesOps, variables);
+    this.processorInstance = new Processor(this.nodesInstance, this.variablesInstance, this.functionInstance, this.nodesState, this.nodesOps);
+    this.toJsonInstance = new Json(this.nodesOps);
+    this.variablesInstance.setInstances({
+      postfixInstance: this.postfixInstance,
+      processorInstance: this.processorInstance,
+      toJsonInstance: this.toJsonInstance
     });
     this.options.nodes = outputOptions?.nodes || false;
   }
 
-  public callbackMode({path, then, description}: tPathWithCallBack) {
+  public callbackMode({ path, then, description }: tPathWithCallBack) {
     let error: string;
     let value = [];
     let nodesValue;
@@ -46,22 +52,22 @@ export class RunPath {
       const item = this.processorInstance.output.pop();
       if (item) {
         value = item.type !== TYPES.nodes
-          ? item.value 
+          ? item.value
           : this.toJsonInstance.reconstruct(item.value);
       }
       if (item && item.type === TYPES.nodes && this.options.nodes) {
         nodesValue = item.value;
       }
-    } catch(e) {
-      error = `${e.message}${description ? ` for the scenario:"${description}"`: ` for path "${path}"`}`;
+    } catch (e) {
+      error = `${e.message}${description ? ` for the scenario:"${description}"` : ` for path "${path}"`}`;
     }
-    
+
     then({
       path,
       description,
       value,
       error,
-      nodes: this.options.nodes ? nodesOps.get.nodeList(true) as tNodesState['nodes']['byId'] : undefined,
+      nodes: this.options.nodes ? this.nodesOps.get.nodeList(true) as tNodesState['nodes']['byId'] : undefined,
       nodesValue
     });
   }
@@ -74,8 +80,8 @@ export class RunPath {
       const item = this.processorInstance.output.pop();
       if (item) {
         value = item.type !== TYPES.nodes ? item.value : this.toJsonInstance.reconstruct(item.value);
-      } 
-    } catch(e) {
+      }
+    } catch (e) {
       throw new Error(`${e.message} for path "${path}"`);
     }
     return value;
