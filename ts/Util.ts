@@ -4,29 +4,29 @@ import { NodesState } from "./nodes/State";
 import { KEYS, SYMBOLS } from "./nodes/consts";
 import { Json } from "./nodes/Json";
 
-const nsInstance = NodesState.getInstance();
+export class NodesOps {
+  constructor(private nsInstance: NodesState) { }
 
-export const nodesOps = {
-  tests: {
+  public tests = {
     exists: (id: number) => {
-      return !!nsInstance.getNodeById(id);
+      return !!this.nsInstance.getNodeById(id);
     },
     isEqual: (node1: tNode, node2: tNode): boolean => {
       if (node1[KEYS.valueType] !== node2[KEYS.valueType]) {
         return false;
       }
-      
+
       if (node1[KEYS.value] === SYMBOLS.object) {
-        return nodesOps.tests.equal.object(node1, node2);
+        return this.tests.equal.object(node1, node2);
       } else if (node1[KEYS.value] === SYMBOLS.array) {
-        return nodesOps.tests.equal.array(node1, node2);
+        return this.tests.equal.array(node1, node2);
       }
       return node1[KEYS.value] === node2[KEYS.value];
     },
     equal: {
       object: (node1: tNode, node2: tNode): boolean => {
-        const node1Children = nodesOps.get.children(node1);
-        const node2Children = nodesOps.get.children(node2);
+        const node1Children = this.get.children(node1);
+        const node2Children = this.get.children(node2);
         if (node1Children.length === node2Children.length) {
           return node1Children.every(n1 => {
             return node2Children.some(n2 => {
@@ -34,16 +34,16 @@ export const nodesOps = {
                 n1[KEYS.value] === n2[KEYS.value] &&
                 (
                   ![SYMBOLS.array, SYMBOLS.object].includes(n1[KEYS.value]) ||
-                  nodesOps.tests.equal[KEYS.valueType](n1, n2)
+                  this.tests.equal[KEYS.valueType](n1, n2)
                 )
             });
           });
         }
         return false;
       },
-      array: (node1:tNode, node2: tNode): boolean => {
-        const node1Children = nodesOps.get.children(node1);
-        const node2Children = nodesOps.get.children(node2);
+      array: (node1: tNode, node2: tNode): boolean => {
+        const node1Children = this.get.children(node1);
+        const node2Children = this.get.children(node2);
         if (node1Children.length === node2Children.length) {
           return node1Children.every(n1 => {
             return node2Children.some(n2 => {
@@ -52,7 +52,7 @@ export const nodesOps = {
                 n1[KEYS.value] === n2[KEYS.value] &&
                 (
                   ![SYMBOLS.array, SYMBOLS.object, SYMBOLS.ao].includes(n1[KEYS.value]) ||
-                  nodesOps.tests.equal[n1[KEYS.valueType]](n1, n2)
+                  this.tests.equal[n1[KEYS.valueType]](n1, n2)
                 )
             });
           });
@@ -60,20 +60,21 @@ export const nodesOps = {
         return false;
       }
     }
-  },
-  get: {
+  };
+
+  public get = {
     root: (nodes: tNode[]): tNode[] => {
       if (nodes.length) {
         if (nodes[0][KEYS.name] === SYMBOLS.root) {
           return [nodes[0]];
         } else {
-          return nodesOps.get.byName(nodes, SYMBOLS.root)[0];
+          return this.get.byName(nodes, SYMBOLS.root)[0];
         }
       }
     },
     byName: (nodes: tNode[], name?: string): tNode[] => {
       if (!name || name === '*') return nodes;
-  
+
       return nodes.filter((c) => {
         return c[KEYS.name] === name;
       });
@@ -94,39 +95,90 @@ export const nodesOps = {
       });
     },
     descendants: (current: tNode, nodeName?: string): tNode[] => {
-      return current 
-        ? nodesOps.get.byName(nsInstance.getNodesByIds(current[KEYS.links].descendantIds), nodeName)
-        : [];
+      if (!current) return [];
+
+      // Lazy computation: traverse children recursively
+      const descendants: tNode[] = [];
+      const queue = [...current[KEYS.links].childrenIds];
+
+      while (queue.length > 0) {
+        const childId = queue.shift()!;
+        const child = this.nsInstance.getNodeById(childId);
+        if (!child) continue;
+
+        // Add to descendants if name matches (or no filter)
+        if (!nodeName || nodeName === '*' || child[KEYS.name] === nodeName) {
+          descendants.push(child);
+        }
+
+        // Add this child's children to queue for traversal
+        if (child[KEYS.links].childrenIds) {
+          queue.push(...child[KEYS.links].childrenIds);
+        }
+      }
+
+      return descendants;
     },
     ancestors: (current: tNode, nodeName?: string): tNode[] => {
-      return current 
-        ? nodesOps.get.byName(nsInstance.getNodesByIds(current[KEYS.links].ancestorIds), nodeName)
-        : [];
+      if (!current) return [];
+
+      // Lazy computation: traverse parents iteratively
+      const ancestors: tNode[] = [];
+      let parentId = current[KEYS.links].parentId;
+
+      while (parentId !== null && parentId !== undefined) {
+        const parent = this.nsInstance.getNodeById(parentId);
+        if (!parent) break;
+
+        // Add to ancestors if name matches (or no filter)
+        if (!nodeName || nodeName === '*' || parent[KEYS.name] === nodeName) {
+          ancestors.push(parent);
+        }
+
+        parentId = parent[KEYS.links].parentId;
+      }
+
+      return ancestors;
     },
     siblings: (current: tNode, nodeName?: string): tNode[] => {
-      return current
-        ? nodesOps.get.byName(nsInstance.getNodesByIds(current[KEYS.links].siblings), nodeName)
-        : []
+      if (!current) return [];
+
+      const parentId = current[KEYS.links].parentId;
+      if (parentId === null) {
+        return [];
+      }
+
+      const parentNode = this.nsInstance.getNodeById(parentId);
+      if (!parentNode) {
+        return [];
+      }
+
+      const childrenIds = parentNode[KEYS.links].childrenIds || [];
+      const allChildren = this.nsInstance.getNodesByIds(childrenIds);
+      const siblings = allChildren.filter(node => node[KEYS.id] !== current[KEYS.id]);
+
+      return nodeName ? this.get.byName(siblings, nodeName) : siblings;
     },
     children: (current: tNode, nodeName?: string): tNode[] => {
       return current
-        ? nodesOps.get.byName(nsInstance.getNodesByIds(current[KEYS.links].childrenIds), nodeName)
+        ? this.get.byName(this.nsInstance.getNodesByIds(current[KEYS.links].childrenIds), nodeName)
         : [];
     },
     parent: (current: tNode, nodeName?: string): tNode[] => {
       if (!current) return [];
-      let parent = nsInstance.getNodeById(current[KEYS.links].parentId);
+      let parent = this.nsInstance.getNodeById(current[KEYS.links].parentId);
       if (parent[KEYS.name] === SYMBOLS.ao) {
-        parent = nsInstance.getNodeById(parent[KEYS.links].parentId);
+        parent = this.nsInstance.getNodeById(parent[KEYS.links].parentId);
       }
       return parent && ((!nodeName || nodeName === '*') || nodeName === parent[KEYS.name]) ? parent : undefined;
     },
-    nodeList: (byId: boolean):  tNodesState['nodes']['byId'] | tNodesState['nodes']['byCaller'] => {
-      return nsInstance.getNodeList(byId);
+    nodeList: (byId: boolean): tNodesState['nodes']['byId'] | tNodesState['nodes']['byCaller'] => {
+      return this.nsInstance.getNodeList(byId);
     }
-  },
-  reconstruct: (nodes: tNode[]) => {
-    const jsonInstance = new Json();
+  };
+
+  public reconstruct = (nodes: tNode[]) => {
+    const jsonInstance = new Json(this);
     return jsonInstance.reconstruct(nodes);
   }
 };
@@ -148,7 +200,7 @@ export const opFunc = {
       throwError(context, `Missing stack item/argument`);
     }
 
-    if (![...expectedTypes, TYPES.nodes].includes(item.type)) { 
+    if (![...expectedTypes, TYPES.nodes].includes(item.type)) {
       throwError(context, `Invalid type "${item.type}" - was expecting "${expectedTypes.join(',')}" type.`);
     }
 
@@ -156,7 +208,7 @@ export const opFunc = {
       if (!item.value.length) {
         throwError(context, `Was expecting at least one node value.`);
       }
-      if (!expectedTypes.includes(item.value[0][KEYS.valueType])) { 
+      if (!expectedTypes.includes(item.value[0][KEYS.valueType])) {
         throwError(context, `Invalid value type "${item.value[0][KEYS.valueType]}" - was expecting "${expectedTypes.join(',')}" value type.`);
       }
       return item.value[0][KEYS.value];
@@ -190,13 +242,13 @@ export const opFunc = {
      * @returns 
      *  boolean
      */
-    numberOfNodeItems:  (item: tStack, expectedLength: number, symbol?: string, context?: string): boolean => {
+    numberOfNodeItems: (item: tStack, expectedLength: number, symbol?: string, context?: string): boolean => {
       context = context ? `${context}.validate.numberOfNodeItems` : 'validate.numberOfNodeItems';
       if (item.type !== TYPES.nodes) {
         throwError(context, `Invalid type "${item.type}" - expecting "nodes".`);
       }
-      
-      switch(symbol) {
+
+      switch (symbol) {
         case '>':
           if (item.value.length <= expectedLength) {
             throwError(context, `Invalid number of elements in value. Expecting greater than ${expectedLength} elements but received ${item.value.length}.`);
@@ -237,6 +289,6 @@ export const opFunc = {
   }
 };
 
-export const throwError  = (context, msg) => {
+export const throwError = (context, msg) => {
   throw new Error(`Error thrown in ${context}: ${msg}`);
 };

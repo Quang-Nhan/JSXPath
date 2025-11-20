@@ -1,12 +1,12 @@
 import { TYPES } from "../consts";
 import { KEYS, SYMBOLS } from "../nodes/consts";
-import { throwError, opFunc, nodesOps} from "../Util";
+import { throwError, opFunc, NodesOps } from "../Util";
 import { tFilterModeOptions, tStack } from "../types";
 
 type tOperationFunction = () => tStack
 
 type tOperationFunctions = {
-  [operationName: string] : tOperationFunction
+  [operationName: string]: tOperationFunction
 };
 
 type tOperations = {
@@ -61,7 +61,7 @@ export class Operations {
         const tmp = this.props.rightOperandItem;
         rightOperandItem = this.props.leftOperandItem;
         leftOperandItem = tmp;
-        switch(operationType) {
+        switch (operationType) {
           case '<': operationType = '>='; break;
           case '>': operationType = '<='; break;
           case '<=': operationType = '>'; break;
@@ -89,7 +89,7 @@ export class Operations {
         this.tests.isNodes(this.props.rightOperandItem) &&
         this.props.leftOperandItem.value.length === this.props.rightOperandItem.value.length &&
         this.props.leftOperandItem.value.length === 1 && // only accept 1 node
-        nodesOps.tests.isEqual(this.props.leftOperandItem.value[0], this.props.rightOperandItem.value[0]);
+        this.nodesOps.tests.isEqual(this.props.leftOperandItem.value[0], this.props.rightOperandItem.value[0]);
     }
   };
 
@@ -105,7 +105,7 @@ export class Operations {
     types: (types: string[], shouldThrow: boolean = false) => {
       let message;
       if (!types.includes(this.props.leftOperandItem.type)) {
-        message = `Left operand is an invalid type. Was expecting ${types.join(' or ')} type but received ${this.props.leftOperandItem.type}`;
+        message = `Left operand is an invalid type.Was expecting ${types.join(' or ')} type but received ${this.props.leftOperandItem.type} `;
         shouldThrow && throwError(this.props.context, message);
       }
       if (!types.includes(this.props.rightOperandItem.type)) {
@@ -171,7 +171,7 @@ export class Operations {
           type: 'operatedValues',
           value: operand.value.map(li => {
             return {
-              operands: [{ startedFromRoot: leftStartedFromRoot, type: TYPES.nodes, value: li  }],
+              operands: [{ startedFromRoot: leftStartedFromRoot, type: TYPES.nodes, value: li }],
               value: li[KEYS.value],
               type: li[KEYS.valueType]
             }
@@ -182,7 +182,7 @@ export class Operations {
           type: 'operatedValues',
           value: [
             {
-              operands: [{startedFromRoot: false, type: operand.type, value: operand.value}],
+              operands: [{ startedFromRoot: false, type: operand.type, value: operand.value }],
               value: operand.value,
               type: operand.type
             }
@@ -193,7 +193,7 @@ export class Operations {
     },
     toOperatedValues: () => {
       this.props.leftOperandItem = this.convert._toOperatedValues(this.props.leftOperandItem);
-      this.props.rightOperandItem =this.convert._toOperatedValues(this.props.rightOperandItem);
+      this.props.rightOperandItem = this.convert._toOperatedValues(this.props.rightOperandItem);
     }
   }
 
@@ -213,7 +213,7 @@ export class Operations {
         this.keep.numberOperatedValues();
         this.convert.toOperatedValues();
         const type = 'operatedValues';
-  
+
         let operand1 = this.props.leftOperandItem;
         let operand2 = this.props.rightOperandItem;
 
@@ -240,7 +240,7 @@ export class Operations {
           });
           return r;
         }, []);
-        
+
         return {
           type: type,
           value: value
@@ -286,7 +286,7 @@ export class Operations {
             return r;
           }, []);
         }
-        
+
         return {
           type: type,
           value: value
@@ -302,7 +302,7 @@ export class Operations {
         this.keep.numberOperatedValues();
         this.convert.toOperatedValues();
         const type = 'operatedValues';
-  
+
         let operand1 = this.props.leftOperandItem;
         let operand2 = this.props.rightOperandItem;
 
@@ -329,7 +329,7 @@ export class Operations {
           });
           return r;
         }, []);
-        
+
         return {
           type: type,
           value: value
@@ -369,7 +369,7 @@ export class Operations {
             return r;
           }, []);
         }
-        
+
         return {
           type: type,
           value: value
@@ -415,7 +415,7 @@ export class Operations {
             return r;
           }, []);
         }
-        
+
         return {
           type: type,
           value: value
@@ -429,14 +429,14 @@ export class Operations {
         if (this.tests.isInvalid(this.props.rightOperandItem)) {
           return this.props.rightOperandItem;
         }
-        
+
         // TODO type = variable and
         let type = TYPES.boolean;
         let value = false;
-        
+
         if (this.tests.isPositionType(this.props.leftOperandItem) || this.tests.isPositionType(this.props.rightOperandItem)) {
           value = this.tests.position('=');
-        } else if (this.tests.areEqualNodes()) { 
+        } else if (this.tests.areEqualNodes()) {
           value = true;
         } else {
           this.convert.toOperatedValues();
@@ -446,7 +446,7 @@ export class Operations {
             });
           });
         }
-        
+
         return {
           type: type,
           value: value
@@ -460,10 +460,10 @@ export class Operations {
         if (this.tests.isInvalid(this.props.rightOperandItem)) {
           return this.props.rightOperandItem;
         }
-        
+
         let type = TYPES.boolean;
         let value = false;
-        
+
         this.keep.numberNodes();
 
         if (this.tests.isPositionType(this.props.leftOperandItem) || this.tests.isPositionType(this.props.rightOperandItem)) {
@@ -478,7 +478,7 @@ export class Operations {
             });
           });
         }
-        
+
         return {
           type: type,
           value: value
@@ -492,10 +492,10 @@ export class Operations {
         if (this.tests.isInvalid(this.props.rightOperandItem)) {
           return this.props.rightOperandItem;
         }
-        
+
         let type = TYPES.boolean;
         let value = false;
-        
+
         this.keep.numberNodes();
 
         if (this.tests.isPositionType(this.props.leftOperandItem) || this.tests.isPositionType(this.props.rightOperandItem)) {
@@ -510,7 +510,7 @@ export class Operations {
             });
           });
         }
-        
+
         return {
           type: type,
           value: value
@@ -524,10 +524,10 @@ export class Operations {
         if (this.tests.isInvalid(this.props.rightOperandItem)) {
           return this.props.rightOperandItem;
         }
-        
+
         let type = TYPES.boolean;
         let value = false;
-        
+
         this.keep.numberNodes();
 
         if (this.tests.isPositionType(this.props.leftOperandItem) || this.tests.isPositionType(this.props.rightOperandItem)) {
@@ -542,7 +542,7 @@ export class Operations {
             });
           });
         }
-        
+
         return {
           type: type,
           value: value
@@ -556,10 +556,10 @@ export class Operations {
         if (this.tests.isInvalid(this.props.rightOperandItem)) {
           return this.props.rightOperandItem;
         }
-        
+
         let type = TYPES.boolean;
         let value = false;
-        
+
         this.keep.numberNodes();
 
         if (this.tests.isPositionType(this.props.leftOperandItem) || this.tests.isPositionType(this.props.rightOperandItem)) {
@@ -574,7 +574,7 @@ export class Operations {
             });
           });
         }
-        
+
         return {
           type: type,
           value: value
@@ -588,10 +588,10 @@ export class Operations {
         if (this.tests.isInvalid(this.props.rightOperandItem)) {
           return this.props.rightOperandItem;
         }
-        
+
         const lbool = Array.isArray(this.props.leftOperandItem.value) ? !!this.props.leftOperandItem.value.length : !!this.props.leftOperandItem.value;
         const rbool = Array.isArray(this.props.rightOperandItem.value) ? !!this.props.rightOperandItem.value.length : !!this.props.rightOperandItem.value;
-        
+
         return {
           type: TYPES.boolean,
           value: lbool && rbool
@@ -608,7 +608,7 @@ export class Operations {
 
         const lbool = Array.isArray(this.props.leftOperandItem.value) ? !!this.props.leftOperandItem.value.length : !!this.props.leftOperandItem.value;
         const rbool = Array.isArray(this.props.rightOperandItem.value) ? !!this.props.rightOperandItem.value.length : !!this.props.rightOperandItem.value;
-        
+
         return {
           type: TYPES.boolean,
           value: lbool || rbool
@@ -623,7 +623,7 @@ export class Operations {
           return this.props.rightOperandItem;
         }
 
-        const invalidType = this.validate.types([ TYPES.nodes ]);
+        const invalidType = this.validate.types([TYPES.nodes]);
         if (invalidType) {
           return invalidType;
         }
@@ -647,7 +647,7 @@ export class Operations {
       },
       '-': () => {
         const leftValue = opFunc.getValueByType(this.getContext('-'), [TYPES.number], this.props.leftOperandItem);
-        const rightValue = opFunc.getValueByType(this.getContext('-'), [TYPES.number], this.props.rightOperandItem);        
+        const rightValue = opFunc.getValueByType(this.getContext('-'), [TYPES.number], this.props.rightOperandItem);
         return {
           type: TYPES.number,
           value: leftValue - rightValue
@@ -704,11 +704,11 @@ export class Operations {
     }
   };
 
-  constructor() {}
+  constructor(private nodesOps: NodesOps) { }
 
-  public run(opName, leftOperandItem: tStack, rightOperandItem: tStack, {isFilterMode}: tFilterModeOptions) {
+  public run(opName, leftOperandItem: tStack, rightOperandItem: tStack, { isFilterMode }: tFilterModeOptions) {
     this.props.set({ leftOperandItem, rightOperandItem, context: opName });
-    const mode = isFilterMode ? 'filterMode': 'default';
+    const mode = isFilterMode ? 'filterMode' : 'default';
 
     if (!this.f[mode]) {
       throwError(this.getContext('run'), `No operation "${opName}" exists.`);

@@ -501,8 +501,8 @@ describe("Functions", () => {
       args.push({
         type: TYPES.nodes,
         value: [
-          [2, 1, 1, "_", "a", "{$o}", "object", {childrenIds: [3], descendantIds: [3, 4], ancestorIds: [1], parentId: 1}],
-          [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], descendantIds: [4], ancestorIds: [1, 2], parentId: 2}],
+          [2, 1, 1, "_", "a", "{$o}", "object", {childrenIds: [3], parentId: 1}],
+          [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], parentId: 2}],
         ]
       });
       expect(functionInstance.run('local-name', args)).toEqual({
@@ -515,7 +515,7 @@ describe("Functions", () => {
       args.push({
         type: TYPES.nodes,
         value: [
-          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2, 3], descendantIds: [2, 3], parentId: null}]
+          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2, 3], parentId: null}]
         ]
       });
       expect(functionInstance.run('local-name', args)).toEqual({
@@ -526,7 +526,7 @@ describe("Functions", () => {
 
     it('When there is no argument and a context proprieties node exists, should return the context node name', () => {
       functionInstance.preRun({
-        current: [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], descendantIds: [4], ancestorIds: [1, 2], parentId: 2}]
+        current: [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], parentId: 2}]
       });
       expect(functionInstance.run('local-name', args)).toEqual({
         type: TYPES.string,
@@ -556,8 +556,8 @@ describe("Functions", () => {
       args.push({
         type: TYPES.nodes,
         value: [
-          [2, 1, 1, "_", "a", "{$o}", "object", {childrenIds: [3], descendantIds: [3, 4], ancestorIds: [1], parentId: 1}],
-          [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], descendantIds: [4], ancestorIds: [1, 2], parentId: 2}],
+          [2, 1, 1, "_", "a", "{$o}", "object", {childrenIds: [3], parentId: 1}],
+          [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], parentId: 2}],
         ]
       });
       expect(functionInstance.run('name', args)).toEqual({
@@ -570,7 +570,7 @@ describe("Functions", () => {
       args.push({
         type: TYPES.nodes,
         value: [
-          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2, 3], descendantIds: [2, 3], parentId: null}]
+          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2, 3], parentId: null}]
         ]
       });
       expect(functionInstance.run('name', args)).toEqual({
@@ -581,7 +581,7 @@ describe("Functions", () => {
 
     it('When there is no argument and a context proprieties node exists, should return the context node name', () => {
       functionInstance.preRun({
-        current: [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], descendantIds: [4], ancestorIds: [1, 2], parentId: 2}]
+        current: [3, 2, 2, "_", "b", "{$o}", "object", {childrenIds: [4], parentId: 2}]
       });
       expect(functionInstance.run('name', args)).toEqual({
         type: TYPES.string,
@@ -608,7 +608,7 @@ describe("Functions", () => {
       args.push({
         type: TYPES.nodes,
         value: [
-          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2, 3], descendantIds: [2, 3], parentId: null}]
+          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2, 3], parentId: null}]
         ]
       });
       expect(functionInstance.run('not', args)).toEqual({

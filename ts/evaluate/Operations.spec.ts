@@ -1,23 +1,28 @@
 import { TYPES } from "../consts";
 import { Nodes } from "../nodes/Nodes";
 import { NodesState } from "../nodes/State";
+import { NodesOps } from "../Util";
 import { Operations } from "./Operations";
 
 describe('Class Operations', () => {
-  let 
+  let
     operationsInstance,
     nodesInstance,
-    leftOperandItem, 
-    rightOperandItem, 
+    leftOperandItem,
+    rightOperandItem,
     operation,
     numberNode1,
     numberNode2,
-    stringNode;
+    stringNode,
+    nodesState,
+    nodesOps;
 
   beforeEach(() => {
-    numberNode1 = [5, 2, 2, 2, "b", 2, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}];
-    numberNode2 = [4, 3, 3, "_", "value", 3, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2, 3], parentId: 3}];
-    stringNode = [2, 1, 1, "_", "a", "a", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1], parentId: 1}];
+    nodesState = new NodesState();
+    nodesOps = new NodesOps(nodesState);
+    numberNode1 = [5, 2, 2, 2, "b", 2, "number", { childrenIds: [], parentId: 2 }];
+    numberNode2 = [4, 3, 3, "_", "value", 3, "number", { childrenIds: [], parentId: 3 }];
+    stringNode = [2, 1, 1, "_", "a", "a", "string", { childrenIds: [], parentId: 1 }];
   });
 
   describe('', () => {
@@ -34,7 +39,7 @@ describe('Class Operations', () => {
 
     describe('+', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '+';
       });
 
@@ -42,7 +47,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -71,12 +76,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -144,10 +149,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
+
     describe('-', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '-';
       });
 
@@ -155,7 +160,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -184,12 +189,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-  
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -257,10 +262,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
+
     describe('*', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '*';
       });
 
@@ -268,7 +273,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -297,12 +302,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -370,10 +375,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
+
     describe('div', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = 'div';
       });
 
@@ -381,7 +386,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -396,7 +401,7 @@ describe('Class Operations', () => {
           type: TYPES.operatedValues,
           value: [{
             type: TYPES.number,
-            value: 2/3,
+            value: 2 / 3,
             operands: [
               {
                 startedFromRoot: false,
@@ -410,12 +415,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -427,7 +432,7 @@ describe('Class Operations', () => {
           type: TYPES.operatedValues,
           value: [{
             type: TYPES.number,
-            value: 2/3.1,
+            value: 2 / 3.1,
             operands: [
               {
                 startedFromRoot: false,
@@ -474,11 +479,11 @@ describe('Class Operations', () => {
         });
       });
     });
-  
-  
+
+
     xdescribe('mod', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = 'mod';
       });
 
@@ -486,7 +491,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -515,12 +520,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -591,7 +596,7 @@ describe('Class Operations', () => {
 
     describe('=', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '=';
       });
 
@@ -609,7 +614,7 @@ describe('Class Operations', () => {
           value: true
         });
       });
-      
+
       it('right is a position type with value not matching the left number value', () => {
         leftOperandItem = {
           type: TYPES.number,
@@ -776,14 +781,14 @@ describe('Class Operations', () => {
           }]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
-          type: TYPES.boolean, 
+          type: TYPES.boolean,
           value: true
         });
       });
 
       it('left and right are nodes types both have same value, it should return true', () => {
-        NodesState.getInstance().reset();
-        nodesInstance = new Nodes();
+        nodesState.reset();
+        nodesInstance = new Nodes(nodesState);
         const callerId = 'main';
         const json = {
           a: {
@@ -797,13 +802,13 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [ 2, 1, 1, "_", "a", "{$o}", "object", { "ancestorIds": [ 1 ], "childrenIds": [ 3 ], "descendantIds": [ 3 ], "parentId": 1 } ]
+            [2, 1, 1, "_", "a", "{$o}", "object", { "childrenIds": [3], "parentId": 1 }]
           ]
         };
         rightOperandItem = {
           type: TYPES.nodes,
           value: [
-            [ 4, 1, 1, "_", "b", "{$o}", "object", { "ancestorIds": [ 1 ], "childrenIds": [ 5 ], "descendantIds": [ 5 ], "parentId": 1 } ]
+            [4, 1, 1, "_", "b", "{$o}", "object", { "childrenIds": [5], "parentId": 1 }]
           ]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
@@ -813,18 +818,18 @@ describe('Class Operations', () => {
       });
 
       it('left and right are nodes array types both have same value, it should return true', () => {
-        NodesState.getInstance().reset();
-        nodesInstance = new Nodes();
+        nodesState.reset();
+        nodesInstance = new Nodes(nodesState);
         const callerId = 'main';
         const json = {
           a: [
             1,
-            {k: "l"},
+            { k: "l" },
             false
           ],
           b: [
             1,
-            {k: "l"},
+            { k: "l" },
             false
           ]
         };
@@ -832,13 +837,13 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [ 2, 1, 1, "_", "a", "{$a}", "array", { "ancestorIds": [ 1 ], "childrenIds": [ 3, 4, 6 ], "descendantIds": [ 3, 4, 6, 5 ], "parentId": 1, "siblings": [ 7 ], } ]
+            [2, 1, 1, "_", "a", "{$a}", "array", { "childrenIds": [3, 4, 6], "parentId": 1, }]
           ]
         };
         rightOperandItem = {
           type: TYPES.nodes,
           value: [
-            [ 7, 1, 1, "_", "b", "{$a}", "array", { "ancestorIds": [ 1 ], "childrenIds": [ 8, 9, 11 ], "descendantIds": [ 8, 9, 11, 10 ], "parentId": 1, "siblings": [ 2 ] } ]
+            [7, 1, 1, "_", "b", "{$a}", "array", { "childrenIds": [8, 9, 11], "parentId": 1 }]
           ]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
@@ -848,28 +853,28 @@ describe('Class Operations', () => {
       });
 
       it('left and right are nodes types but have different value, it should return false', () => {
-        NodesState.getInstance().reset();
-        nodesInstance = new Nodes();
+        nodesState.reset();
+        nodesInstance = new Nodes(nodesState);
         const callerId = 'main';
         const json = {
           a: {
             c: 'value'
           },
           b: [
-            {c: 'value'}
+            { c: 'value' }
           ]
         };
         nodesInstance.jsonToNodes(json, callerId);
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [ 2, 1, 1, "_", "a", "{$o}", "object", { "ancestorIds": [ 1 ], "childrenIds": [ 3 ], "descendantIds": [ 3 ], "parentId": 1, } ]
+            [2, 1, 1, "_", "a", "{$o}", "object", { "childrenIds": [3], "parentId": 1, }]
           ]
         };
         rightOperandItem = {
           type: TYPES.nodes,
           value: [
-            [ 4, 1, 1, "_", "b", "{$a}", "array", { "ancestorIds": [ 1 ], "childrenIds": [ 5 ], "descendantIds": [ 5 ], "parentId": 1 } ]
+            [4, 1, 1, "_", "b", "{$a}", "array", { "childrenIds": [5], "parentId": 1 }]
           ]
         };
 
@@ -879,11 +884,11 @@ describe('Class Operations', () => {
           value: false
         });
       });
-    }); 
+    });
 
     describe('>', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '>';
       });
 
@@ -901,7 +906,7 @@ describe('Class Operations', () => {
           value: false
         });
       });
-      
+
       it('right is a position type with value not matching the left number value', () => {
         leftOperandItem = {
           type: TYPES.number,
@@ -920,11 +925,11 @@ describe('Class Operations', () => {
       it('left and right are number nodes left have a higher value, it should return true', () => {
         leftOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode2 ]
+          value: [numberNode2]
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode1 ]
+          value: [numberNode1]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -935,11 +940,11 @@ describe('Class Operations', () => {
       it('left and right are number nodes have the same value, it should return false', () => {
         leftOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode2 ]
+          value: [numberNode2]
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode2 ]
+          value: [numberNode2]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -950,11 +955,11 @@ describe('Class Operations', () => {
       it('left and right are number nodes left have a lower value, it should return false', () => {
         leftOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode1 ]
+          value: [numberNode1]
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode2 ]
+          value: [numberNode2]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -965,11 +970,11 @@ describe('Class Operations', () => {
       it('left or right have only string nodes, it should return false', () => {
         leftOperandItem = {
           type: TYPES.nodes,
-          value: [ stringNode ]
+          value: [stringNode]
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ stringNode ]
+          value: [stringNode]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -995,12 +1000,12 @@ describe('Class Operations', () => {
 
     describe('<', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '<';
       });
 
       it('left and right number nodes, ', () => {
-        
+
       });
     });
 
@@ -1014,7 +1019,7 @@ describe('Class Operations', () => {
 
     describe('and', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = 'and';
       });
 
@@ -1051,11 +1056,11 @@ describe('Class Operations', () => {
       it('left and right are nodes types both are not empty, it should return true', () => {
         leftOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode1 ]
+          value: [numberNode1]
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ stringNode ]
+          value: [stringNode]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -1070,7 +1075,7 @@ describe('Class Operations', () => {
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode1 ]
+          value: [numberNode1]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -1081,7 +1086,7 @@ describe('Class Operations', () => {
 
     describe('or', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = 'or';
       });
 
@@ -1118,11 +1123,11 @@ describe('Class Operations', () => {
       it('left and right are nodes types both are not empty, it should return true', () => {
         leftOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode1 ]
+          value: [numberNode1]
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ stringNode ]
+          value: [stringNode]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -1137,7 +1142,7 @@ describe('Class Operations', () => {
         };
         rightOperandItem = {
           type: TYPES.nodes,
-          value: [ numberNode1 ]
+          value: [numberNode1]
         };
         expect(operationsInstance.run(operation, leftOperandItem, rightOperandItem, filterOptions)).toEqual({
           type: TYPES.boolean,
@@ -1184,7 +1189,7 @@ describe('Class Operations', () => {
 
     describe('+', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '+';
       });
 
@@ -1192,7 +1197,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1221,12 +1226,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1294,10 +1299,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
+
     describe('-', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '-';
       });
 
@@ -1305,7 +1310,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1334,12 +1339,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-  
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1407,10 +1412,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
+
     describe('*', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = '*';
       });
 
@@ -1418,7 +1423,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1447,12 +1452,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1520,10 +1525,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
+
     describe('div', () => {
       beforeEach(() => {
-        operationsInstance = new Operations();
+        operationsInstance = new Operations(nodesOps);
         operation = 'div';
       });
 
@@ -1531,7 +1536,7 @@ describe('Class Operations', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1546,7 +1551,7 @@ describe('Class Operations', () => {
           type: TYPES.operatedValues,
           value: [{
             type: TYPES.number,
-            value: 2/3,
+            value: 2 / 3,
             operands: [
               {
                 startedFromRoot: false,
@@ -1560,12 +1565,12 @@ describe('Class Operations', () => {
           }]
         });
       });
-      
+
       it('left is nodes and right is number', () => {
         leftOperandItem = {
           type: TYPES.nodes,
           value: [
-            [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
+            [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
             numberNode1
           ]
         };
@@ -1577,7 +1582,7 @@ describe('Class Operations', () => {
           type: TYPES.operatedValues,
           value: [{
             type: TYPES.number,
-            value: 2/3.1,
+            value: 2 / 3.1,
             operands: [
               {
                 startedFromRoot: false,
@@ -1624,10 +1629,10 @@ describe('Class Operations', () => {
         });
       });
     });
-  
-  
+
+
     describe('mod', () => {
-  
+
     });
 
     describe('=', () => {

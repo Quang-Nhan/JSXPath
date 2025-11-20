@@ -5,7 +5,7 @@ describe('NodeState', () => {
 
   describe('State', () => {
     beforeEach(() => {
-      nodeStateInstance = NodesState.getInstance();
+      nodeStateInstance = new NodesState();
     });
 
     describe('setCaller()', () => {
@@ -23,7 +23,7 @@ describe('NodeState', () => {
       let node;
       beforeEach(() => {
         nodeStateInstance.reset()
-        node = [1, 0, "_", "_", "{$r}", "{$o}", "object", {childrenIds: [2], descendantIds: [2], parentId: null}];
+        node = [1, 0, "_", "_", "{$r}", "{$o}", "object", { childrenIds: [2], parentId: null }];
       });
 
       it('When caller is not set, it should throw an error', () => {
@@ -45,7 +45,7 @@ describe('NodeState', () => {
         nodeStateInstance.reset();
         mainCaller = 'main';
         nodeStateInstance.setCaller(mainCaller);
-        node = [1, 0, "_", "_", "{$r}", "{$o}", "object", {childrenIds: [2], descendantIds: [2], parentId: null}];
+        node = [1, 0, "_", "_", "{$r}", "{$o}", "object", { childrenIds: [2], parentId: null }];
       });
 
       it('When unknown caller argument is provided, it should return an empty array', () => {
@@ -74,11 +74,11 @@ describe('NodeState', () => {
         nodeStateInstance.reset();
         nodeStateInstance.setCaller('main');
         [
-          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2], descendantIds: [2, 3, 4, 5], parentId: null}],
-          [2, 1, 1, 0, "a", "{$a}", "array", {childrenIds: [3, 4, 5], descendantIds: [3, 4, 5], ancestorIds: [1], parentId: 1}],
-          [3, 2, "_", 0, "{$v}", 1, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
-          [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
-          [5, 2, 2, 2, "b", 2, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}]
+          [1, 0, "_", "_", "{$r}", "{$a}", "array", { childrenIds: [2], parentId: null }],
+          [2, 1, 1, 0, "a", "{$a}", "array", { childrenIds: [3, 4, 5], parentId: 1 }],
+          [3, 2, "_", 0, "{$v}", 1, "number", { childrenIds: [], parentId: 2 }],
+          [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
+          [5, 2, 2, 2, "b", 2, "number", { childrenIds: [], parentId: 2 }]
         ].forEach(node => {
           nodeStateInstance.addNode(node);
         });
@@ -86,14 +86,14 @@ describe('NodeState', () => {
 
       it('Should return all the requested ids', () => {
         expect(nodeStateInstance.getNodesByIds([1, 2])).toEqual([
-          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2], descendantIds: [2, 3, 4, 5], parentId: null}],
-          [2, 1, 1, 0, "a", "{$a}", "array", {childrenIds: [3, 4, 5], descendantIds: [3, 4, 5], ancestorIds: [1], parentId: 1}]
+          [1, 0, "_", "_", "{$r}", "{$a}", "array", { childrenIds: [2], parentId: null }],
+          [2, 1, 1, 0, "a", "{$a}", "array", { childrenIds: [3, 4, 5], parentId: 1 }]
         ]);
       });
 
       it('When the id list contains an invalid id, it should not return those ids', () => {
         expect(nodeStateInstance.getNodesByIds([5, 6, 7])).toEqual([
-          [5, 2, 2, 2, "b", 2, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}]
+          [5, 2, 2, 2, "b", 2, "number", { childrenIds: [], parentId: 2 }]
         ]);
       });
     });
@@ -103,11 +103,11 @@ describe('NodeState', () => {
         nodeStateInstance.reset();
         nodeStateInstance.setCaller('main');
         [
-          [1, 0, "_", "_", "{$r}", "{$a}", "array", {childrenIds: [2], descendantIds: [2, 3, 4, 5], parentId: null}],
-          [2, 1, 1, 0, "a", "{$a}", "array", {childrenIds: [3, 4, 5], descendantIds: [3, 4, 5], ancestorIds: [1], parentId: 1}],
-          [3, 2, "_", 0, "{$v}", 1, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
-          [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}],
-          [5, 2, 2, 2, "b", 2, "number", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}]
+          [1, 0, "_", "_", "{$r}", "{$a}", "array", { childrenIds: [2], parentId: null }],
+          [2, 1, 1, 0, "a", "{$a}", "array", { childrenIds: [3, 4, 5], parentId: 1 }],
+          [3, 2, "_", 0, "{$v}", 1, "number", { childrenIds: [], parentId: 2 }],
+          [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }],
+          [5, 2, 2, 2, "b", 2, "number", { childrenIds: [], parentId: 2 }]
         ].forEach(node => {
           nodeStateInstance.addNode(node);
         });
@@ -119,7 +119,7 @@ describe('NodeState', () => {
 
       it('Should return a node with the right id', () => {
         expect(nodeStateInstance.getNodeById(4)).toEqual(
-          [4, 2, "_", 1, "{$v}", "string", "string", {childrenIds: [], descendantIds: [], ancestorIds: [1, 2], parentId: 2}]
+          [4, 2, "_", 1, "{$v}", "string", "string", { childrenIds: [], parentId: 2 }]
         );
       });
     });
@@ -132,7 +132,7 @@ describe('NodeState', () => {
       it('When called, the state id should increment by 1', () => {
         const currentId = nodeStateInstance.state.id;
         nodeStateInstance.incrementId();
-        expect(nodeStateInstance.state.id).toBe(currentId+1);
+        expect(nodeStateInstance.state.id).toBe(currentId + 1);
       });
     });
 
@@ -144,7 +144,7 @@ describe('NodeState', () => {
       it('When called, the state group should increment by 1', () => {
         const currentId = nodeStateInstance.state.group;
         nodeStateInstance.incrementGroup();
-        expect(nodeStateInstance.state.group).toBe(currentId+1);
+        expect(nodeStateInstance.state.group).toBe(currentId + 1);
       });
     });
 

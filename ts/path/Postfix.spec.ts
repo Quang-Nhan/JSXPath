@@ -3,11 +3,11 @@ import { Functions } from '../evaluate/Functions';
 import { Postfix } from './Postfix';
 
 describe('Class Postfix', () => {
-  let 
-    callerId, 
+  let
+    callerId,
     expected,
-    functionsInstance, 
-    path, 
+    functionsInstance,
+    path,
     postfixInstance;
 
   beforeEach(() => {
@@ -22,13 +22,13 @@ describe('Class Postfix', () => {
 
     it('path is /a', () => {
       path = '/a',
-      expect(postfixInstance.toPostfix(path)).toEqual([
-        {
-          type: TYPES.rootPath,
-          callerId,
-          value: '/a'
-        }
-      ]);
+        expect(postfixInstance.toPostfix(path)).toEqual([
+          {
+            type: TYPES.rootPath,
+            callerId,
+            value: '/a'
+          }
+        ]);
     });
 
   });
@@ -40,43 +40,43 @@ describe('Class Postfix', () => {
 
     it('path is /a[b]', () => {
       path = '/a[b]',
-      expect(postfixInstance.toPostfix(path)).toEqual([
-        {
-          type: TYPES.rootPath,
-          callerId,
-          value: '/a'
-        },
-        [
+        expect(postfixInstance.toPostfix(path)).toEqual([
           {
-            type: TYPES.path,
+            type: TYPES.rootPath,
             callerId,
-            value: './b'
-          }
-        ]
-      ]);
+            value: '/a'
+          },
+          [
+            {
+              type: TYPES.path,
+              callerId,
+              value: './b'
+            }
+          ]
+        ]);
     });
 
     it('path is /a[b]/c', () => {
       path = '/a[b]/c',
-      expect(postfixInstance.toPostfix(path)).toEqual([
-        {
-          type: TYPES.rootPath,
-          callerId,
-          value: '/a'
-        },
-        [
+        expect(postfixInstance.toPostfix(path)).toEqual([
+          {
+            type: TYPES.rootPath,
+            callerId,
+            value: '/a'
+          },
+          [
+            {
+              type: TYPES.path,
+              callerId,
+              value: './b'
+            }
+          ],
           {
             type: TYPES.path,
             callerId,
-            value: './b'
+            value: '/c'
           }
-        ],
-        {
-          type: TYPES.path,
-          callerId,
-          value: '/c'
-        }
-      ]);
+        ]);
     });
   });
 
@@ -92,7 +92,7 @@ describe('Class Postfix', () => {
           type: TYPES.rootPath,
           callerId,
           value: '/a/b'
-        },{
+        }, {
           type: TYPES.rootPath,
           callerId,
           value: '/a/c'
@@ -151,7 +151,7 @@ describe('Class Postfix', () => {
         ]
       ];
       expect(postfixInstance.toPostfix(path)).toEqual(expected);
-      
+
       path = '/a[b+/c/d=3]';
       expect(postfixInstance.toPostfix(path)).toEqual(expected);
 
@@ -525,6 +525,79 @@ describe('Class Postfix', () => {
           {
             type: TYPES.operator,
             value: '=',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.operator,
+            value: 'and',
+            callerId: 'main'
+          }
+        ]
+      ];
+      expect(postfixInstance.toPostfix(path)).toEqual(expected);
+    });
+
+    it('path is /a[sibling::b[c=1] and sibling::d="test" or sibling::e > 5]', () => {
+      const path = '/a[sibling::b[c=1] and sibling::d="test" or sibling::e > 5]';
+      expected = [
+        {
+          type: TYPES.rootPath,
+          value: '/a',
+          callerId: 'main'
+        },
+        [
+          {
+            type: TYPES.path,
+            value: './sibling::b',
+            callerId: 'main'
+          },
+          [
+            {
+              type: TYPES.path,
+              value: './c',
+              callerId: 'main'
+            },
+            {
+              type: TYPES.number,
+              value: 1
+            },
+            {
+              type: TYPES.operator,
+              value: '=',
+              callerId: 'main'
+            }
+          ],
+          {
+            type: TYPES.path,
+            value: 'sibling::d',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.string,
+            value: 'test'
+          },
+          {
+            type: TYPES.operator,
+            value: '=',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.path,
+            value: './sibling::e',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.number,
+            value: 5
+          },
+          {
+            type: TYPES.operator,
+            value: '>',
+            callerId: 'main'
+          },
+          {
+            type: TYPES.operator,
+            value: 'or',
             callerId: 'main'
           },
           {

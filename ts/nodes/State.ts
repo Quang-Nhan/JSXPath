@@ -1,10 +1,11 @@
 import { tNode, tNodesState, iState } from "../types";
 import { KEYS } from "./consts";
 
-  
-class State implements iState {
+
+export class NodesState implements iState {
   private state: tNodesState;
   private caller: string;
+
   constructor() {
     this.setState();
   };
@@ -72,7 +73,7 @@ class State implements iState {
   };
 
   public getNodeList(byId: boolean) {
-    return byId ?  this.state.nodes.byId : this.state.nodes.byCaller;
+    return byId ? this.state.nodes.byId : this.state.nodes.byCaller;
   }
 
   public reset() {
@@ -88,12 +89,3 @@ class State implements iState {
   };
 };
 
-export class NodesState {
-  static instance: State;
-  static getInstance() {
-    if (!this.instance) {
-      this.instance = new State();
-    }
-    return this.instance;
-  }
-};

@@ -1,7 +1,7 @@
 
 import { tPathWithCallBack, tRunPathsInput } from "./types";
 import { RunPath } from "./RunPath";
-export { nodesOps } from './Util'
+export { NodesOps } from './Util'
 export { KEYS } from './nodes/consts';
 export { tStack, tPathWithCallBack, tRunPathsInput, tRunPathResult, eStackTypesObject, tNode, tNodesState } from './types';
 
